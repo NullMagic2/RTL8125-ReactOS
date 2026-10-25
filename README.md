@@ -7,25 +7,17 @@ Experimental Realtek RTL8125A/B 2.5 GbE drivers and a native installer for React
 
 ## Downloads and installation
 
-Download the complete i386 ZIP from [Releases](https://github.com/NullMagic2/RTL8125-ReactOS/releases). Extract it before running `RTL8125-Setup.exe` inside a recoverable ReactOS test system as an administrator. The standalone executable also requires its matching `rtl8125.sys`, `rtl8125.inf`, and the package’s supporting files beside it.
+Download **[RTL8125B-ReactOS-Standalone-i386.zip](https://github.com/NullMagic2/RTL8125-ReactOS/releases/download/v0.1.0-alpha.2/RTL8125B-ReactOS-Standalone-i386.zip)**.
 
-Requirements:
+1. Extract the ZIP.
+2. Run **RTL8125B-Setup.exe** as administrator inside **ReactOS i386**.
+3. Restart when prompted. Setup resumes automatically at administrator sign-in.
 
-- ReactOS i386 and administrator access. Native AMD64 is not implemented.
-- An actual RTL8125 PCI device available to ReactOS. A virtual VirtIO adapter uses NetKVM instead.
-- A matching patched ReactOS NDIS build. Apply the three ordered patches in [patches/reactos](patches/reactos) and read [REACTOS_COMPATIBILITY.txt](packaging/REACTOS_COMPATIBILITY.txt). The installer requires its reviewed NDIS binary hash and verification across a real reboot.
-- Separately obtained, uncompressed Realtek firmware: RTL8125B uses `rtl8125b-2.fw`; an unidentified RTL8125 requires both A/B firmware files for preflight. Firmware is not included or downloaded. See [FIRMWARE.txt](packaging/FIRMWARE.txt).
+This single package includes the driver, firmware, approved NDIS compatibility update, license notices, and matching source. No Qemu-Lightning manager preparation, separate firmware download, or additional installer is needed.
 
-Two installer packages are provided:
+ReactOS needs access to an actual RTL8125 card to use this driver. Setup stages the driver if the card is absent. Native AMD64 is not implemented, and unknown OS compatibility baselines are rejected.
 
-| Package | Journal handling |
-| --- | --- |
-| `RTL8125B-ReactOS-Setup-i386.zip` | Requires protected machine registry journals; rejects ReactOS builds whose registry security is stubbed. |
-| `RTL8125B-ReactOS-Controlled-VM-i386.zip` | Explicit trusted test guest variant. Accepts the audited ReactOS ACL stub; journal permissions cannot be enforced. The window title says **Controlled VM**. |
-
-The controlled variant retains approved NDIS hash, payload integrity, actual reboot, and per-device checks. Use it only in an isolated trusted test guest. It does not make the driver hardware-qualified. The installer never replaces core OS files.
-
-Read [SETUP.txt](packaging/SETUP.txt) and [INSTALL.txt](packaging/INSTALL.txt) for readiness checks, recovery, and current ReactOS removal limitations. Keep a recoverable VM disk or system backup. A source-only completion percentage does not establish working hardware.
+See [SETUP.txt](packaging/SETUP.txt) for recovery details.
 
 ## Build
 
@@ -48,11 +40,11 @@ cmake -S . -B build-driver \
 cmake --build build-driver --target rtl8125_candidate_package -j2
 ```
 
-For the GUI, configure `RTL8125_INSTALLER=ON` and `RTL8125_INSTALLER_DRIVER` with the actual operational SYS path. `RTL8125_INSTALLER_TRUSTED_GUEST=ON` explicitly selects the controlled VM variant; the default is OFF. `RTL8125_INSTALLER_NDIS_HASH` pins the reviewed patched NDIS binary. Do not replace it with an unreviewed hash to bypass preflight.
+To build the single installer package, use the `rtl8125_standalone` target described in [packaging/standalone/BUILD.txt](packaging/standalone/BUILD.txt).
 
 
 ## License
 
 The driver and combined project are distributed under **GNU GPL version 2 only (`GPL-2.0-only`)**. See [LICENSE](LICENSE).
 
-This port adapts Linux v6.12 `r8169` code. Upstream notices and per-file licenses remain intact; some upstream reference files permit GPL v2 or later. Compiler runtime notices and separately obtained Realtek firmware retain their respective terms. This is a community ReactOS port, not an official Realtek driver package.
+This port adapts Linux v6.12 `r8169` code. Upstream notices and per-file licenses remain intact; some upstream reference files permit GPL v2 or later. Compiler runtime notices and Realtek firmware retain their respective terms. This is a community ReactOS port, not an official Realtek driver package.
