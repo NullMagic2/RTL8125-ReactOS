@@ -4,13 +4,6 @@ Experimental Realtek RTL8125A/B 2.5 GbE drivers and a native installer for React
 
 **These drivers are tailor-made for ReactOS and may not be fully compatible with Windows. The drivers, interfaces, and installation requirements are subject to change.**
 
-## Status
-
-The RTL8125A/B implementation is complete in source. Physical-card validation is still pending: successful RTL8125 Ethernet traffic, throughput, interrupt delivery, reset, and power recovery have not been demonstrated. Treat releases as experimental development builds.
-
-The confirmed target PCI ID is `10ec:8125`. The verified subsystem `7e27:1462`, revision `05` is identified as **RTL8125B** in the installer and Device Manager. Other variants remain RTL8125 until the driver identifies their MAC family.
-
-The ReactOS VM’s separate **VirtIO/NetKVM** connection passed DHCP, default-route selection, and a TCP/HTTP transfer bound to that virtual adapter. The patched NDIS image also passed an actual boot/reboot compatibility check. **VirtIO results do not test this RTL8125 driver, which has no VirtIO backend.**
 
 ## Downloads and installation
 
@@ -57,14 +50,6 @@ cmake --build build-driver --target rtl8125_candidate_package -j2
 
 For the GUI, configure `RTL8125_INSTALLER=ON` and `RTL8125_INSTALLER_DRIVER` with the actual operational SYS path. `RTL8125_INSTALLER_TRUSTED_GUEST=ON` explicitly selects the controlled VM variant; the default is OFF. `RTL8125_INSTALLER_NDIS_HASH` pins the reviewed patched NDIS binary. Do not replace it with an unreviewed hash to bypass preflight.
 
-## Source and validation
-
-- [Architecture](ARCHITECTURE.md) and [implementation ledger](roadmap.json).
-- [Linux source provenance and attribution](THIRD_PARTY.txt).
-- [Guest shared-network results](evidence/shared-network.json) and [actual guest output](evidence/shared-network-guest.txt).
-- [Installer and NDIS guest preparation](evidence/vm-installation.json).
-
-Release ZIPs include matching source archives, license notices, required ReactOS patches, and SHA-256 manifests. VM disks, local build caches, STYLE_GUIDE.md, and agent instruction files are excluded from publication.
 
 ## License
 
