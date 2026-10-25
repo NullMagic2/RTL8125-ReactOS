@@ -1,0 +1,76 @@
+Module: rtl8125.package.installation
+Purpose: Install, remove and recover the exact operational package in an isolated guest.
+Created: 2026-10-24
+Architecture: Device Manager performs real Net-class PCI PnP binding; no host installer.
+
+For the native graphical installer, open RTL8125-Setup.exe and follow SETUP.txt.
+It verifies the reviewed patched image across a reboot, identifies the confirmed
+card as RTL8125B and changes only the selected adapter. The manual procedure
+below remains available for controlled validation and offline recovery.
+
+Scope and prerequisites
+  This is an experimental ReactOS i386 NDIS 5.1 driver, not a qualified Windows
+  driver. It may write device registers and initiate DMA. Installation, sustained
+  traffic, reboot, disable/enable, unload and physical correctness remain separate
+  validation tasks. No catalog, Authenticode signature or WHQL certification is
+  supplied. Do not substitute the separately named read-only probe binary.
+
+  Use an owned guest disk overlay and an unchanged read-only base. Record guest
+  build identity, source/SYS/package hashes and the exact assigned PCI device.
+  Keep serial debug output to a new host file. Preserve a boot entry and recovery
+  media that can access the guest disk while the guest is stopped. Follow the
+  ReactOS wrapper compatibility requirements in REACTOS_COMPATIBILITY.txt before
+  installing: a stock affected wrapper is not a supported operational target.
+
+  Assign a dedicated RTL8125 endpoint exclusively to the guest. Preserve host
+  networking. A VirtIO/E1000 guest adapter with shared-host NAT supplies a control
+  connection but cannot exercise this RTL8125 miniport. This package performs no
+  VFIO binding, host NIC detach, PCI reset, guest launch or automatic installation.
+
+Firmware
+  Follow FIRMWARE.txt. The loader requires the uncompressed selected firmware in
+  %SystemRoot%\system32\drivers\rtl_nic before the adapter starts. The driver
+  package contains no firmware blob. Missing or malformed firmware fails start.
+
+Install
+  1. Shut down the guest and create a recoverable overlay/snapshot before changes.
+     Boot the owned guest with serial debugging and the compatibility fix active.
+  2. In Device Manager inspect the intended adapter's hardware IDs. Require
+     PCI\VEN_10EC&DEV_8125. The driver further rejects unknown RTL8125 MAC/XID
+     variants; the PCI ID alone does not promise support for every revision.
+  3. Select Update Driver for only that adapter and select rtl8125.inf from this
+     package. It creates the demand-start Rtl8125 service and copies rtl8125.sys
+     to %SystemRoot%\system32\drivers. Do not install via a generic SCM start:
+     a service alone lacks the PCI PnP resources and NDIS configuration context.
+  4. Preserve installation and serial logs. Record actual MAC/XID, firmware,
+     BARs, DMA addresses and IRQ mode. Verify that startup succeeds before any
+     traffic claims; measured link down is a valid state with no connected peer.
+  5. Test peer traffic, disable/enable and reboot while capturing separate logs.
+     Do not use text replay or ABI fixtures as evidence of device networking.
+
+Remove
+  1. Stop traffic and disable the exact RTL8125 adapter in Device Manager. Wait
+     for completion. Uninstall that adapter; reboot the guest if requested.
+  2. Keep the package and logs for recovery. If the guest retained the Rtl8125
+     service after device removal, inspect it with sc qc Rtl8125; delete only
+     that exact orphaned service with sc delete Rtl8125 after all adapters using
+     it are removed. Never delete NDIS, TCP/IP or another network service.
+  3. After a clean shutdown and removal, remove only this package's unused
+     %SystemRoot%\system32\drivers\rtl8125.sys if desired. Firmware can be shared
+     by other installations; retain it unless ownership is established.
+     Preserve any previous adapter driver/package for reinstallation.
+
+Recovery from a hang or failed boot
+  Stop the owned guest. Restore/recreate its disposable overlay from the saved
+  base instead of modifying the base. If preserving the failed disk for analysis,
+  keep it stopped and use separate recovery media or a copied overlay. Disable
+  only Rtl8125 in the offline SYSTEM hive (Start=4), or rename only rtl8125.sys
+  before the next boot, then uninstall/rebind the exact device normally. Record
+  the operation and retain crash/serial logs. Never remove live DMA mappings by
+  manipulating a running guest disk or pass through the host's active NIC.
+
+Corresponding source
+  source.tar.gz contains the complete corresponding C++ source, build inputs,
+  compatibility patch, unchanged Linux references, LICENSE and THIRD_PARTY.txt.
+  BUILD.txt records the compiler/architecture commands. SHA256SUMS.txt covers
+  the staged package files; BUILD_INFO.txt identifies the binary configuration.

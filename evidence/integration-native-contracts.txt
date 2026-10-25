@@ -1,0 +1,5 @@
+Native SDK miniport contract checks: 199 passed, 0 failed
+RTL8125 real-SDK resource contracts: 131 checks, 0 failures
+RTL8125 real-SDK DMA/firmware contracts: 2149 checks, 0 failures
+RTL8125 complete hardware models: 32 checks, 0 failures
+1088 genuine-SDK datapath mock checks, 0 failures

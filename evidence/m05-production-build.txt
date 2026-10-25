@@ -1,0 +1,14 @@
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/m05-native
+[ 14%] Generating native/src_reactos_miniport.cpp.obj
+[ 28%] Generating native/rtl8125.sys
+[100%] Built target rtl8125_native_driver
+[ 12%] Generating native/miniport_contract_tests.exe
+[100%] Built target rtl8125_native_contract_tests
+[ 10%] Generating hardware-native/src_hardware_device.cpp.obj
+[ 10%] Generating datapath-native/datapath_contract_tests.exe
+[100%] Built target rtl8125_native_datapath_contract_tests
+[ 12%] Generating native/guest_production_entry.obj, native/guest_kernel.obj
+[ 25%] Generating native/rtl8125_m01_guest.sys
+[100%] Built target rtl8125_guest_fixture

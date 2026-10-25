@@ -1,0 +1,2 @@
+# Preserve upstream provenance hashes and the exact INF bytes pinned by setup.
+* -text

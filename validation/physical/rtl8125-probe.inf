@@ -1,0 +1,53 @@
+; Module: rtl8125.validation.physical_pnp
+; Purpose: Associate only PCI 10EC:8125 with the read-only NDIS probe for validation.
+; Created: 2026-10-24
+; Architecture: Probe-only test media; Initialize intentionally returns NOT_SUPPORTED.
+[Version]
+Signature="$Windows NT$"
+Class=Net
+ClassGUID={4D36E972-E325-11CE-BFC1-08002BE10318}
+Provider=%Provider%
+DriverVer=10/24/2026,0.0.1.0
+
+[SourceDisksNames]
+1="RTL8125 read-only probe validation media",,,
+
+[SourceDisksFiles]
+rtl8125-probe-i386.sys=1
+
+[DestinationDirs]
+DefaultDestDir=12
+
+[Manufacturer]
+%Provider%=Devices
+
+[Devices]
+%Device%=Probe_Install.ndi,PCI\VEN_10EC&DEV_8125
+
+[Probe_Install.ndi.NT]
+Characteristics=0x4
+BusType=5
+AddReg=Probe_Ndi
+CopyFiles=Probe_Files
+
+[Probe_Files]
+rtl8125-probe-i386.sys
+
+[Probe_Ndi]
+HKR,Ndi,Service,0,"Rtl8125Probe"
+HKR,Ndi\Interfaces,UpperRange,0,"ndis5"
+HKR,Ndi\Interfaces,LowerRange,0,"ethernet"
+
+[Probe_Install.ndi.NT.Services]
+AddService=Rtl8125Probe,0x00000002,Probe_Service
+
+[Probe_Service]
+ServiceType=1
+StartType=3
+ErrorControl=0
+ServiceBinary=%12%\rtl8125-probe-i386.sys
+LoadOrderGroup=NDIS
+
+[Strings]
+Provider="RTL8125 ReactOS development"
+Device="RTL8125 read-only resource probe (networking incomplete)"

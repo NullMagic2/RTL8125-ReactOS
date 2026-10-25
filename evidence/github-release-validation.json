@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-25",
+  "release": "v0.1.0-alpha.1",
+  "license": "GPL-2.0-only",
+  "upstream_notices_preserved": true,
+  "excluded_case_insensitive_basenames": [
+    "style_guide.md",
+    "agents.md",
+    "agents.txt"
+  ],
+  "portable_suites_passed": 10,
+  "asan_ubsan": true,
+  "leak_sanitizer": "Disabled because the sandbox runs under ptrace; ASan and UBSan remained enabled",
+  "default_wine_isolation_checks": 11,
+  "controlled_wine_isolation_checks": 11,
+  "package_manifest_files_verified_each": 21,
+  "nested_source_archive_exclusions_verified": true,
+  "retained_upstream_hashes_verified": true,
+  "driver_sha256": "6b3797171995598e999e10960ecd57cc24145b7c43dd1826a3edb1ca719ec158",
+  "default_exe_sha256": "2660a7fc5c459ff96b1dd84b5fa7c9f2981e008be843ac0b7c8e6c9da55ae5ce",
+  "controlled_exe_sha256": "c535f928f3fd82d1df8ac1676cb52ac39953deeb5d001362733c625282cd6c64",
+  "scope": "Experimental i386 source/packaging release; RTL8125 physical-card traffic and hardware qualification remain pending. Prior guest VirtIO results apply to separate NetKVM."
+}

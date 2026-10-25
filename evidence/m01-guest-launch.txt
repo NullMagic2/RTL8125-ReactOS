@@ -1,0 +1,53 @@
+Module: rtl8125.evidence.m01_guest_launch
+Purpose: Reproduce the isolated genuine ReactOS kernel lifecycle fixture.
+Created: 2026-10-24 America/Sao_Paulo
+Architecture: Test-only kernel control scaffold; never a networking package.
+
+Build:
+cmake -S . -B Binaries/.build/m01-native -DRTL8125_TESTS=OFF -DRTL8125_NATIVE_DRIVER=ON -DRTL8125_GUEST_FIXTURE=ON -DRTL8125_REACTOS_SOURCE=/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/src -DRTL8125_REACTOS_BUILD=/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release
+cmake --build Binaries/.build/m01-native --target rtl8125_guest_fixture
+
+ISO staging directory contains the built rtl8125_m01_guest.sys and the built
+miniport_guest_runner.exe, also copied as m01.exe for a short Run command.
+xorriso -as mkisofs -quiet -J -r -V RTL8125_V5 -o Binaries/.build/m01-guest/validation-v5.iso Binaries/.build/m01-guest/media
+
+Read-only standalone backing image:
+/home/x/Documents/Codex/2026-10-21/he/work/gdi-stack-safe-snapshot.qcow2
+No backing chain; SHA-256 and final fixture inputs: m01-guest-hashes.txt.
+
+Owned overlay (created exactly once before this launch):
+qemu-img create -f qcow2 -F qcow2 -b /home/x/Documents/Codex/2026-10-21/he/work/gdi-stack-safe-snapshot.qcow2 Binaries/.build/m01-guest/reactos-validation-v5.qcow2
+
+Exact launch from the project directory:
+qemu-system-i386 -name RTL8125-M01-isolated-validation-v5 -machine pc -accel kvm -accel tcg -cpu qemu32 -m 512 -smp 1 -drive file=Binaries/.build/m01-guest/reactos-validation-v5.qcow2,format=qcow2,if=ide -drive file=Binaries/.build/m01-guest/validation-v5.iso,if=ide,index=2,media=cdrom,readonly=on -boot order=c -vga std -nic none -display none -serial file:Binaries/.build/m01-guest/kernel-v5.log -serial file:Binaries/.build/m01-guest/com2-v5.log -monitor unix:Binaries/.build/m01-guest/monitor-v5.sock,server=on,wait=off -qmp unix:Binaries/.build/m01-guest/qmp-v5.sock,server=on,wait=off -no-reboot
+
+QEMU 10.2.1. KVM is used when available, otherwise TCG. All guest disk writes go
+to the project-owned overlay. No host NIC, USB device, physical PCI device,
+network backend or passthrough is attached. QMP keyboard opened Run and entered
+d:\m01.exe. Final media is attached read-only before boot, never changed during
+the validation. Guest kernel advertises ReactOS 0.4.16-x86, Build
+20261021-unknown-revision, Commit unknown-hash; snapshot hash identifies it.
+
+The guest kernel fixture compiles the production miniport.cpp with DriverEntry
+renamed only to rtl8125_production_entry, and links the production resources,
+chip and OID objects against real NDIS/HAL/kernel imports. Its own DriverEntry
+calls the real production entry and checks the actual installed unload handler.
+Initialization rejection cases call production callbacks directly. Adapter/Halt
+tests construct labelled empty state using actual NdisAllocateMemoryWithTag;
+they do not represent a successfully initialized hardware adapter.
+
+ReactOS IopInitializeDriverModule clears DRVO_LEGACY_DRIVER for a driver which
+creates no device objects. IopUnloadDriver then rejects SCM stop for such a PnP
+driver with the misleading combined-condition message "No DriverUnload" even
+when an unload callback exists. The guest-only harness creates an anonymous
+control device, then its unload scaffold deletes that device and invokes the
+actual production rtl8125_unload. This permits two isolated SCM start/stop cycles
+and proves wrapper retirement. The production driver creates no such device and
+its PnP unload behavior is unchanged. Initial failure transcripts are retained;
+no claim of operational PnP NIC removal or networking follows from this fixture.
+
+The runner copies only the guest fixture to its unique RTL8125M01Guest service,
+reports through OutputDebugString and a guest text file, performs two start/stop
+cycles and deletes the fixture service. COM2 is supplementary and may remain
+empty if that serial port is not active in the snapshot. The authoritative
+kernel serial log includes the runner's OutputDebugString reports.

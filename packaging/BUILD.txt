@@ -1,0 +1,61 @@
+Module: rtl8125.package.build_instructions
+Purpose: Reproduce source-specific native builds with explicit compiler and architecture.
+Created: 2026-10-24
+Architecture: Standalone GCC uses matching SDK inputs; ReactOS owns native MSVC libs.
+
+Verified route: GCC 13 i686-w64-mingw32
+  Use a matching ReactOS i386 source and completed build. Generated headers and
+  import libraries must come from that same source/build. Read the required NDIS
+  compatibility patch in REACTOS_COMPATIBILITY.txt before operational guest use.
+  Set ROS_SOURCE and ROS_BUILD below to those absolute paths and DRIVER_SOURCE
+  to the extracted corresponding source. Build only in a new owned directory.
+
+  cmake -S "$DRIVER_SOURCE" -B build-operational \
+    -DRTL8125_TESTS=OFF -DRTL8125_NATIVE_DRIVER=ON \
+    -DRTL8125_NATIVE_ARCH=i386 \
+    -DRTL8125_NATIVE_CXX=/usr/bin/i686-w64-mingw32-g++ \
+    -DRTL8125_REACTOS_SOURCE="$ROS_SOURCE" \
+    -DRTL8125_REACTOS_BUILD="$ROS_BUILD" \
+    -DRTL8125_OPERATIONAL=ON -DRTL8125_REACTOS_WRAPPER_PATCHED=ON
+  cmake --build build-operational --target rtl8125_candidate_package -j2
+
+  The explicit acknowledgment is not automatic verification of the guest's NDIS
+  binary. Apply/build/deploy the compatibility patch in the OWNED guest OS build
+  and record that NDIS hash separately. The package builder never changes the
+  external SDK, installed OS, host PCI bindings or firmware. Operational output
+  is native/operational/rtl8125.sys; staged package lives beneath package/.
+  Its source.tar.gz includes all corresponding C++/CMake inputs and GPL license.
+
+Read-only probe route
+  Use a separate build directory, the same SDK and native options, and leave
+  RTL8125_OPERATIONAL=OFF (default). Build target rtl8125_native_driver. Its
+  native/rtl8125.sys intentionally fails adapter initialization after read-only
+  probing. It is installed only using validation/physical/rtl8125-probe.inf and
+  the separately named rtl8125-probe-i386.sys. No operational package target is
+  defined for that configuration. Guest lifecycle fixtures remain probe-mode
+  builds even when an operational SYS is requested.
+
+Actual ReactOS build route: GCC or MSVC 2022
+  Work in a separate owned ReactOS checkout and build tree. Apply the required
+  compatibility patch there. Add this line to that checkout's root CMakeLists:
+    add_subdirectory("ABSOLUTE_DRIVER_SOURCE/packaging/reactos" rtl8125-external)
+  Supply -DRTL8125_OPERATIONAL=ON -DRTL8125_REACTOS_WRAPPER_PATCHED=ON and ARCH=i386
+  when configuring the real ReactOS tree with its own toolchain. This adapter
+  calls real set_module_type(kernelmodedriver) and add_importlibs(ndis ntoskrnl
+  hal); it never substitutes GCC .a files for MSVC .lib files.
+
+  GCC: use ReactOS toolchain-gcc.cmake and the matching i386 RosBE/GCC tools.
+  MSVC: open an x86 Native Tools prompt for Visual Studio 2022, configure the
+  ReactOS source using its toolchain-msvc.cmake, -DARCH=i386 and the two explicit
+  options above; build the rtl8125 target using that tree's normal build system.
+  The package adapter requests C++17, disables RTTI/exceptions/runtime defaults
+  and rejects AMD64. MSVC 2022 compilation/linking is not yet verified here.
+  Use the host rtl8125_package_check tool on the resulting .sys and rtl8125.inf
+  before staging it. Genuine-SDK ABI tests need compiler-native mocked fixtures;
+  a MinGW user-mode test run does not qualify the MSVC build.
+
+Unsupported/remaining qualification
+  Native AMD64 and Windows NDIS targets are not implemented or qualified. A host
+  portable C++17 library compile does not establish either. Preserve exact tool
+  versions, compiler commands, PE imports, sources and the operational build
+  define with each binary. Guest and physical network tests remain separate.

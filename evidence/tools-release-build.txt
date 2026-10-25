@@ -1,0 +1,16 @@
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/tools-release
+[ 22%] Building CXX object CMakeFiles/rtl8125_core.dir/src/core/descriptor.cpp.o
+[ 22%] Building CXX object CMakeFiles/rtl8125_core.dir/src/core/receive.cpp.o
+[ 33%] Building CXX object CMakeFiles/rtl8125_core.dir/src/core/oid.cpp.o
+[ 44%] Building CXX object CMakeFiles/rtl8125_core.dir/src/core/resources.cpp.o
+[ 55%] Building CXX object CMakeFiles/rtl8125_core.dir/src/core/probe_log.cpp.o
+[ 66%] Linking CXX static library librtl8125_core.a
+[ 77%] Built target rtl8125_core
+[ 88%] Linking CXX executable rtl8125_probe_collect
+[100%] Built target rtl8125_probe_collect
+[ 77%] Built target rtl8125_core
+[ 88%] Building CXX object CMakeFiles/rtl8125_vfio_check.dir/src/tools/vfio_check.cpp.o
+[100%] Linking CXX executable rtl8125_vfio_check
+[100%] Built target rtl8125_vfio_check

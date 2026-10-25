@@ -1,0 +1,3 @@
+[ 12%] Generating native/guest_production_entry.obj, native/guest_kernel.obj
+[ 25%] Generating native/rtl8125_m01_guest.sys
+[100%] Built target rtl8125_guest_fixture

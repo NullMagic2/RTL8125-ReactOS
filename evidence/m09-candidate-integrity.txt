@@ -1,0 +1,9 @@
+Candidate stage: Binaries/.build/m09-operational/package/rtl8125-i386-6b3797171995598e
+Top-level manifest entries verified: 14
+Source manifest entries verified: 241
+Source archive members: 263; bytes match staged corresponding source
+No firmware, VM disk, SYS or Binaries intermediate is included inside source archive
+6b3797171995598e999e10960ecd57cc24145b7c43dd1826a3edb1ca719ec158  rtl8125.sys
+dfd0f1fb39f6e4ae459defc695b330761e56dcaee1fe73f2b38028fe0edb026a  source.tar.gz
+076b0c4640ca8d92559b94fa558b156cb62614c711d52ab9315b81076a38c9fd  rtl8125.inf
+ebce7aff5241da64f12937121df0b3ae5c1fd6e0e42417d0e9727e247c2726cf  SHA256SUMS.txt

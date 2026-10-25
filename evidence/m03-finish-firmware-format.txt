@@ -1,0 +1,1 @@
+Firmware format only: status=0 bytes=3456 instructions=838 offset=96 version=rtl8125a-3_0.0.1 08/24/19

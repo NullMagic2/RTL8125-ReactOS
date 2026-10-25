@@ -1,0 +1,36 @@
+Module: rtl8125.evidence.m02_probe_collector_tests
+Purpose: Record bounded offline native-log parsing and collector verification.
+Created: 2026-10-24
+Architecture: Synthetic test strings only; no ReactOS or hardware capture.
+
+ASan/UBSan command:
+g++ -std=c++17 -Wall -Wextra -Wpedantic -Werror -fno-exceptions -fno-rtti -fsanitize=address,undefined -fno-omit-frame-pointer -Isrc/core tests/probe_log_tests.cpp src/core/probe_log.cpp src/core/resources.cpp src/core/chip.cpp -o Binaries/.build/m02-host/probe_log_tests
+ASAN_OPTIONS=detect_leaks=0 Binaries/.build/m02-host/probe_log_tests
+Result: RTL8125 probe-log parser: 271 checks, 0 failures (synthetic text only)
+Leak detection disabled because of process tracing; ASan/UBSan remain enabled.
+
+Coverage: complete supported A/B records, high 64-bit addresses, CRLF, last complete
+record selection, every truncation of each versioned diagnostic line, oversize
+lines, embedded NUL/newline, numeric overflow, invalid/short memory aperture,
+address interval overflow, invalid IRQ/MSI flags, all-ones/unknown TxConfig,
+inconsistent XID/family, unexpected successful initialization, orphan triples,
+new-attempt isolation, interleaved unrelated lines, EOF and idempotent finalize.
+
+CLI checks against explicitly labeled SYNTHETIC TEST FIXTURE in the owned build:
+- Valid complete fixture exits0 and emits JSON whose capture_origin is explicitly
+  unverified, reactos_physical_gate_passed=false and datapath_ready=false.
+- Existing output path rejected, exit2; original output retained.
+- Same input/output path rejected, exit2; input retained.
+- Real Linux-only inventory log rejected as native capture, exit3; no output.
+- Sparse 67,108,865-byte input rejected (64 MiB+1), exit2; no output.
+These checks validate collector behavior only, not the authenticity of input logs.
+
+Actual PCI snapshot regression resumed after original M02 suite:
+RTL8125 resources: 309 checks, 0 failures
+Includes first 64 PCI config bytes read safely from actual host card, selecting
+its real first memory BAR2 instead of BAR4. It performs no physical MMIO access.
+50c771cb33e0697b311f1c37e013e534efd5df36b755e5ada5e251deee493336  src/core/probe_log.hpp
+9b296b0959de4a8e41b6c276cd75d027cedfc59ad5dd0fde9f0c751dedbdcde8  src/core/probe_log.cpp
+aad96cd2e87ea40b26da95a2b5f9c4a45a3948ca510c4e1c393d3c0e6efe31a7  src/tools/probe_collect.cpp
+68573368420937a1c3a5c2c65c3169235782a3b0d398cbeb929161ccbd3e9f58  tests/probe_log_tests.cpp
+37cd41d0e59f2fefa084e019c81838bb95f3f1763508c0b2c3368370becfdc0c  tests/resources_tests.cpp

@@ -1,0 +1,1 @@
+PE32 native/import, operational build marker or exact-device INF check failed

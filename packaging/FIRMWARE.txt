@@ -1,0 +1,29 @@
+Module: rtl8125.package.firmware
+Purpose: Supply exact fixed-name firmware acquisition and installation boundaries.
+Created: 2026-10-24
+Architecture: Names match core/chip.cpp and the PASSIVE_LEVEL NT loader.
+
+No firmware binary is distributed with this package. Obtain the corresponding
+unmodified files and accompanying Realtek notice from a linux-firmware release:
+  https://gitlab.com/kernel-firmware/linux-firmware
+For a pinned reference see release 20250211 and the r8169 notice in its WHENCE:
+  https://kernel.googlesource.com/pub/scm/linux/kernel/git/firmware/linux-firmware.git/+/refs/tags/20250211/WHENCE
+The installed linux-firmware-realtek package is another source where available;
+retain its copyright file and record the package version and firmware SHA256.
+
+RTL8125A (XID 609): rtl_nic/rtl8125a-3.fw
+RTL8125B (XID 641): rtl_nic/rtl8125b-2.fw
+
+If distribution compresses the file as .zst or .xz, decompress a copy with the
+matching tool. Do not rename compressed bytes to .fw. Install the uncompressed
+file with the exact name under:
+  %SystemRoot%\system32\drivers\rtl_nic\rtl8125a-3.fw
+  %SystemRoot%\system32\drivers\rtl_nic\rtl8125b-2.fw
+
+Create only that rtl_nic subdirectory if absent. Preserve the firmware's notice
+beside the installed files. The driver validates format, bounds, checksums where
+present and opcode control flow before execution. Validation does not establish
+the identity or license of an arbitrary downloaded file; record provenance.
+
+Realtek's firmware notice is reproduced separately in notices/REALTEK.txt.
+The driver source's GPL-2.0-only license does not relicense firmware.

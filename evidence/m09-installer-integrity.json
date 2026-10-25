@@ -1,0 +1,17 @@
+{
+  "scope": "Native installer candidate; no real ReactOS install or physical networking claim",
+  "zip": "Binaries/.build/m09-installer/installer-release/RTL8125B-ReactOS-Setup-i386.zip",
+  "zip_sha256": "4a96f928cfd56ac2c3441c3a3a9a03a2f7bfb876dae557ec14b8491af48d85bb",
+  "directory": "Binaries/.build/m09-installer/installer-release/RTL8125B-ReactOS-Setup-i386",
+  "outer_manifest_files": 21,
+  "zip_files": 22,
+  "source_manifest_files": 269,
+  "source_archive_members": 293,
+  "sha256": {
+    "RTL8125-Setup.exe": "ef714f68a2b224ab189777bb53fefc182e6909ea6b263412efdb1a1c745bf312",
+    "rtl8125.sys": "6b3797171995598e999e10960ecd57cc24145b7c43dd1826a3edb1ca719ec158",
+    "rtl8125.inf": "2b118674d9d8682a1f2983c94ce7b8bf68f161a435da58b08ce9195a2e5ab928",
+    "source.tar.gz": "643d3e8f30bbe03ddba2e8e0c8ac496af1b489d54ed9d7c99a7d7e74ecadd323",
+    "SHA256SUMS.txt": "b31c78bb63f8e5c48fb14fef53d2a1477000e04ad444d6626a23f47038a93e0d"
+  }
+}

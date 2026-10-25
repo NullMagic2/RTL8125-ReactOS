@@ -1,0 +1,69 @@
+Module: rtl8125.evidence.m04
+Purpose: Record real NDIS common-buffer ownership and the unvalidated drain gate.
+Created: 2026-10-24
+
+Gate 1: COMPLETE in source and genuine-SDK ABI fixture. acquire_dma requires
+PASSIVE_LEVEL and an adapter already marked NDIS_ATTRIBUTE_BUS_MASTER. It calls
+NdisMInitializeScatterGatherDma(adapter,FALSE,524288) before any common-buffer
+allocation. This establishes the real ReactOS DMA adapter while requesting
+32-bit DMA; scatter/gather lists are never consumed. Every returned logical
+range is checked through its final byte against the 32-bit mask, preserving
+the full HighPart/LowPart. It never substitutes the CPU pointer for a bus address.
+NDIS owns the DMA adapter lifetime; successful setup is not repeated on retries.
+
+Gate 2: COMPLETE in source and genuine-SDK ABI fixture. Owns separate TX/RX
+256-entry, 16-byte legacy rings and separate fixed TX/RX 2048-byte packet arenas.
+Allocations use uncached NDIS common buffers with logical and CPU alignment
+checks (256-byte rings, 64-byte arenas). Acquisition initializes no OWN bits.
+Every allocation and address failure unwinds acquired buffers in reverse order,
+using the original virtual/logical address, length and cache flag. Release is
+idempotent. A second acquisition cannot overwrite owned memory. All lengths
+are fixed/capped before allocation, with no DMA-time allocation or heap runtime.
+
+Gate 3: COMPLETE in source and modeled native-ABI fixture. C++17 placement
+construction starts live descriptor object lifetimes; size/alignment asserted.
+The x86 native representation has aligned volatile 32-bit little-endian fields.
+TX copies the validated frame, writes address/options2, publishes software
+pending ownership, executes KeMemoryBarrier, then writes status with OWN last.
+RX uses the same final ownership publication. Completion observes OWN clear,
+executes a native barrier, and consumes software pending state exactly once.
+RX payload copy follows completion and rechecks descriptor length, segmentation,
+error flags, frame limits and caller capacity. No offline DescriptorImage is
+cast into DMA memory. Tests exercise all 256 slots and final ring-end markers.
+
+Gate 4: PENDING. Hardware retirement is deliberately conservative and unwired.
+expose_dma_rings must precede hardware ring-base publication; publishing OWN
+also conservatively marks exposure. There is no public caller-clear flag.
+release_dma refuses every exposed owner. retire_dma requires a CPU access
+retirement callback, bounded hardware reset, reset/engines-clear observation,
+exact PCI identity and bus-master disable/readback plus posted-write flush.
+Every injected fence/reset/removal/config/write/readback/flush failure leaves
+the exposed flag and all allocations intact. A failed timeout cannot free them.
+Successful modeled proof prevents late publication until released/reacquired.
+However, physical retirement/drain of in-flight PCIe transactions is not proven
+by source/models or reset+command readback alone. M08 must provide real ISR/DPC/
+timer/packet fencing and physical stop/removal validation. No physical DMA run
+or retired-ring test occurred, and this gate remains incomplete.
+
+Verification:
+  GCC 13-win32 genuine i386 ReactOS SDK compilation and -nostdlib kernel link
+  check pass. SDK inputs match the M01 source/generated-header/import-library
+  paths; no synthetic headers. No scatter/gather list or C++ runtime dependency.
+  2,149 Wine user-mode genuine-SDK ABI checks pass with mocked NDIS/NT/MMIO/PCI
+  imports, covering all four allocation failures and all address/alignment
+  failures, ring wrap, late/double completion, unsafe frees, failed retirement,
+  partial startup, wrong IRQL and firmware loader failure paths. This is not
+  actual kernel/guest, DMA coherency, PCI drain, interrupt or network evidence.
+  Host hardware/firmware model evidence is in m03-summary.txt. DMA ABI fixtures
+  themselves are Windows executables under Wine, not sanitizer-instrumented
+  native kernel tests. MSVC and native AMD64 are unverified.
+
+Reproduction from project root:
+  cmake -S . -B Binaries/.build/m04-native -DRTL8125_TESTS=OFF -DRTL8125_NATIVE_DRIVER=ON -DRTL8125_REACTOS_SOURCE=/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/src -DRTL8125_REACTOS_BUILD=/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release
+  cmake --build Binaries/.build/m04-native --target rtl8125_native_dma_contract_tests rtl8125_native_hardware_link_check -j2
+  WINEPREFIX="$PWD/Binaries/.build/m01-wine" WINEDEBUG=-all wine Binaries/.build/m04-native/hardware-native/dma_contract_tests.exe
+
+The Wine execution required approved escalation for the local server socket;
+every device/file API in this executable is a mock. No Linux NIC MMIO writes,
+reset, detach, rebind, bus-master change or DMA occurred. Native hardware-link
+.sys remains owned .build evidence, not a published operational driver.

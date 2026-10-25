@@ -1,0 +1,1 @@
+RTL8125 real-SDK DMA/firmware contracts: 2149 checks, 0 failures

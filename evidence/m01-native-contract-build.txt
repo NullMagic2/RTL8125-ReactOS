@@ -1,0 +1,5 @@
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/m01-native
+[ 16%] Generating native/miniport_contract_tests.exe
+[100%] Built target rtl8125_native_contract_tests

@@ -1,0 +1,16 @@
+Module: rtl8125.installer.package_integrity
+Purpose: Independently verify the final installer payload and full corresponding source.
+Created: 2026-10-24
+Architecture: Root staging review; no installation or physical-device test.
+
+Verified all21 outer manifest hashes; all269 source hashes and293 tar members.
+Verified ZIP CRCs and byte equality for all payload files plus SHA256SUMS.txt.
+Authored source/build/test/package files match the frozen workspace exactly.
+No firmware, NDIS binary, driver executable, VM disk or Binaries directory occurs
+inside the source archive. Outer payload intentionally contains the SYS and GUI.
+
+4a96f928cfd56ac2c3441c3a3a9a03a2f7bfb876dae557ec14b8491af48d85bb  Binaries/.build/m09-installer/installer-release/RTL8125B-ReactOS-Setup-i386.zip
+ef714f68a2b224ab189777bb53fefc182e6909ea6b263412efdb1a1c745bf312  Binaries/.build/m09-installer/installer-release/RTL8125B-ReactOS-Setup-i386/RTL8125-Setup.exe
+6b3797171995598e999e10960ecd57cc24145b7c43dd1826a3edb1ca719ec158  Binaries/.build/m09-installer/installer-release/RTL8125B-ReactOS-Setup-i386/rtl8125.sys
+2b118674d9d8682a1f2983c94ce7b8bf68f161a435da58b08ce9195a2e5ab928  Binaries/.build/m09-installer/installer-release/RTL8125B-ReactOS-Setup-i386/rtl8125.inf
+643d3e8f30bbe03ddba2e8e0c8ac496af1b489d54ed9d7c99a7d7e74ecadd323  Binaries/.build/m09-installer/installer-release/RTL8125B-ReactOS-Setup-i386/source.tar.gz

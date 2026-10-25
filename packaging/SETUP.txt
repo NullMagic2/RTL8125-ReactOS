@@ -1,0 +1,101 @@
+Module: rtl8125.package.gui_setup
+Purpose: Use the native installer and understand its actual compatibility/recovery boundaries.
+Created: 2026-10-24
+Architecture: The executable configures one selected PCI adapter through real SetupAPI.
+
+RTL8125B setup for ReactOS i386
+
+Keep RTL8125-Setup.exe beside rtl8125.sys, rtl8125.inf and this package's other
+files. Open the executable inside an isolated ReactOS i386 guest as an
+administrator. The wizard finds actual PCI VEN_10EC DEV_8125 devices and installs
+only the selected instance. Your confirmed subsystem 7E271462 / revision 05 card
+is named exactly RTL8125B. Other variants remain RTL8125 until identified by the
+native driver's XID checks. Manufacturer is Realtek; driver provider is this
+ReactOS project. The experimental package is unsigned and is not an official
+Realtek-certified Windows release. Windows and Wine cannot install through it.
+
+Before installation
+  1. Use a recoverable guest overlay and retain its unchanged base image. A VirtIO
+     adapter with shared-host networking can supply a control connection; actual
+     RTL8125 testing requires an assigned RTL8125 device. Do not detach the host's
+     active Linux network card.
+  2. Use the compatible patched ReactOS NDIS image described in
+     REACTOS_COMPATIBILITY.txt. The installer never replaces core OS files.
+     Its pinned approved ndis.sys SHA256 is:
+       d71a8f327a2afda106c56031da84cf17da37f10fb9a32cf0311a9baa43bc7cd3
+     Applying the same source patches does not reproduce this binary identity:
+     toolchain, configuration and PE timestamps can change its hash. To support a
+     different independently reviewed patched build, rebuild the installer with
+     RTL8125_INSTALLER_NDIS_HASH set to that reviewed actual ndis.sys SHA256.
+     Do not substitute a stock/unreviewed hash to bypass this requirement.
+  3. On first use the requirements page offers Record image & restart later.
+     This writes administrator-protected machine evidence of the approved image
+     and current boot. Restart ReactOS and reopen the wizard. Setup requires an
+     earlier recorded boot, the same approved image, a loaded NDIS module at the
+     expected SystemRoot path, and an image write time preceding the new boot.
+     File presence, a checkbox or patch-source files alone cannot enable install.
+     Some ReactOS builds synthesize a World/GENERIC_ALL registry ACL and ignore
+     security changes (ntoskrnl/config/cmse.c). The default installer rejects that
+     journal explicitly. For an isolated trusted test guest only, configure
+     RTL8125_INSTALLER_TRUSTED_GUEST=ON. Its title says Controlled VM and its
+     review page discloses that journal permissions cannot be enforced. This
+     option accepts only the audited stub ACL shape on a native ReactOS admin
+     session; approved NDIS hash, payload, device and actual reboot checks stay
+     mandatory. Registry evidence in that variant is not protected from other
+     guest users. Do not distribute it as the normal protected installer.
+  4. Obtain uncompressed firmware separately as explained in FIRMWARE.txt.
+     RTL8125B needs rtl8125b-2.fw only. An unidentified RTL8125 needs both A/B files
+     because the user-mode PCI ID cannot choose the firmware family. Browse to
+     the original named files, or use valid copies already installed under the
+     fixed SystemRoot/system32/drivers/rtl_nic paths. No firmware is downloaded
+     or included in this package. Keep the accompanying Realtek notice.
+
+Installation and results
+  Select your card, complete readiness checks and review the changes. Setup
+  rechecks and locks the driver, INF, NDIS image and firmware before mutation.
+  It preserves previous files and binding identity under
+    %SystemRoot%\RTL8125-Setup\<transaction>
+  and records integrity hashes in the protected machine registry. FAT filesystems
+  can use registry-backed recovery integrity even without directory ACL support.
+  The original recovery point survives reinstalls and failed later attempts.
+
+  Real SetupAPI binds only the selected instance. The INF hardware section and
+  explicit verification set Device Manager's FriendlyName to RTL8125B or RTL8125.
+  Setup checks the actual service binding, restart flags and device-start status.
+  A completed install is not evidence of peer traffic or physical qualification.
+  No successful networking result is fabricated from a preview or API error.
+
+Removal and recovery
+  Remove selected driver stops only the selected adapter and requests real device
+  removal. This ReactOS snapshot does not implement SetupDiRemoveDevice; setup
+  reports the limitation and the disabled state instead of claiming uninstall.
+  It never deletes arbitrary services, OEM INFs, shared SYS or firmware files.
+
+  Restore previous binding validates recorded INF/backup/binary hashes, stops the
+  selected card and rebinds an unchanged previous non-Rtl8125 driver without
+  copying files from missing media. Same-service rollback, missing provenance,
+  changed binaries or unsupported operations require the preserved backup files
+  and stopped-guest recovery procedure in INSTALL.txt. It does not overwrite a
+  loaded SYS. Another adapter using the shared Rtl8125 service blocks changes to
+  those shared files. Preserve logs and the guest snapshot on any failure.
+
+Preview and build
+  RTL8125-Setup.exe --preview
+  RTL8125-Setup.exe --preview --preview-page=requirements
+  Page names are device, requirements, review, progress and finish. The preview
+  is visibly labeled, uses a deterministic sample backend and cannot enter any
+  real installation, removal, recovery or compatibility-journal operation. Wine
+  is separately denied even if the preview flag is omitted. --capture=PATH.bmp
+  creates a new preview-only screenshot file; no existing file is overwritten.
+
+  Build with CMake option RTL8125_INSTALLER=ON and RTL8125_INSTALLER_DRIVER set
+  to the actual operational SYS. The GUI is i386 C++17, with compiler/architecture
+  checks and exact embedded payload hashes. RTL8125_INSTALLER_NDIS_HASH identifies
+  the reviewed matching OS build. Target rtl8125_setup builds the executable;
+  rtl8125_installer_package stages the complete package without installing it.
+  GCC 13 was built and inspected. MSVC Win32 configuration remains unverified.
+  The automatic ZIP staging target currently uses the verified GCC route; MSVC
+  binaries require a separate manual packaging/import verification pass.
+  Source, driver GPL license, compiler runtime notices and firmware terms are
+  separate files in this package. No firmware blob or rebuilt NDIS binary is
+  distributed here. Operational guest/physical validation remains separate.

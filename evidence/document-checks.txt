@@ -1,0 +1,9 @@
+2026-10-24 installer UI cleanup and source snapshot checks PASS.
+Requested four text elements removed; normal and800x600 layouts reviewed.
+GCC13 i386 GUI rebuild and operational PE/INF package check passed.
+Published21 payload hashes;275 source hashes;299 source members; ZIP CRC/content verified.
+Browsable snapshot matches corresponding archive and current installer source.
+All 194 local report links/images exist; nine unchanged imports verified.
+Architecture retains three overview paragraphs. Implementation100/physical0 unchanged.
+Previous behavioral-test evidence retained; this edit changes painting/text only.
+No actual driver installation, OS update or host NIC access performed.

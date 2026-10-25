@@ -1,0 +1,14 @@
+-- The CXX compiler identification is GNU 15.2.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+CMake Error at cmake/native.cmake:25 (message):
+  Standalone native build requires i686-w64-mingw32 GCC; MSVC uses
+  packaging/reactos inside a matching ReactOS MSVC build
+Call Stack (most recent call first):
+  CMakeLists.txt:76 (include)
+
+
+-- Configuring incomplete, errors occurred!

@@ -1,0 +1,77 @@
+; Module: rtl8125.package.pnp
+; Purpose: Bind the experimental operational i386 miniport to exact RTL8125 PCI IDs.
+; Created: 2026-10-24
+; Architecture: Operational package only; the read-only probe uses a separate INF.
+[Version]
+Signature="$Windows NT$"
+Class=Net
+ClassGUID={4D36E972-E325-11CE-BFC1-08002BE10318}
+Provider=%Provider%
+DriverVer=10/24/2026,0.1.0.0
+
+[SourceDisksNames]
+1="RTL8125 ReactOS experimental i386 driver",,,
+
+[SourceDisksFiles]
+rtl8125.sys=1
+
+[DestinationDirs]
+DefaultDestDir=12
+
+[Manufacturer]
+%HardwareVendor%=Devices,NTx86
+
+[Devices.NTx86]
+%DeviceB%=RTL8125B_Install.ndi,PCI\VEN_10EC&DEV_8125&SUBSYS_7E271462&REV_05
+%Device%=RTL8125_Install.ndi,PCI\VEN_10EC&DEV_8125
+
+[RTL8125B_Install.ndi.NTx86]
+Characteristics=0x4
+BusType=5
+AddReg=RTL8125_Ndi
+CopyFiles=RTL8125_Files
+
+[RTL8125B_Install.ndi.NTx86.Services]
+AddService=Rtl8125,0x00000002,RTL8125_Service
+
+[RTL8125B_Name]
+HKR,,FriendlyName,0,"RTL8125B"
+
+[RTL8125B_Install.ndi.NTx86.HW]
+AddReg=RTL8125B_Name
+
+[RTL8125_Install.ndi.NTx86.HW]
+AddReg=RTL8125_Name
+
+[RTL8125_Name]
+HKR,,FriendlyName,0,"RTL8125"
+
+[RTL8125_Install.ndi.NTx86]
+Characteristics=0x4
+BusType=5
+AddReg=RTL8125_Ndi
+CopyFiles=RTL8125_Files
+
+[RTL8125_Files]
+rtl8125.sys
+
+[RTL8125_Ndi]
+HKR,Ndi,Service,0,"Rtl8125"
+HKR,Ndi\Interfaces,UpperRange,0,"ndis5"
+HKR,Ndi\Interfaces,LowerRange,0,"ethernet"
+
+[RTL8125_Install.ndi.NTx86.Services]
+AddService=Rtl8125,0x00000002,RTL8125_Service
+
+[RTL8125_Service]
+ServiceType=1
+StartType=3
+ErrorControl=0
+ServiceBinary=%12%\rtl8125.sys
+LoadOrderGroup=NDIS
+
+[Strings]
+Provider="RTL8125 ReactOS development"
+HardwareVendor="Realtek"
+Device="RTL8125"
+DeviceB="RTL8125B"

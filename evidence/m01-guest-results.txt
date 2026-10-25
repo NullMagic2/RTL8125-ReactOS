@@ -1,0 +1,92 @@
+RTL8125_M01_RUNNER: begin v1 isolated guest fixture, no hardware binding
+RTL8125_M01_RUNNER: OS 5.2 build 3790 Service Pack 3
+RTL8125_M01_GUEST: begin v2 explicit-wrapper-unload real-ReactOS-kernel no-hardware-device
+RTL8125_M01_GUEST: production-NDIS-registration status 00000000
+RTL8125_M01_GUEST: fixture PASS genuine-ndis-unload-handler-installed
+RTL8125_M01_GUEST: fixture PASS unsupported-medium-no-adapter-acquisition
+RTL8125_M01_GUEST: fixture PASS null-medium-rejected-before-dereference
+RTL8125_M01_GUEST: fixture PASS empty-medium-array-rejected
+RTL8125_M01_GUEST: fixture PASS wrong-irql-initialize-rejected-before-allocation
+RTL8125_M01_GUEST: fixture PASS real-ndis-nonpaged-adapter-allocation
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-disconnected-zero-speed
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-refuses-invented-mac
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-refuses-unimplemented-filter
+RTL8125_M01_GUEST: fixture PASS actual-kernel-send-retains-no-packet
+RTL8125_M01_GUEST: fixture PASS actual-kernel-reset-refuses-false-success
+RTL8125_M01_GUEST: fixture PASS empty-owned-adapter-halt-returned iteration 0
+RTL8125_M01_GUEST: fixture PASS real-ndis-nonpaged-adapter-allocation
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-disconnected-zero-speed
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-refuses-invented-mac
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-refuses-unimplemented-filter
+RTL8125_M01_GUEST: fixture PASS actual-kernel-send-retains-no-packet
+RTL8125_M01_GUEST: fixture PASS actual-kernel-reset-refuses-false-success
+RTL8125_M01_GUEST: fixture PASS empty-owned-adapter-halt-returned iteration 1
+RTL8125_M01_GUEST: fixture PASS real-ndis-nonpaged-adapter-allocation
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-disconnected-zero-speed
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-refuses-invented-mac
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-refuses-unimplemented-filter
+RTL8125_M01_GUEST: fixture PASS actual-kernel-send-retains-no-packet
+RTL8125_M01_GUEST: fixture PASS actual-kernel-reset-refuses-false-success
+RTL8125_M01_GUEST: fixture PASS empty-owned-adapter-halt-returned iteration 2
+RTL8125_M01_GUEST: fixture PASS real-ndis-nonpaged-adapter-allocation
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-disconnected-zero-speed
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-refuses-invented-mac
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-refuses-unimplemented-filter
+RTL8125_M01_GUEST: fixture PASS actual-kernel-send-retains-no-packet
+RTL8125_M01_GUEST: fixture PASS actual-kernel-reset-refuses-false-success
+RTL8125_M01_GUEST: fixture PASS empty-owned-adapter-halt-returned iteration 3
+RTL8125_M01_GUEST: fixture PASS null-halt-returned
+RTL8125_M01_GUEST: fixture PASS guest-only-anonymous-control-device-for-scm-unload
+RTL8125_M01_GUEST: end checks 35 failures 0
+RTL8125_M01_RUNNER: start-service result 0
+RTL8125_M01_RUNNER: query-service-state result 4
+RTL8125_M01_GUEST: fixture anonymous-control-device-released
+RTL8125: wrapper unload begin
+RTL8125: wrapper unload complete
+RTL8125_M01_RUNNER: stop-service result 0
+RTL8125_M01_GUEST: begin v2 explicit-wrapper-unload real-ReactOS-kernel no-hardware-device
+RTL8125_M01_GUEST: production-NDIS-registration status 00000000
+RTL8125_M01_GUEST: fixture PASS genuine-ndis-unload-handler-installed
+RTL8125_M01_GUEST: fixture PASS unsupported-medium-no-adapter-acquisition
+RTL8125_M01_GUEST: fixture PASS null-medium-rejected-before-dereference
+RTL8125_M01_GUEST: fixture PASS empty-medium-array-rejected
+RTL8125_M01_GUEST: fixture PASS wrong-irql-initialize-rejected-before-allocation
+RTL8125_M01_GUEST: fixture PASS real-ndis-nonpaged-adapter-allocation
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-disconnected-zero-speed
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-refuses-invented-mac
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-refuses-unimplemented-filter
+RTL8125_M01_GUEST: fixture PASS actual-kernel-send-retains-no-packet
+RTL8125_M01_GUEST: fixture PASS actual-kernel-reset-refuses-false-success
+RTL8125_M01_GUEST: fixture PASS empty-owned-adapter-halt-returned iteration 0
+RTL8125_M01_GUEST: fixture PASS real-ndis-nonpaged-adapter-allocation
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-disconnected-zero-speed
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-refuses-invented-mac
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-refuses-unimplemented-filter
+RTL8125_M01_GUEST: fixture PASS actual-kernel-send-retains-no-packet
+RTL8125_M01_GUEST: fixture PASS actual-kernel-reset-refuses-false-success
+RTL8125_M01_GUEST: fixture PASS empty-owned-adapter-halt-returned iteration 1
+RTL8125_M01_GUEST: fixture PASS real-ndis-nonpaged-adapter-allocation
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-disconnected-zero-speed
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-refuses-invented-mac
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-refuses-unimplemented-filter
+RTL8125_M01_GUEST: fixture PASS actual-kernel-send-retains-no-packet
+RTL8125_M01_GUEST: fixture PASS actual-kernel-reset-refuses-false-success
+RTL8125_M01_GUEST: fixture PASS empty-owned-adapter-halt-returned iteration 2
+RTL8125_M01_GUEST: fixture PASS real-ndis-nonpaged-adapter-allocation
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-disconnected-zero-speed
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-refuses-invented-mac
+RTL8125_M01_GUEST: fixture PASS actual-kernel-oid-refuses-unimplemented-filter
+RTL8125_M01_GUEST: fixture PASS actual-kernel-send-retains-no-packet
+RTL8125_M01_GUEST: fixture PASS actual-kernel-reset-refuses-false-success
+RTL8125_M01_GUEST: fixture PASS empty-owned-adapter-halt-returned iteration 3
+RTL8125_M01_GUEST: fixture PASS null-halt-returned
+RTL8125_M01_GUEST: fixture PASS guest-only-anonymous-control-device-for-scm-unload
+RTL8125_M01_GUEST: end checks 35 failures 0
+RTL8125_M01_RUNNER: start-service result 0
+RTL8125_M01_RUNNER: query-service-state result 4
+RTL8125_M01_GUEST: fixture anonymous-control-device-released
+RTL8125: wrapper unload begin
+RTL8125: wrapper unload complete
+RTL8125_M01_RUNNER: stop-service result 0
+RTL8125_M01_RUNNER: delete-service result 0
+RTL8125_M01_RUNNER: end-failures result 0

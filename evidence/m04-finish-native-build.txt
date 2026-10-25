@@ -1,0 +1,4 @@
+[  0%] Generating hardware-native/hardware_contract_tests.exe
+[100%] Built target rtl8125_native_hardware_contract_tests
+[ 11%] Generating hardware-native/rtl8125-hardware-link.sys
+[100%] Built target rtl8125_native_hardware_link_check

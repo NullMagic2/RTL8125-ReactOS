@@ -1,0 +1,33 @@
+Module: rtl8125.evidence.m05_guest_launch
+Purpose: Reproduce a NIC-less genuine ReactOS regression after production wiring.
+Created: 2026-10-24 America/Sao_Paulo
+Architecture: Existing labelled kernel fixture, actual production packet objects.
+
+Build:
+cmake -S . -B Binaries/.build/m05-native -DRTL8125_TESTS=OFF -DRTL8125_NATIVE_DRIVER=ON -DRTL8125_GUEST_FIXTURE=ON -DRTL8125_REACTOS_SOURCE=/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/src -DRTL8125_REACTOS_BUILD=/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release
+cmake --build Binaries/.build/m05-native --target rtl8125_native_driver rtl8125_native_contract_tests rtl8125_native_datapath_contract_tests rtl8125_guest_fixture -j2
+
+Owned media contains rtl8125_m01_guest.sys and miniport_guest_runner.exe renamed
+m01.exe. Existing kernel test source is unchanged, retaining its M01 log markers.
+Sources/artifact hashes are recorded in m05-production-hashes.json.
+xorriso -as mkisofs -quiet -J -r -V RTL8125_M05 -o Binaries/.build/m05-guest/production-validation.iso Binaries/.build/m05-guest/media
+
+Backing image, never opened writable:
+/home/x/Documents/Codex/2026-10-21/he/work/gdi-stack-safe-snapshot.qcow2
+SHA256 after run matches previous8761f26e97807dd6e03bbbfd4b27558f3d5ee0adb4e7fc478f77e038cdc007f4.
+qemu-img create -f qcow2 -F qcow2 -b /home/x/Documents/Codex/2026-10-21/he/work/gdi-stack-safe-snapshot.qcow2 Binaries/.build/m05-guest/production-validation.qcow2
+
+Exact launch from project root:
+qemu-system-i386 -name RTL8125-M05-production-regression -machine pc -accel kvm -accel tcg -cpu qemu32 -m 512 -smp 1 -drive file=Binaries/.build/m05-guest/production-validation.qcow2,format=qcow2,if=ide -drive file=Binaries/.build/m05-guest/production-validation.iso,if=ide,index=2,media=cdrom,readonly=on -boot order=c -vga std -nic none -display none -serial file:Binaries/.build/m05-guest/kernel.log -monitor unix:Binaries/.build/m05-guest/monitor.sock,server=on,wait=off -qmp unix:Binaries/.build/m05-guest/qmp.sock,server=on,wait=off -no-reboot
+
+QMP local virtual keyboard opened Run and typed d:\m01.exe. Socket connections
+use the short project-relative path (the absolute AF_UNIX path exceeds108 bytes).
+QEMU10.2.1, ReactOS0.4.16-x86 Build20261021-unknown-revision. No NIC/network backend,
+PCI passthrough, USB passthrough or host physical device was attached. Guest writes
+went only into the owned overlay. No host NIC detach/reset/MMIO/config operation.
+
+Observed: two genuine production registrations status0, two35-check kernel test
+cycles failures0, two successful starts/stops, two wrapper unloads, runner final0.
+See full m05-production-guest-kernel.txt. These are lifecycle tests using a labelled
+fixture control-device scaffold, not natural PnP NIC initialization or networking.
+The guest was stopped with QMP quit; owned QEMU session exited0.

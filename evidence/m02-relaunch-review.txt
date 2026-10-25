@@ -1,0 +1,70 @@
+Module: rtl8125.evidence.m02_relaunch_review
+Purpose: Record relaunched M02 inventory, concrete parser/preflight fixes and limits.
+Created: 2026-10-24
+Architecture: Host read-only inventory and CPU/ABI checks; no physical-card ReactOS execution.
+
+Read-only inventory refresh:
+2026-10-24 21:57:39 UTC
+0000:0d:00.0 Ethernet controller [0200]: Realtek Semiconductor Co., Ltd. RTL8125 2.5GbE Controller [10ec:8125] (rev 05)
+	Subsystem: Micro-Star International Co., Ltd. [MSI] Device [1462:7e27]
+	Kernel driver in use: r8169
+	Kernel modules: r8169
+up
+1000
+../../../../../../bus/pci/drivers/r8169
+0000:05:0a.0
+0000:0d:00.0
+
+Result: still only one RTL8125, the live host card 0000:0d:00.0 with r8169 and
+interface enp13s0 up at 1000 Mb/s. There is no separate eligible card for the
+user-selected dedicated-VFIO ReactOS VM. Sandbox device visibility hides KVM/VFIO
+nodes in this shell, so their absence here is not evidence of host-wide absence.
+No physical VM was launched, and no device binding/reset/MMIO/DMA state changed.
+The original final M02 actual-card ReactOS XID gate remains incomplete (75%).
+
+Concrete resource-parser correction:
+The old parser rejected duplicate BAR starts and other ranges containing the BAR
+start, but accepted another assigned memory range beginning inside the selected
+aperture. Regression tests for an inner overlap and an overlap beginning at the
+last byte failed before the fix for both i386 and AMD64 descriptor layouts:
+  RTL8125 resources: 315 checks, 4 failures
+A bounded second pass now rejects any overlap with the complete selected BAR
+aperture, regardless of descriptor order. Adjacent non-overlapping ranges remain
+accepted. No API changed and every rejected result still returns empty output.
+Final production-helper ASan/UBSan result is saved in m02-overlap-tests.txt:
+  RTL8125 resources: 315 checks, 0 failures
+GCC13 i386 compiled the updated helper with the genuine ReactOS SDK include set:
+  i686-w64-mingw32-g++ @evidence/m02-native-i386.rsp -I/home/x/Documents/Codex/2026-10-21/he/work/reactos/sdk/include/c++ -c src/core/resources.cpp -o Binaries/.build/m02-host/resources-overlap-i386.obj
+Root rebuilds the actual published SYS and validation ISO after integration.
+
+Concrete VFIO preflight correction:
+Group-node permissions alone did not prove group viability or lack of an existing
+container owner. The tool now only opens an otherwise eligible group's character
+node read-only/no-follow, invokes VFIO_GROUP_GET_STATUS, requires VIABLE and no
+CONTAINER_SET flag, then closes it. It never requests a container, device FD,
+IOMMU setup, interrupts, reset or DMA mapping. Failures reject readiness. The
+result is a snapshot; another process may change state before a future launch.
+Kernel interface definitions were checked against installed linux/vfio.h and:
+  https://docs.kernel.org/driver-api/vfio.html
+  https://github.com/torvalds/linux/blob/v6.12/drivers/vfio/group.c
+The inspected group open/ioctl implementation accepts a read-only group FD for
+metadata queries; an existing open owner is rejected by the kernel too. This is
+interface/source evidence, not a successful ioctl on this host's physical group.
+
+Production-tool policy and error-path ASan/UBSan result, saved in
+m02-vfio-status-tests.txt:
+  RTL8125 VFIO preflight contracts: 28 checks, 0 failures (no physical group access)
+The tests cover viable/unassigned versus nonviable/already-owned/short status,
+PCI-address syntax, and failed queries against /dev/null, regular, missing and
+symlink nodes. No actual VFIO group is opened by these tests.
+
+Live-host rejection, saved in m02-relaunch-preflight.txt, exits1 as expected. The
+new group-status ioctl is skipped because this is an r8169-bound host interface,
+not an otherwise eligible VFIO candidate. The existing active adapter remains
+untouched. A dedicated physical RTL8125 plus real guest serial capture is still
+needed; no synthetic fixture, Linux XID or CPU check completes that hardware gate.
+f2df97ccf4490ca65b588a40e957e589b1f9bd1d869023c604aa8a63d416410d  src/core/resources.cpp
+682e81913921576a39b9dd58fdc7dfe728888c8c8f1917ed6c5ca619ae82a01b  src/core/resources.hpp
+f2c4cac535e9d210326d99a986cf4c8cea4d6674115c9cd6146bbbbea109127b  src/tools/vfio_check.cpp
+6b187b9ac997d6fc07b166afa92fff93d5437950477f21689b128b9749af60c5  tests/resources_tests.cpp
+d057a2ec22b528dda4edd7ef64f5fce49fa88cda10deeb7c6c8a5515de9341f9  tests/resources_vfio_check_tests.cpp

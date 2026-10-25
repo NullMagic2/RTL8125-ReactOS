@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "captured_date": "2026-10-24",
+  "timezone": "America/Sao_Paulo",
+  "linux_tag": "v6.12",
+  "linux_commit": "adc218676eef25575469234709c2d87185ca223a",
+  "signature_verified": false,
+  "files": [
+    {
+      "local_path": "third_party/linux/r8169_main.c",
+      "upstream_path": "drivers/net/ethernet/realtek/r8169_main.c",
+      "url": "https://github.com/torvalds/linux/blob/adc218676eef25575469234709c2d87185ca223a/drivers/net/ethernet/realtek/r8169_main.c",
+      "download_url": "https://raw.githubusercontent.com/torvalds/linux/v6.12/drivers/net/ethernet/realtek/r8169_main.c",
+      "sha256": "c7d8ba27d0266db93d5177388b95a688d825ec7244e674a5fd2f2f10d74a0417",
+      "bytes": 146439,
+      "license": "GPL-2.0-only"
+    },
+    {
+      "local_path": "third_party/linux/r8169.h",
+      "upstream_path": "drivers/net/ethernet/realtek/r8169.h",
+      "url": "https://github.com/torvalds/linux/blob/adc218676eef25575469234709c2d87185ca223a/drivers/net/ethernet/realtek/r8169.h",
+      "download_url": "https://raw.githubusercontent.com/torvalds/linux/v6.12/drivers/net/ethernet/realtek/r8169.h",
+      "sha256": "0caa32bf62eae054150f858d20d02e0da4b4aff8635e238b306cd6cf42056a2f",
+      "bytes": 2999,
+      "license": "GPL-2.0-only"
+    },
+    {
+      "local_path": "third_party/linux/r8169_phy_config.c",
+      "upstream_path": "drivers/net/ethernet/realtek/r8169_phy_config.c",
+      "url": "https://github.com/torvalds/linux/blob/adc218676eef25575469234709c2d87185ca223a/drivers/net/ethernet/realtek/r8169_phy_config.c",
+      "download_url": "https://raw.githubusercontent.com/torvalds/linux/v6.12/drivers/net/ethernet/realtek/r8169_phy_config.c",
+      "sha256": "3462237a279ecaf29fc14d5021d68e6aeb45e0123493e3e9e200c64c1944b84b",
+      "bytes": 32136,
+      "license": "GPL-2.0-only"
+    },
+    {
+      "local_path": "third_party/linux/r8169_firmware.c",
+      "upstream_path": "drivers/net/ethernet/realtek/r8169_firmware.c",
+      "url": "https://github.com/torvalds/linux/blob/adc218676eef25575469234709c2d87185ca223a/drivers/net/ethernet/realtek/r8169_firmware.c",
+      "download_url": "https://raw.githubusercontent.com/torvalds/linux/v6.12/drivers/net/ethernet/realtek/r8169_firmware.c",
+      "sha256": "95d3ab823a5874495a75a23bba912804eb1c940fe33876d8292ae68582cc87a2",
+      "bytes": 4900,
+      "license": "GPL-2.0-only"
+    },
+    {
+      "local_path": "third_party/linux/r8169_firmware.h",
+      "upstream_path": "drivers/net/ethernet/realtek/r8169_firmware.h",
+      "url": "https://github.com/torvalds/linux/blob/adc218676eef25575469234709c2d87185ca223a/drivers/net/ethernet/realtek/r8169_firmware.h",
+      "download_url": "https://raw.githubusercontent.com/torvalds/linux/v6.12/drivers/net/ethernet/realtek/r8169_firmware.h",
+      "sha256": "d3ccb59f6f0eefd714d1aa7e7b475b42c4951fcad12c1e241be0037f1955c94a",
+      "bytes": 1104,
+      "license": "GPL-2.0-only"
+    },
+    {
+      "local_path": "third_party/linux/realtek_phy.c",
+      "upstream_path": "drivers/net/phy/realtek.c",
+      "url": "https://github.com/torvalds/linux/blob/adc218676eef25575469234709c2d87185ca223a/drivers/net/phy/realtek.c",
+      "download_url": "https://raw.githubusercontent.com/torvalds/linux/v6.12/drivers/net/phy/realtek.c",
+      "sha256": "0cb29edc739e7eff9323be96e7fc51f587ff9c767bbd3992d3f7ff9ba9117d79",
+      "bytes": 38734,
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "local_path": "third_party/linux/GPL-2.0.txt",
+      "upstream_path": "LICENSES/preferred/GPL-2.0",
+      "url": "https://github.com/torvalds/linux/blob/adc218676eef25575469234709c2d87185ca223a/LICENSES/preferred/GPL-2.0",
+      "download_url": "https://raw.githubusercontent.com/torvalds/linux/v6.12/LICENSES/preferred/GPL-2.0",
+      "sha256": "f6b78c087c3ebdf0f3c13415070dd480a3f35d8fc76f3d02180a407c1c812f79",
+      "bytes": 18729,
+      "license": "license-text"
+    },
+    {
+      "local_path": "docs/imported/rx7900/ARCHITECTURE.md",
+      "source_path": "/home/x/Documents/Codex/2026-10-21/he/outputs/rx7900-reactos/ARCHITECTURE.md",
+      "sha256": "6bde83d40f4a231db238340a7c88fe924ced2c3595d0776b982e9c9def013e79",
+      "bytes": 60093,
+      "unchanged_snapshot": true
+    }
+  ],
+  "public_export_note": "STYLE_GUIDE.md and agent instruction files are excluded at the owner's request; retained upstream file hashes are unchanged."
+}

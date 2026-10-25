@@ -1,0 +1,2 @@
+[ 16%] Generating native/resources_contract_tests.exe
+[100%] Built target rtl8125_native_resource_contract_tests

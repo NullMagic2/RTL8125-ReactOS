@@ -1,0 +1,8 @@
+Test project /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/host
+    Start 1: rtl8125_core_boundaries
+1/1 Test #1: rtl8125_core_boundaries ..........   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.01 sec
+RTL8125 core: 1555 checks, 0 failures

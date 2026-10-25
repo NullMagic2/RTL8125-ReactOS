@@ -1,0 +1,63 @@
+Module: rtl8125.evidence.m02_linux_device_probe
+Purpose: Capture actual card family/XID and assigned BAR prerequisites without modifying hardware.
+Created: 2026-10-24
+Architecture: Read-only Linux kernel journal and sysfs inventory; does not satisfy ReactOS native probe gate.
+
+Command: journalctl -k -b --no-pager --grep='r8169 0000:0d:00.0 eth0: RTL8125|pci 0000:0d:00.0: BAR'
+Oct 23 16:28:00 x-MS-7E27 kernel: pci 0000:0d:00.0: BAR 0 [io  0xe000-0xe0ff]
+Oct 23 16:28:00 x-MS-7E27 kernel: pci 0000:0d:00.0: BAR 2 [mem 0xdf800000-0xdf80ffff 64bit]
+Oct 23 16:28:00 x-MS-7E27 kernel: pci 0000:0d:00.0: BAR 4 [mem 0xdf810000-0xdf813fff 64bit]
+Oct 23 16:28:00 x-MS-7E27 kernel: r8169 0000:0d:00.0 eth0: RTL8125B, [host MAC omitted], XID 641, IRQ 64
+
+Command: od -Ax -tx1 -N64 /sys/bus/pci/devices/0000:0d:00.0/config
+000000 ec 10 25 81 07 04 10 00 05 00 00 02 10 00 00 00
+000010 01 e0 00 00 00 00 00 00 04 00 80 df 00 00 00 00
+000020 04 00 81 df 00 00 00 00 00 00 00 00 62 14 27 7e
+000030 00 00 00 00 40 00 00 00 00 00 00 00 0a 01 00 00
+000040
+
+Command: cat /sys/bus/pci/devices/0000:0d:00.0/resource
+0x000000000000e000 0x000000000000e0ff 0x0000000000040101
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x00000000df800000 0x00000000df80ffff 0x0000000000140204
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x00000000df810000 0x00000000df813fff 0x0000000000140204
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+0x0000000000000000 0x0000000000000000 0x0000000000000000
+
+Command: cat /sys/class/net/enp13s0/device/uevent
+DRIVER=r8169
+PCI_CLASS=20000
+PCI_ID=10EC:8125
+PCI_SUBSYS_ID=1462:7E27
+PCI_SLOT_NAME=0000:0d:00.0
+MODALIAS=pci:v000010ECd00008125sv00001462sd00007E27bc02sc00i00
+
+Command: cat /sys/class/net/enp13s0/operstate /sys/class/net/enp13s0/speed
+up
+1000
+
+Command: ls /sys/bus/pci/devices/0000:0d:00.0/iommu_group/devices
+0000:05:0a.0
+0000:0d:00.0
+
+Interpretation: The running Linux r8169 driver reported the actual adapter as
+RTL8125B with XID 0x641. Its first memory BAR is PCI BAR2, 64-bit address
+0x00000000df800000, length 0x10000. BAR4 is a separate 0x4000-byte aperture and
+cannot satisfy this driver's >=0x604c register contract. Full TxConfig bits were
+not captured; the logged XID must not be represented as a full TxConfig snapshot.
+Linux IRQ64 proves neither a ReactOS assigned line vector nor INTx delivery.
+The adapter is currently active on Linux at 1000 Mb/s, with r8169 bound. Its IOMMU
+group also contains upstream device 0000:05:0a.0. Native ReactOS access would
+require physical boot on this board or a separately owned test adapter; safely
+passing this active NIC through to a guest is outside the authorized operation.
+No detach/rebind/reset, host MMIO map/write, bus-master change or DMA operation
+was performed. dmesg was denied by host access policy; the existing kernel journal
+provided the needed log without escalation. ethtool -i could not create a control
+socket under the sandbox; no retry was required because sysfs identifies r8169.

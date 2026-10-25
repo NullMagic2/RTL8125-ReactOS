@@ -1,0 +1,12 @@
+{
+  "source": "Linux sysfs PCI configuration, first 64 bytes, read-only",
+  "device": "0000:0d:00.0",
+  "vendor_id": "10ec",
+  "device_id": "8125",
+  "revision": "05",
+  "interrupt_pin": 1,
+  "interrupt_pin_name": "INTA",
+  "linux_interrupt_line_byte": 10,
+  "reactos_interrupt_delivery_verified": false,
+  "note": "Advertised interrupt pin does not prove firmware/ReactOS routing; Linux line byte is not a usable ReactOS vector."
+}

@@ -1,0 +1,24 @@
+{
+  "node_id": "TA_kwDOACN7MtoAKDA2MDkwYzliNjIyYTdlMWY3OTdlNzc1ZGI0YzAzNWUwZDc3OWI3NmU",
+  "sha": "06090c9b622a7e1f797e775db4c035e0d779b76e",
+  "url": "https://api.github.com/repos/torvalds/linux/git/tags/06090c9b622a7e1f797e775db4c035e0d779b76e",
+  "tagger": {
+    "name": "Linus Torvalds",
+    "email": "torvalds@linux-foundation.org",
+    "date": "2024-11-17T22:15:08Z"
+  },
+  "object": {
+    "sha": "adc218676eef25575469234709c2d87185ca223a",
+    "type": "commit",
+    "url": "https://api.github.com/repos/torvalds/linux/git/commits/adc218676eef25575469234709c2d87185ca223a"
+  },
+  "tag": "v6.12",
+  "message": "Linux 6.12\n-----BEGIN PGP SIGNATURE-----\n\niQFSBAABCAA8FiEEq68RxlopcLEwq+PEeb4+QwBBGIYFAmc6auweHHRvcnZhbGRz\nQGxpbnV4LWZvdW5kYXRpb24ub3JnAAoJEHm+PkMAQRiGfvUIAKKSUVI+fIgJmbwV\nuvLiwYLe2DPaGFOlzkDqjAs4+TR0I04YQzClN0eANiEpU5witHJkD5IWv+aXnm9G\nAbtD1ht9gIFEOsgzSqfvawFKYODhAtPwiV4iM5fds8+0IjHu42XFGNP7WUhhmlMa\n3DGJoqKKWOxzA7VEjS56OpZWJSQnbkimrisi/Emw6XgJQZijAnj3WU6V2RNiG5Vk\nyyS82pChkZy1BdzD6rkjLF+7cHnYlN737lKGdK0PDb8DZRqd4Ndnpq/gEOFYdNb1\nmih6bE6qbznJVvgo0mUR9mVzZh7Jo96gqx+VV4O9hKM243twmvtdCeKwoGfdY0qf\nFPVtm+0=\n=h8AI\n-----END PGP SIGNATURE-----\n",
+  "verification": {
+    "verified": false,
+    "reason": "unknown_key",
+    "signature": "-----BEGIN PGP SIGNATURE-----\n\niQFSBAABCAA8FiEEq68RxlopcLEwq+PEeb4+QwBBGIYFAmc6auweHHRvcnZhbGRz\nQGxpbnV4LWZvdW5kYXRpb24ub3JnAAoJEHm+PkMAQRiGfvUIAKKSUVI+fIgJmbwV\nuvLiwYLe2DPaGFOlzkDqjAs4+TR0I04YQzClN0eANiEpU5witHJkD5IWv+aXnm9G\nAbtD1ht9gIFEOsgzSqfvawFKYODhAtPwiV4iM5fds8+0IjHu42XFGNP7WUhhmlMa\n3DGJoqKKWOxzA7VEjS56OpZWJSQnbkimrisi/Emw6XgJQZijAnj3WU6V2RNiG5Vk\nyyS82pChkZy1BdzD6rkjLF+7cHnYlN737lKGdK0PDb8DZRqd4Ndnpq/gEOFYdNb1\nmih6bE6qbznJVvgo0mUR9mVzZh7Jo96gqx+VV4O9hKM243twmvtdCeKwoGfdY0qf\nFPVtm+0=\n=h8AI\n-----END PGP SIGNATURE-----\n",
+    "payload": "object adc218676eef25575469234709c2d87185ca223a\ntype commit\ntag v6.12\ntagger Linus Torvalds <torvalds@linux-foundation.org> 1731881708 -0800\n\nLinux 6.12\n",
+    "verified_at": null
+  }
+}

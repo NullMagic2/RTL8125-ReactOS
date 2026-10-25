@@ -1,0 +1,25 @@
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/m03-finish-native
+[  0%] Generating hardware-native/src_hardware_registers.cpp.obj
+[  0%] Generating native/src_reactos_datapath_adapter.cpp.obj
+[  9%] Generating hardware-native/src_hardware_firmware.cpp.obj
+[ 18%] Generating hardware-native/src_hardware_phy.cpp.obj
+[ 18%] Generating hardware-native/src_hardware_device.cpp.obj
+[ 27%] Generating hardware-native/src_reactos_hardware_init.cpp.obj
+[ 36%] Generating native/src_core_chip.cpp.obj
+[ 45%] Generating native/src_core_oid.cpp.obj
+[ 54%] Generating native/src_core_resources.cpp.obj
+[ 54%] Generating native/src_reactos_resources.cpp.obj
+[ 63%] Generating native/src_reactos_miniport.cpp.obj
+[ 72%] Generating native/src_core_packet.cpp.obj
+[ 72%] Generating native/src_core_filter.cpp.obj
+[ 72%] Generating native/src_core_receive.cpp.obj
+[ 81%] Generating native/src_reactos_dma.cpp.obj
+[ 90%] Generating native/src_reactos_datapath.cpp.obj
+[100%] Generating hardware-native/hardware_contract_tests.exe
+[100%] Built target rtl8125_native_hardware_contract_tests
+[  9%] Generating hardware-native/dma_contract_tests.exe
+[100%] Built target rtl8125_native_dma_contract_tests
+[  8%] Generating hardware-native/rtl8125-hardware-link.sys
+[100%] Built target rtl8125_native_hardware_link_check

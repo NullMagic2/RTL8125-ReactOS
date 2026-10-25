@@ -1,0 +1,9 @@
+Copyright © 2011-2013, Realtek Semiconductor Corporation
+
+Permission is hereby granted for the distribution of this firmware
+data in hexadecimal or equivalent format, provided this copyright
+notice is accompanying it.
+
+Notice source: linux-firmware-realtek copyright, Files rtl_nic/*,
+Redistributable-r8169. See evidence/m03-firmware-terms.txt for provenance.
+No firmware is bundled in this package.

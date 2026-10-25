@@ -1,0 +1,43 @@
+{
+  "module": "rtl8125.evidence.m04_source_snapshot",
+  "created": "2026-10-24",
+  "scope": "M04 completed source; same shared files may later change through integration",
+  "files": [
+    {
+      "path": "src/reactos/dma.hpp",
+      "sha256": "210adcaf89428a616f42fc6b4bf50c234d8b52fe0ffee86459bb88d9b32ec074"
+    },
+    {
+      "path": "src/reactos/dma.cpp",
+      "sha256": "2e51638274763a0f869f0840d6191d789c90d5be35afcf216560d716c1e82d81"
+    },
+    {
+      "path": "src/hardware/device.hpp",
+      "sha256": "51ae7248751894703c01d0836251222c6591ceefc54b619c058f651f72a1237d"
+    },
+    {
+      "path": "src/hardware/device.cpp",
+      "sha256": "0f9105437fe5c054fce2099c2193cfc899a7dd5450086bbd6633b44784658409"
+    },
+    {
+      "path": "src/reactos/hardware_io.cpp",
+      "sha256": "dd8c81b6300e388dc71d72b3adb4c63bb34b123b6e64835a021e0aa53757b698"
+    },
+    {
+      "path": "src/reactos/hardware_init.cpp",
+      "sha256": "dd925dd9a3a50f646e1548db95141144e397914943f953a4b91cdb01de917d95"
+    },
+    {
+      "path": "tests/dma_native_tests.cpp",
+      "sha256": "6052cb286bbf440b205d75d4faef8111f57c9222c11cd60daba9e8a90ca4fe12"
+    },
+    {
+      "path": "tests/hardware_device_tests.cpp",
+      "sha256": "57de9e9b28fdecf4f94ed4814283a032a2b46ba8fe2cf947df2d9d9f7fda3b07"
+    },
+    {
+      "path": "tests/datapath_native_tests.cpp",
+      "sha256": "fdba4781075588e7f0f5bb6f5bab32cc441ac6ea2502c811bd73f083d9367147"
+    }
+  ]
+}

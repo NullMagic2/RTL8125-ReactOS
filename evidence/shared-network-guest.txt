@@ -1,0 +1,9 @@
+(/ntoskrnl/mm/ARM3/sysldr.c:170) Loading: \SystemRoot\System32\drivers\netkvm.sys at ADA42000 with 39 pages
+SHARED_NET BEGIN actual guest inspection
+SHARED_NET BundledNetKvmPresent=1
+SHARED_NET VirtioPnp NetKvm=1 Started=1 Problem=0
+SHARED_NET Adapter= IPv4=10.0.3.15
+SHARED_NET VirtioSourceIPv4=10.0.3.15
+SHARED_NET VirtioDefaultRoute=1
+SHARED_NET VirtioBoundHttpTransfer=1 Bytes=251
+SHARED_NET END shared networking only; RTL8125 hardware not exercised

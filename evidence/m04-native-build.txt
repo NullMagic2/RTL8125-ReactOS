@@ -1,0 +1,2 @@
+[100%] Built target rtl8125_native_dma_contract_tests
+[100%] Built target rtl8125_native_hardware_link_check

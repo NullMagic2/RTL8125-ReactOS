@@ -1,0 +1,5 @@
+Actual i386 user-mode PE export audit against matched ReactOS source
+188 imports found in the actual nine DLL export specifications
+No libstdc++/libgcc/winpthread/UCRT/VCRUNTIME DLL dependencies
+GetThreadId imported by static C++ runtime is actually implemented in kernel32/client/thread.c:913
+Actual NT5/ReactOS target only; Windows installation is rejected

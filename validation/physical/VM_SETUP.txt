@@ -1,0 +1,51 @@
+Module: rtl8125.validation.dedicated_vfio
+Purpose: Run the read-only native resource/XID probe in the user-selected dedicated-card VM.
+Created: 2026-10-24
+Architecture: Non-bootable validation media plus an existing isolated ReactOS i386 guest.
+
+This media contains an incomplete read-only network probe. It does not provide
+Ethernet connectivity and deliberately returns NOT_SUPPORTED after identification.
+rtl8125-source.tar.gz includes corresponding C++/CMake source and pinned Linux
+references. Firmware binaries and intermediate VM disks are excluded. The Linux
+collector and preflight executables remain in the project Binaries directory;
+build them from the archive with the root CMake project if needed.
+
+Host setup
+  1. Use a separate physical RTL8125 for the guest. The current host adapter
+     0000:0d:00.0 is active on r8169 and is not an eligible substitute.
+  2. Identify the dedicated BDF and arrange exclusive VFIO ownership without
+     touching the host's active NIC. This package performs no detach or binding.
+  3. Run the Linux tool Binaries/rtl8125_vfio_check DDDD:BB:SS.F.
+     Continue only if it exits 0. A connected host interface, non-VFIO binding,
+     another endpoint in the IOMMU group, or unavailable KVM/VFIO nodes is rejected.
+  4. Use a project-owned disk overlay. Keep the existing base image read-only.
+     Attach rtl8125-probe-validation.iso as CD-ROM; this ISO is not bootable.
+     Enable a serial-debug ReactOS boot entry and capture COM1 to a NEW host log.
+     The separate card QEMU device argument is:
+       -device vfio-pci,host=DDDD:BB:SS.F
+     The tool prints the argument only for an eligible already-owned candidate.
+     The guest launch template does not automatically select or detach a card.
+
+Guest setup
+  1. Open Device Manager and verify that the assigned device is PCI VEN_10EC,
+     DEV_8125. Record the dedicated card's subsystem/revision and guest build.
+  2. Update only this dedicated adapter's driver, selecting rtl8125-probe.inf
+     on the read-only CD-ROM. This Net-class PnP association supplies the genuine
+     NDIS device/configuration context; sc start alone does not run the PCI probe.
+  3. The adapter is expected to fail initialization after the read-only probe.
+     Preserve the complete serial log, the guest hardware-ID screenshot, QEMU
+     launch configuration, ISO/SYS hashes and precise ReactOS build identity.
+  4. Shut down the owned guest before reusing or restoring its disk overlay.
+
+Host collection
+  Run Binaries/rtl8125_probe_collect ACTUAL_SERIAL_LOG NEW_OUTPUT_JSON.
+  The collector rejects incomplete/interleaved captures and never overwrites
+  existing evidence. Exit 0 means known Linux-card identity match; exit 4 means
+  a different supported dedicated RTL8125. Either requires provenance review.
+  Its JSON cannot certify physical execution from text and intentionally leaves
+  reactos_physical_gate_passed=false. Supply the original log and guest/BDF/hash
+  context for review before completing M02 gate 3.
+
+The exact command reference and evidence criteria are also included in
+M02_PHYSICAL_HANDOFF.txt. The separate M01 kernel-fixture media is not a hardware
+probe and cannot satisfy M02 by emulating or replaying the RTL8125 identity.

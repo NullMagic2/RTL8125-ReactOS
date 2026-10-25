@@ -1,0 +1,37 @@
+image: Binaries/.build/m01-guest/reactos-validation-v5.qcow2
+file format: qcow2
+virtual size: 4 GiB (4294967296 bytes)
+disk size: 5.63 MiB
+cluster_size: 65536
+backing file: /home/x/Documents/Codex/2026-10-21/he/work/gdi-stack-safe-snapshot.qcow2
+backing file format: qcow2
+Format specific information:
+    compat: 1.1
+    compression type: zlib
+    lazy refcounts: false
+    refcount bits: 16
+    corrupt: false
+    extended l2: false
+Child node '/file':
+    filename: Binaries/.build/m01-guest/reactos-validation-v5.qcow2
+    protocol type: file
+    file length: 5.69 MiB (5963776 bytes)
+    disk size: 5.63 MiB
+
+image: /home/x/Documents/Codex/2026-10-21/he/work/gdi-stack-safe-snapshot.qcow2
+file format: qcow2
+virtual size: 4 GiB (4294967296 bytes)
+disk size: 416 MiB
+cluster_size: 65536
+Format specific information:
+    compat: 1.1
+    compression type: zlib
+    lazy refcounts: false
+    refcount bits: 16
+    corrupt: false
+    extended l2: false
+Child node '/file':
+    filename: /home/x/Documents/Codex/2026-10-21/he/work/gdi-stack-safe-snapshot.qcow2
+    protocol type: file
+    file length: 416 MiB (436207616 bytes)
+    disk size: 416 MiB

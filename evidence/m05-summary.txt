@@ -1,0 +1,64 @@
+Supersession notice (2026-10-24): this first-pass callable-component report is historical. Production callback/ownership wiring is now complete; see evidence/m05-production-summary.txt for the current100% source assessment and separate pending validation.
+
+Module: rtl8125.evidence.m05_summary
+Purpose: Record callable TX implementation, build evidence and remaining integration.
+Created: 2026-10-24 (America/Sao_Paulo)
+
+Implemented code:
+- src/core/packet.hpp/.cpp bounds frame lengths and applies minimum 60-byte zero
+  padding and exact RTL8125 UDP/PTP rules (ports319/320, patch47, packet<175,
+  short UDP header8). Checked IPv4 IHL/options/fragment offsets and direct IPv6
+  UDP parsing; VLAN/QinQ insertion is rejected. Original bytes are preserved.
+- src/reactos/datapath.hpp/.cpp gathers at most256 NDIS_BUFFERs into owned copied
+  storage. NdisQueryPacket requests only FirstBuffer, avoiding its unbounded
+  total-length walk. Safe MDL mapping and checked cumulative lengths prevent
+  overflow; zero-length cycles terminate. Explicit checksum/TSO/VLAN metadata
+  requests are rejected: protocol software finishes checksums/segmentation.
+- Serialized producer/consumer/pending-slot ownership uses existing DmaOwner.
+  OWN is published by that owner after payload; checked 16-bit TxPoll0x90=1
+  follows publication. Exactly one pending NDIS packet belongs to each live
+  slot. Ring-full backpressure returns RESOURCES and notifies availability once
+  after progress. Completion clears state before the NDIS callback, tolerating
+  synchronous resubmission. Duplicate pending pointers are rejected.
+- Post-OWN doorbell failure keeps PENDING ownership and faults admission; it
+  never rolls back live DMA. stop_datapath only stops CPU admission. Abort/free
+  refuse until the separate DMA owner positively retires and callbacks finish.
+
+Validation completed:
+- GCC15.2 host ASan/UBSan: 8,335 new packet/filter checks, zero failures. Existing
+  core1,555 checks also pass after unchanged receive decoder extraction.
+  ASAN_OPTIONS=detect_leaks=0 (process tracing prevents LeakSanitizer).
+- GCC13 MinGW i386 + genuine matched ReactOS SDK: contract executable and a
+  combined kernel-link .sys build. PE imports only ndis.sys/hal.dll/ntoskrnl.exe.
+  The combined .sys is a link check, not the published probe or an active driver.
+- Wine real-SDK fixture with mocked NDIS/NT imports and memory-only NIC:
+  863 checks, zero failures. Includes full256-slot wrap, ring-full rejection,
+  exact256-MDL and rejected257-MDL chains, cyclic/oversize/unmappable buffers,
+  native short/PTP padding, reentrant submit, no double completion, failed
+  doorbell retention, modeled retirement and exactly-once error completion.
+  It executes no real DMA, PCI, MMIO, kernel or network traffic.
+
+Implementation versus validation:
+- Original M05 gates1/2/3 have concrete callable implementation and passing model
+  evidence. Original gate4 is peer/throughput/reset validation and remains pending.
+- Packet algorithms and native callable ownership are implemented. Production
+  MiniportSend/Initialize remain the fail-closed read-only probe. Activation and
+  live adapter wiring require full M03 MAC/link, M07 IRQ/DPC and M08 recovery/
+  callback fencing. A compiled callable module is not operational networking.
+- No peer Ethernet/ARP/IP capture, sustained TX, real in-flight reset, native
+  packet guest test, physical DMA validation, MSVC2022 or nativeAMD64 evidence.
+- No host NIC detach/reset/MMIO/PCI binding/bus-master operation occurred.
+
+Reproduce from project root:
+cmake -S . -B Binaries/.build/m05-host -DRTL8125_SANITIZERS=ON -DCMAKE_BUILD_TYPE=Debug
+cmake --build Binaries/.build/m05-host --target rtl8125_packet_tests rtl8125_core_tests -j2
+ASAN_OPTIONS=detect_leaks=0 ctest --test-dir Binaries/.build/m05-host -R 'rtl8125_(packet|core)_boundaries' --verbose
+cmake -S . -B Binaries/.build/m05-native -DRTL8125_TESTS=OFF -DRTL8125_NATIVE_DRIVER=ON -DRTL8125_REACTOS_SOURCE=/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/src -DRTL8125_REACTOS_BUILD=/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release
+cmake --build Binaries/.build/m05-native --target rtl8125_native_datapath_contract_tests rtl8125_native_datapath_link_check -j2
+WINEPREFIX=/home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/m01-wine WINEDEBUG=-all DISPLAY= wine Binaries/.build/m05-native/datapath-native/datapath_contract_tests.exe
+
+Pinned algorithm attribution:
+Linuxv6.12 adc218676eef25575469234709c2d87185ca223a, unchanged
+third_party/linux/r8169_main.c: rtl_skb_is_udp, rtl8125_quirk_udp_padto,
+rtl_quirk_packet_padto, rtl8169_doorbell, rtl8169_start_xmit, rtl_tx.
+Adapted C++ files retain GPL-2.0-only and attribution; no Linux runtime is linked.

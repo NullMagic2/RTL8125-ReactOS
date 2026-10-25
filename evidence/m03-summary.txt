@@ -1,0 +1,77 @@
+Module: rtl8125.evidence.m03
+Purpose: Bound M03 implementation claims to source, model and genuine-SDK evidence.
+Created: 2026-10-24
+
+Gate 1: COMPLETE in implemented callable modules. RegisterSession serializes a
+whole sequence, including MAC OCP read/modify/write and firmware MDIO page state.
+Checked 8/16/32-bit native M02 accessors back the platform bridge. PHY OCP, MAC
+OCP, EPHY, EXGMAC ERI, RTL8125 paged MDIO and firmware MAC-MCU commands preserve
+the pinned Linux command encoding/polarity/delays. Polls have finite attempts;
+all operations have elapsed, delay and operation budgets; the first I/O error,
+removal or timeout latches and blocks subsequent writes. Session claim/release
+is explicit and concurrent claim fails. Native code enforces PASSIVE_LEVEL.
+
+Gate 2: PENDING. Full RTL8125B PHY tuning and A/B EPHY tables are ported, with
+firmware followed by bounded soft-reset polling, parameter writes, legacy force
+mode, ALDPS and B PHY EEE tuning in Linux order. The overall gate still requires
+A PHY tuning and complete A/B reset, OOB/FIFO, ASPM/PCI/CSI and common MAC start
+sequencing, legacy descriptor mode, MAC EEE policy and controlled integration.
+The EPHY function explicitly requires its caller to set ASPM latency first.
+These sub-sequences are never advertised as complete MAC initialization.
+
+Gate 3: COMPLETE in source and genuine-SDK ABI fixture. Linux raw/headered
+firmware formats are bounded to 1 MiB; bytewise decoding avoids alignment
+assumptions. Header checksum, code extents, nonempty code and all Linux opcode
+and branch rules are checked before any execution. Header/code overlap is
+additionally refused. All Linux opcodes execute with step and elapsed budgets;
+all delays share the session budget. Execution revalidates borrowed file bytes.
+NT acquisition selects only core firmware_name(A/B) under the fixed path
+SystemRoot/system32/drivers, opens a read-only synchronous kernel handle,
+queries/caps file size, reads a private nonpaged copy, validates it, closes every
+opened handle and frees partial storage. There is no arbitrary caller pathname.
+No firmware is distributed with the driver. No actual NT file call was executed:
+ABI fixture file imports are mocks. This gate does not imply physical execution.
+
+Gate 4: PENDING. No autonegotiation, selected-card link transitions or truthful
+10/100/1000/2500 status integration yet. Model sequencing cannot satisfy the
+physical-card portion. Dedicated card is unavailable; host NIC was never touched.
+
+Verification:
+  Host GCC 15.2.0, ASan/UBSan: 2,562 hardware/firmware model checks pass.
+  Leak detection disabled because tracing prevents LeakSanitizer, as baseline.
+  Includes indirect failure/time/removal budgets, exclusion, exact B PHY tuning,
+  every I/O failure in EPHY+B PHY sequence, header truncations, control flow,
+  self-loop cap, huge delay and 2,000 deterministic malformed firmware inputs.
+  GCC 13-win32 genuine i386 ReactOS SDK: all new production TUs compile and
+  link with the existing inactive miniport under -nostdlib. New imports are
+  NDIS/NT/HAL only; no C++ runtime DLL, exceptions or allocating new dependency.
+  Shared-memory and NT-loader ABI fixture: 2,149 checks pass under Wine with
+  mocked imports. These are not kernel, guest, actual DMA or hardware evidence.
+  No MSVC 2022 or native AMD64 validation is claimed.
+
+Installed firmware format-only check:
+  /usr/lib/firmware/rtl_nic/rtl8125b-2.fw.zst was decompressed only in owned
+  Binaries/.build/m03-host. 3,328 bytes, 800 instructions, code offset 112,
+  version rtl8125b-2_0.0.2 07/13/20 validates. No opcodes were executed from it.
+  Compressed SHA256 3652e9f6ebd094b1f57c489f3813f8242760bc2c455831e87301299380d74eba
+  File SHA256 529bf1c25c97ff52b401090d00ff89cc22351012336e5a0c9662728a3ee909ef
+
+Firmware terms, distinct from driver GPL-2.0-only:
+  Upstream linux-firmware WHENCE tag 20250211, blob
+  19d0f7184257e912a6bfd4650e12771458454f1f, r8169 section, lists the A/B files.
+  It identifies Realtek Semiconductor Corporation copyright 2011-2013 and
+  permits firmware distribution in hexadecimal/equivalent form accompanied by
+  that copyright notice. Keep the applicable notice with any future package;
+  this implementation presently packages no firmware. Authoritative source:
+  https://kernel.googlesource.com/pub/scm/linux/kernel/git/firmware/linux-firmware.git/+/refs/tags/20250211/WHENCE
+
+Reproduction from project root:
+  cmake -S . -B Binaries/.build/m03-host -DRTL8125_SANITIZERS=ON
+  cmake --build Binaries/.build/m03-host --target rtl8125_hardware_tests rtl8125_firmware_check -j2
+  ASAN_OPTIONS=detect_leaks=0 Binaries/.build/m03-host/rtl8125_hardware_tests
+  ASAN_OPTIONS=detect_leaks=0 Binaries/.build/m03-host/rtl8125_firmware_check Binaries/.build/m03-host/rtl8125b-2.fw
+
+All source derives from unchanged third_party/linux v6.12 reference files.
+Probe Initialize remains read-only and fail-closed. The native hardware link
+artifact is an inactive build check in .build, not the published probe artifact
+and not an operational Ethernet driver.

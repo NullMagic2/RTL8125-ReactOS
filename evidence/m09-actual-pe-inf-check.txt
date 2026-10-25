@@ -1,0 +1,2 @@
+Package metadata passes: i386 native PE, executable entry, operational build marker, NDIS/kernel-only imports, exact PCI/service INF
+This check does not establish successful guest installation or networking

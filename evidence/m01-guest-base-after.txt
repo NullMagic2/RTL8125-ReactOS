@@ -1,0 +1,1 @@
+8761f26e97807dd6e03bbbfd4b27558f3d5ee0adb4e7fc478f77e038cdc007f4  /home/x/Documents/Codex/2026-10-21/he/work/gdi-stack-safe-snapshot.qcow2

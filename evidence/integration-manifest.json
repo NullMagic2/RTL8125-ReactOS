@@ -1,0 +1,373 @@
+{
+  "date": "2026-10-24",
+  "timezone": "America/Sao_Paulo",
+  "compiler_native": "GCC 13-win32 i686-w64-mingw32-g++",
+  "host_compiler": "GCC 15.2",
+  "native_build_target": "rtl8125_native_driver",
+  "native_contract_targets": [
+    "rtl8125_native_contract_tests",
+    "rtl8125_native_resource_contract_tests",
+    "rtl8125_native_dma_contract_tests",
+    "rtl8125_native_hardware_contract_tests",
+    "rtl8125_native_datapath_contract_tests"
+  ],
+  "sdk_inputs": [
+    {
+      "path": "/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/src/sdk/include/ddk/ndis.h",
+      "sha256": "076e068af589bb86f5c9b16fda4b69b2f152c72abff9a9fb9df297ee0c0486f2",
+      "bytes": 174071
+    },
+    {
+      "path": "/home/x/Documents/Codex/2026-10-21/he/work/reactos/sdk/include/ddk/ndis.h",
+      "sha256": "076e068af589bb86f5c9b16fda4b69b2f152c72abff9a9fb9df297ee0c0486f2",
+      "bytes": 174071
+    },
+    {
+      "path": "/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release/sdk/include/ddk/ntddk.h",
+      "sha256": "20e35887d2c6d4a133a3883ba81043bfbde8c9552970040a295f998b43cf1eb1",
+      "bytes": 182962
+    },
+    {
+      "path": "/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release/sdk/include/ddk/wdm.h",
+      "sha256": "7a6000c5277bc91ba20fb2dfba77e03a0fe02dc221a7bb976f6409b8951ec6dc",
+      "bytes": 562810
+    },
+    {
+      "path": "/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release/sdk/include/psdk/ntdef.h",
+      "sha256": "c22fb43a39f023849b246843cad03241359a565b98211ba93b26d28ed42f64bf",
+      "bytes": 71031
+    },
+    {
+      "path": "/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release/drivers/network/ndis/CMakeFiles/libndis.dir/libndis.a",
+      "sha256": "59d9abce6bcdfb1b8fa36bee82b041a3bc8b004db9bd4a59d9debdd50eca9436",
+      "bytes": 228830
+    },
+    {
+      "path": "/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release/ntoskrnl/CMakeFiles/libntoskrnl.dir/libntoskrnl.a",
+      "sha256": "17bdbf6b2923642b2c1d770186fe95f59e0ce8b2f742d8eff4457f663ff3de8d",
+      "bytes": 1248862
+    },
+    {
+      "path": "/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release/hal/halx86/CMakeFiles/libhal.dir/libhal.a",
+      "sha256": "32cf1d52391429c5f40e8a0d5aa4f17a183d652f172a5e9208f6d1810f44e5dc",
+      "bytes": 71846
+    }
+  ],
+  "project_files": [
+    {
+      "path": "Binaries/rtl8125-probe-i386.sys",
+      "sha256": "85caba7a806811826ed24b0fa6f3448d5809d7bad81ef14dbdb8aa399f7237f6",
+      "bytes": 45831
+    },
+    {
+      "path": "Binaries/rtl8125-probe-validation.iso",
+      "sha256": "6d24fb3c03882a1fa7bf1e0930581775a3cbb12c06a64ea5d685beb058dff4d4",
+      "bytes": 706560
+    },
+    {
+      "path": "Binaries/rtl8125_probe_collect",
+      "sha256": "aca69da902156e350a378f0c2688653fa0734ed17cdce791f27f94e098656916",
+      "bytes": 21296
+    },
+    {
+      "path": "Binaries/rtl8125_vfio_check",
+      "sha256": "4043117528e3bc4ee445a86d5bab8c8852e096b3ad621d61d65f8050a38edeec",
+      "bytes": 33872
+    },
+    {
+      "path": "validation/physical/rtl8125-source.tar.gz",
+      "sha256": "a105eb0b239f8ce44d13623915792c0d0e9bc0c603cef95bf40a3f5aec3ca06a",
+      "bytes": 234317
+    },
+    {
+      "path": "validation/physical/rtl8125-probe.inf",
+      "sha256": "c73148675e75af48cff03b28d6fba5bbad48744f4f33869de787451f6e6dd32a",
+      "bytes": 1203
+    },
+    {
+      "path": "roadmap.json",
+      "sha256": "e3e97e1256db953a437e2ec3c755079944867d51f425faca52531f69fcbc05b1",
+      "bytes": 38580
+    },
+    {
+      "path": "driver-roadmap.html",
+      "sha256": "650f8890cebad866112cced07bd1b0736d9b1865c94ace57ea7630797e227b14",
+      "bytes": 47701
+    },
+    {
+      "path": "ARCHITECTURE.md",
+      "sha256": "15f4e3c8b2badc2ee7849b0f9dd9cd85256f46faaf673505244435efc30fcc92",
+      "bytes": 7699
+    },
+    {
+      "path": "STYLE_GUIDE.md",
+      "sha256": "43c1fa5be7e851c9ccff1326a219965b4ab1192fe6960d7623fcf109bc6af65f",
+      "bytes": 8338
+    },
+    {
+      "path": "THIRD_PARTY.txt",
+      "sha256": "703bf8f304bfb47072e8b66d6458b9ff59d3b7f748c2b1c51386b065db8e992b",
+      "bytes": 9884
+    }
+  ],
+  "host_checks": 16922,
+  "native_mock_contract_checks": 3599,
+  "reactos_guest_tested": true,
+  "physical_hardware_tested": false,
+  "networking_operational": false,
+  "binary_audit": "PE32 NT native5.2. Imports only ndis.sys,hal.dll,ntoskrnl.exe. No exports/C++ runtime import. GNU PE symbol table retains unused linker-script undefined placeholders; these are not loader imports or executed runtime dependencies.",
+  "reactos_guest_kernel_checks": 70,
+  "reactos_guest_cycles": 2,
+  "native_hardware_link_target": "rtl8125_native_hardware_link_check",
+  "guest_scope": "Historical M01 fixture70 checks/two cycles and new M05 packet-linked fixture70 checks/two cycles. Captured source/binary hashes retained independently; no active NIC, physical IRQ/DMA, networking or current M07 guest validation.",
+  "validation_media_scope": "Non-bootable exact-device read-only probe CD with corresponding source; VFIO template BDF remains unselected and no physical VM launched.",
+  "source_scope": "Published probe/validation source remains the immutable completed M03/M05/M06 snapshot in integration-source-snapshot.json. Later completed M07/M08/M09 source and the separate operational candidate are not represented by that historical probe binary.",
+  "source_snapshot_root": "/home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-source-z5gmw94t",
+  "production_and_test_source_files": [
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "a4f414f30ab4d4ec23c81127c2bc99dd47ccc3ddeb205ff035da406bc1b33646"
+    },
+    {
+      "path": "cmake/datapath.cmake",
+      "sha256": "dec51e37e724ba9a9ce07e4bb780b6b4b815b784cc4fdd636b40673a5775c1ad"
+    },
+    {
+      "path": "cmake/hardware.cmake",
+      "sha256": "3c62607f8935403143ecfa7a9b251fc3839ab2fa5d26b9eca3b9387bcb13f792"
+    },
+    {
+      "path": "cmake/native.cmake",
+      "sha256": "aa5bd0f87b996a1722341dd0ba8fc8e8aa18618519581506f6158245b807dc79"
+    },
+    {
+      "path": "src/core/chip.cpp",
+      "sha256": "45bb6fd4779f7ff036f53985b375ab5c5a3c098b09d6c8d106b55752eeabfeab"
+    },
+    {
+      "path": "src/core/chip.hpp",
+      "sha256": "c97890a9528bb70c2142a0cddb7c5e5e722372fce7445a0c5e143710a6ce3e41"
+    },
+    {
+      "path": "src/core/descriptor.cpp",
+      "sha256": "c1f9fdc6e99660eac1faee8784f8ac2b45ac905aacad22fdf1b29ce27154fd0e"
+    },
+    {
+      "path": "src/core/descriptor.hpp",
+      "sha256": "e09d0d301eb59eab7ec89433d3123e67568ac227544adfeb66e5b3f3ad3eef99"
+    },
+    {
+      "path": "src/core/descriptor_bits.hpp",
+      "sha256": "7c5e5196e98007b753184112646add286706d9c08aa2a549954e424588c0272c"
+    },
+    {
+      "path": "src/core/filter.cpp",
+      "sha256": "c7429bf25cf46eae64bebbea89f617d172cdbcf96f9eed0e54cd388028c04369"
+    },
+    {
+      "path": "src/core/filter.hpp",
+      "sha256": "eb4a5ccd6e8248dff6f1caaaa0d87479379b4fbd576f7b9260e530d78cdd6a8a"
+    },
+    {
+      "path": "src/core/frame_limits.hpp",
+      "sha256": "a0be1adc5ecb2bc95a11e1839b44a35315a954b81cd3739b1e07a5ba053a2124"
+    },
+    {
+      "path": "src/core/oid.cpp",
+      "sha256": "5e96e1d74f4f4e503d61757e37ebc82c8f5229f6849fc02b7acbbf4794cf0876"
+    },
+    {
+      "path": "src/core/oid.hpp",
+      "sha256": "47eacf204210f047c857bf579d93bb0a4c697c883bdab01df7b1972affbbef98"
+    },
+    {
+      "path": "src/core/packet.cpp",
+      "sha256": "a0b84608cd7db43c896592020d4e87176c1ecdb5a903d49e1474efdf1c91a39c"
+    },
+    {
+      "path": "src/core/packet.hpp",
+      "sha256": "8a5cf6c885ca8040e1455b3e85bb6a8c36c0e1019d9f822baf41dc429b4ca928"
+    },
+    {
+      "path": "src/core/probe_log.cpp",
+      "sha256": "9b296b0959de4a8e41b6c276cd75d027cedfc59ad5dd0fde9f0c751dedbdcde8"
+    },
+    {
+      "path": "src/core/probe_log.hpp",
+      "sha256": "50c771cb33e0697b311f1c37e013e534efd5df36b755e5ada5e251deee493336"
+    },
+    {
+      "path": "src/core/receive.cpp",
+      "sha256": "0c9479cafa91af514071b3b155764670fba98cda4c7b8928443f6e1b03a1c1da"
+    },
+    {
+      "path": "src/core/receive.hpp",
+      "sha256": "9c81562e2015425870483efc23e89942595354816344ec180b3e1d6059cf7fec"
+    },
+    {
+      "path": "src/core/resources.cpp",
+      "sha256": "f2df97ccf4490ca65b588a40e957e589b1f9bd1d869023c604aa8a63d416410d"
+    },
+    {
+      "path": "src/core/resources.hpp",
+      "sha256": "682e81913921576a39b9dd58fdc7dfe728888c8c8f1917ed6c5ca619ae82a01b"
+    },
+    {
+      "path": "src/hardware/device.cpp",
+      "sha256": "73bf175a14e5f0c7be1cc77a7333cf6a10b514bc63c49e801cb1cddb8e0b8cb6"
+    },
+    {
+      "path": "src/hardware/device.hpp",
+      "sha256": "e8bf86bd8cd6251bf616a7d395f01c4cd9d90dbcde432626682781a6d65f813a"
+    },
+    {
+      "path": "src/hardware/firmware.cpp",
+      "sha256": "646aced05b679ac3d1c025ccda0590b8f62889e802b7de22fe05e1a2ffa37cb2"
+    },
+    {
+      "path": "src/hardware/firmware.hpp",
+      "sha256": "91ff47f48123fade28ab940ecab3bd37482d0206c9fbb144a46f1eecc90a2750"
+    },
+    {
+      "path": "src/hardware/phy.cpp",
+      "sha256": "d6a49ecda9f05b9bb6db9424be0c7f75eb6fb75aaa992ecd4a0b6f9e6007976b"
+    },
+    {
+      "path": "src/hardware/phy.hpp",
+      "sha256": "f5d1e39631f744673a24d8325fc835fc1a551b3b9bf7b740327a14149c3b3cb7"
+    },
+    {
+      "path": "src/hardware/registers.cpp",
+      "sha256": "4cf11667568fe277f163406d0945d7e2c1af87d64d20085ea5ede61ab0e6ca01"
+    },
+    {
+      "path": "src/hardware/registers.hpp",
+      "sha256": "312e6075bfbdb9e5ed048951913fb8635069bc316abd27f2e8567d2171388b8a"
+    },
+    {
+      "path": "src/reactos/adapter.hpp",
+      "sha256": "d4cc1ccf491336fa5d184b186c7b8c0f0c4de2e450a16c04eb31e951c840bbc7"
+    },
+    {
+      "path": "src/reactos/datapath.cpp",
+      "sha256": "5db018b6136e9ed1ead74275f078f9907006722f103e5b7ea5c4269b9b9d0737"
+    },
+    {
+      "path": "src/reactos/datapath.hpp",
+      "sha256": "04e324c2dab9a5a6a2f432a07794a7f3184391e461ee51a141b82f391f373ceb"
+    },
+    {
+      "path": "src/reactos/datapath_adapter.cpp",
+      "sha256": "7e4e631f70be807eb1a009b89519459c88eed81921d76fa2e28dd3dace6db854"
+    },
+    {
+      "path": "src/reactos/dma.cpp",
+      "sha256": "25fc808c6e2e241049ccd4b417d65631f51a35ae4e95cb40366f258e64d78c60"
+    },
+    {
+      "path": "src/reactos/dma.hpp",
+      "sha256": "fa49287b9ccb6f86c81c874dc96daeda293c75ecd6f1771f87723d278c13a0e7"
+    },
+    {
+      "path": "src/reactos/hardware_init.cpp",
+      "sha256": "2ec651ce888af5d570ba6fef3257b29f0b2b9022e54aa4ea48b9b9aa5bcff886"
+    },
+    {
+      "path": "src/reactos/hardware_init.hpp",
+      "sha256": "4c8984ad7e117b5d19be7a2c334dba8c0ca2423c874fe08b729bfbb5794eaa73"
+    },
+    {
+      "path": "src/reactos/miniport.cpp",
+      "sha256": "7da296463a45d815f3b08028001875443e9fcb54beeea4e8ed0c1d60785b2b32"
+    },
+    {
+      "path": "src/reactos/resources.cpp",
+      "sha256": "79e74aa446b5ae723705d5f267e347f4f8684ca1a26122a302c128f9331c9058"
+    },
+    {
+      "path": "src/reactos/resources.hpp",
+      "sha256": "80ebbdbae366da407837282360b5aa3644b0a3d8ffc5371c266bb14ff8702ca9"
+    },
+    {
+      "path": "src/tools/probe_collect.cpp",
+      "sha256": "aad96cd2e87ea40b26da95a2b5f9c4a45a3948ca510c4e1c393d3c0e6efe31a7"
+    },
+    {
+      "path": "src/tools/vfio_check.cpp",
+      "sha256": "f2c4cac535e9d210326d99a986cf4c8cea4d6674115c9cd6146bbbbea109127b"
+    },
+    {
+      "path": "tests/core_tests.cpp",
+      "sha256": "46d14541e228dff5e621977069426187f5ac91ab01f9a00ead55c5ae53c7015a"
+    },
+    {
+      "path": "tests/datapath_import_stubs.cpp",
+      "sha256": "5bf9cbd2c6ad2f978ef70b247dae64a979569430c3d08b418faa3c17551cfaf0"
+    },
+    {
+      "path": "tests/datapath_native_tests.cpp",
+      "sha256": "b4e0d74cb23955b7a52e7304ef07207ba5c69fb8cafdcecaf5738dc2db2d354a"
+    },
+    {
+      "path": "tests/dma_native_tests.cpp",
+      "sha256": "6c0844ae58a69529404a0f9667740c9b5f11dbceec541388e7f00668aad25dce"
+    },
+    {
+      "path": "tests/firmware_file_check.cpp",
+      "sha256": "3d47cff273be0509593fc0de9028bfa0ae4c7784864621a7f1f3ac86cfd6f7f8"
+    },
+    {
+      "path": "tests/hardware_device_tests.cpp",
+      "sha256": "0829be5a0ed228a1f66e533bbc5a045c3652405c68ec6ad60fbc5f335b0fba13"
+    },
+    {
+      "path": "tests/hardware_tests.cpp",
+      "sha256": "a34769444601f87f03af86972a12be65a2d8c53ce68eded73fbc311830e060d7"
+    },
+    {
+      "path": "tests/miniport_contract_tests.cpp",
+      "sha256": "773c4cd2e23bf13cc3e847b504db31207da2758ede1b39f4ad562f0c26744763"
+    },
+    {
+      "path": "tests/miniport_guest_kernel.cpp",
+      "sha256": "e6d2e85fb63c77dcba90aa81dd04023b1b632a78f2ebcf617fbfa76f3f36a7ba"
+    },
+    {
+      "path": "tests/miniport_guest_runner.cpp",
+      "sha256": "f8dccc1fc861d03719ea9cfdf4022543bccab56faecca1e5464d75d484fd84b7"
+    },
+    {
+      "path": "tests/oid_tests.cpp",
+      "sha256": "0b806a0a189c82947ca832093e106d7900d4397bb8b0001e4f575a290e791898"
+    },
+    {
+      "path": "tests/packet_tests.cpp",
+      "sha256": "e9c5ef6fd81659fc6798636cda6c131e1605fe8e3b2d61c46470d51fe944f546"
+    },
+    {
+      "path": "tests/probe_log_tests.cpp",
+      "sha256": "68573368420937a1c3a5c2c65c3169235782a3b0d398cbeb929161ccbd3e9f58"
+    },
+    {
+      "path": "tests/resources_native_tests.cpp",
+      "sha256": "dcb1308751fc164ab42cc62960089730a1bb147c1c79b60ffb5614cf9fda5190"
+    },
+    {
+      "path": "tests/resources_tests.cpp",
+      "sha256": "6b187b9ac997d6fc07b166afa92fff93d5437950477f21689b128b9749af60c5"
+    },
+    {
+      "path": "tests/resources_vfio_check_tests.cpp",
+      "sha256": "d057a2ec22b528dda4edd7ef64f5fce49fa88cda10deeb7c6c8a5515de9341f9"
+    }
+  ],
+  "packet_linked_guest_kernel_checks": 70,
+  "packet_linked_guest_cycles": 2,
+  "report_update_scope": "Current M00\u2013M09 source implementation is100%; M10 is physical validation only. Native RTL8125B installer enhancement implemented and preview/policy checked; original historical probe and frozen source scope remain unchanged. Operational installation and physical networking remain unverified.",
+  "installer_release": {
+    "path": "Binaries/RTL8125B-ReactOS-Setup-i386",
+    "archive": "Binaries/RTL8125B-ReactOS-Setup-i386.zip",
+    "scope": "Published GUI text cleanup with matching browsable/source-archive snapshot; original historical probe scope remains unchanged. Actual guest installation and hardware qualification remain pending.",
+    "zip_sha256": "e1774d3e152fb637740e244ca07a8314d6d456f7c4508cb9ce60907a483ffd67"
+  }
+}

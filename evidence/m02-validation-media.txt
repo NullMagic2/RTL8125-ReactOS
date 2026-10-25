@@ -1,0 +1,13 @@
+xorriso 1.5.6 : RockRidge filesystem manipulator, libburnia project.
+
+Drive current: -outdev 'stdio:Binaries/rtl8125-probe-validation.iso'
+Media current: stdio file, overwriteable
+Media status : is blank
+Media summary: 0 sessions, 0 data blocks, 0 data,  323g free
+Added to ISO image: directory '/'='/home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/validation/physical'
+xorriso : UPDATE :       8 files added in 1 seconds
+xorriso : UPDATE :       8 files added in 1 seconds
+ISO image produced: 345 sectors
+Written to medium : 345 sectors at LBA 0
+Writing to 'stdio:Binaries/rtl8125-probe-validation.iso' completed successfully.
+

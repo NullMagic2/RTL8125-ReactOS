@@ -1,0 +1,13 @@
+-- The CXX compiler identification is GNU 13.0.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/x86_64-w64-mingw32-g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/amd64-core
+[ 66%] Building CXX object CMakeFiles/rtl8125_core.dir/src/core/chip.cpp.obj
+[ 66%] Building CXX object CMakeFiles/rtl8125_core.dir/src/core/descriptor.cpp.obj
+[100%] Linking CXX static library librtl8125_core.a
+[100%] Built target rtl8125_core

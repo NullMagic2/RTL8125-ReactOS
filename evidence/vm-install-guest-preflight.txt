@@ -1,0 +1,82 @@
+NDIS_STATUS_MEDIA_CONNECT
+RTL8125_VM BEGIN actual guest read-only preflight
+RTL8125_VM SystemRoot=C:\ReactOS
+RTL8125_VM ReactOSi386=1 Administrator=1
+RTL8125_VM Compatibility=3 NDIS=d71a8f327a2afda106c56031da84cf17da37f10fb9a32cf0311a9baa43bc7cd3
+RTL8125_VM LoadedNdisPath=1 Boot=134373701448895168
+RTL8125_VM Payload=1 RTL8125Count=0
+RTL8125_VM Issue=Confirm this compatible image, restart ReactOS, then reopen setup. This checks that the approved network core was present before this boot.
+RTL8125_VM JournalPrepared=1 Message=Compatible image recorded. Restart ReactOS and reopen setup to verify the new boot.
+RTL8125_VM OEMInfStaged=1 Path=C:\ReactOS\inf\oem6.inf Error=0
+RTL8125_VM NdisStart=0
+RTL8125_VM NdisImagePath=system32\drivers\ndis.sys
+RTL8125_VM NdisServiceWrite=134370688474233408
+RTL8125_VM ModuleQueryStatus=0 Returned=21872
+RTL8125_VM LoadedModule=ndis.sys NameOffset=0 LoadOrder=31
+RTL8125_VM LoadedModule=\SystemRoot\System32\drivers\ndisuio.sys NameOffset=29 LoadOrder=65
+RTL8125_VM AuditCopy=D:\RTL8125\ndis.sys Success=0 Error=80
+RTL8125_VM AuditCopy=D:\RTL8125\ntoskrnl.exe Success=0 Error=80
+RTL8125_VM AuditCopy=D:\RTL8125\hal.dll Success=1 Error=0
+RTL8125_VM AuditVolumeFlushed=1
+RTL8125_VM END no installation attempted
+NDIS_STATUS_MEDIA_CONNECT
+RTL8125_VM BEGIN actual guest read-only preflight
+RTL8125_VM SystemRoot=C:\ReactOS
+RTL8125_VM ReactOSi386=1 Administrator=1
+RTL8125_VM Compatibility=4 NDIS=d71a8f327a2afda106c56031da84cf17da37f10fb9a32cf0311a9baa43bc7cd3
+RTL8125_VM LoadedNdisPath=1 Boot=134373701989541760
+RTL8125_VM Payload=1 RTL8125Count=0
+RTL8125_VM Issue=
+RTL8125_VM NdisStart=0
+RTL8125_VM NdisImagePath=system32\drivers\ndis.sys
+RTL8125_VM NdisServiceWrite=134370688474233408
+RTL8125_VM ModuleQueryStatus=0 Returned=21872
+RTL8125_VM LoadedModule=ndis.sys NameOffset=0 LoadOrder=31
+RTL8125_VM LoadedModule=\SystemRoot\System32\drivers\ndisuio.sys NameOffset=29 LoadOrder=65
+RTL8125_VM AuditCopy=D:\RTL8125\ndis.sys Success=0 Error=80
+RTL8125_VM AuditCopy=D:\RTL8125\ntoskrnl.exe Success=0 Error=80
+RTL8125_VM AuditCopy=D:\RTL8125\hal.dll Success=0 Error=80
+RTL8125_VM AuditVolumeFlushed=1
+RTL8125_VM END no installation attempted
+RTL8125_VM BEGIN actual guest preflight
+RTL8125_VM SystemRoot=C:\ReactOS
+RTL8125_VM ReactOSi386=1 Administrator=1
+RTL8125_VM Compatibility=4 NDIS=d71a8f327a2afda106c56031da84cf17da37f10fb9a32cf0311a9baa43bc7cd3
+RTL8125_VM LoadedNdisPath=1 Boot=134373701989541760
+RTL8125_VM Payload=1 RTL8125Count=0
+RTL8125_VM Issue=
+RTL8125_VM InstalledBFirmwareValid=1
+RTL8125_VM NdisStart=0
+RTL8125_VM NdisImagePath=system32\drivers\ndis.sys
+RTL8125_VM NdisServiceWrite=134370688474233408
+RTL8125_VM ModuleQueryStatus=0 Returned=21872
+RTL8125_VM LoadedModule=ndis.sys NameOffset=0 LoadOrder=31
+RTL8125_VM LoadedModule=\SystemRoot\System32\drivers\ndisuio.sys NameOffset=29 LoadOrder=65
+RTL8125_VM AuditCopy=D:\RTL8125\ndis.sys Success=0 Error=80
+RTL8125_VM AuditCopy=D:\RTL8125\ntoskrnl.exe Success=0 Error=80
+RTL8125_VM AuditCopy=D:\RTL8125\hal.dll Success=0 Error=80
+RTL8125_VM AuditVolumeFlushed=1
+RTL8125_VM END no installation attempted
+RTL8125_VM BEGIN actual guest preflight
+RTL8125_VM Capture=1 Size=1920x1080
+RTL8125_VM BEGIN actual guest preflight
+RTL8125_VM SystemRoot=C:\ReactOS
+RTL8125_VM ReactOSi386=1 Administrator=1
+RTL8125_VM Compatibility=4 NDIS=d71a8f327a2afda106c56031da84cf17da37f10fb9a32cf0311a9baa43bc7cd3
+RTL8125_VM LoadedNdisPath=1 Boot=134373701989541760
+RTL8125_VM Payload=1 RTL8125Count=0
+RTL8125_VM Issue=
+RTL8125_VM InstalledBFirmwareValid=1
+RTL8125_VM NdisStart=0
+RTL8125_VM NdisImagePath=system32\drivers\ndis.sys
+RTL8125_VM NdisServiceWrite=134370688474233408
+RTL8125_VM ModuleQueryStatus=0 Returned=21872
+RTL8125_VM LoadedModule=ndis.sys NameOffset=0 LoadOrder=31
+RTL8125_VM LoadedModule=\SystemRoot\System32\drivers\ndisuio.sys NameOffset=29 LoadOrder=65
+RTL8125_VM AuditCopy=D:\RTL8125\ndis.sys Success=0 Error=80
+RTL8125_VM AuditCopy=D:\RTL8125\ntoskrnl.exe Success=0 Error=80
+RTL8125_VM AuditCopy=D:\RTL8125\hal.dll Success=0 Error=80
+RTL8125_VM AuditVolumeFlushed=1
+RTL8125_VM END no installation attempted
+RTL8125_VM BEGIN actual guest preflight
+RTL8125_VM Capture=1 Size=1920x1080

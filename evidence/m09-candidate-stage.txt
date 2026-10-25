@@ -1,0 +1,6 @@
+[ 88%] Built target rtl8125_native_driver
+[100%] Built target rtl8125_package_check
+Package metadata passes: i386 native PE, executable entry, operational build marker, NDIS/kernel-only imports, exact PCI/service INF
+This check does not establish successful guest installation or networking
+-- Candidate staged without installation: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/m09-operational/package/rtl8125-i386-6b3797171995598e
+[100%] Built target rtl8125_candidate_package

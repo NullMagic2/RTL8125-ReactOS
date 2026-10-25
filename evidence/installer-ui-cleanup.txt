@@ -1,0 +1,18 @@
+Module: rtl8125.installer.ui_cleanup
+Purpose: Record the requested removal of decorative installer text and its source snapshot.
+Created: 2026-10-24
+Architecture: Win32 painting-only change; native install/preflight code unchanged.
+
+Removed the in-client preview/OS eyebrow, Everything in one place heading,
+Made for ReactOS footer and A focused setup for your Realtek Ethernet controller.
+The review details move upward to close the space left by the removed heading.
+Preview remains identified in the native window title and preview action button.
+Confirmed card name remains exactly RTL8125B. The backend is unchanged.
+
+GCC13 i386 GUI build passed with warnings treated as errors.
+Visual checks: review and device pages at1040x720 client; review at800x600 desktop.
+No additional behavioral tests were needed for this reversible copy/layout edit.
+No actual driver install, guest OS update or host NIC access was performed.
+88fc97975d78636cb276a687bb76d71c5137a569f6c8cef36d63e3023b99db43  installer-preview-clean.png
+a2eddec33d34a0a5fe3a6f0bc6fb31a04dc0faa96a3fa8b610017573f9788a8e  installer-device-clean.png
+bd680cb86fef48b1897f944ce41885c088df6b84d773ff09e6c2a0cd86494770  installer-800x600-clean.png

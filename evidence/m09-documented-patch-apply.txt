@@ -1,0 +1,22 @@
+Documented git apply commands, fresh owned four-file baseline copy; external SDK unchanged
+git -C /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/m09-patch-check apply --check /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/patches/reactos/0001-ndis-halt-context.patch
+exit=0
+git -C /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/m09-patch-check apply /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/patches/reactos/0001-ndis-halt-context.patch
+exit=0
+git -C /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/m09-patch-check apply --check /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/patches/reactos/0002-ndis-callback-rundown.patch
+exit=0
+git -C /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/m09-patch-check apply /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/patches/reactos/0002-ndis-callback-rundown.patch
+/home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/patches/reactos/0002-ndis-callback-rundown.patch:380: new blank line at EOF.
++
+warning: 1 line adds whitespace errors.
+exit=0
+git -C /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/m09-patch-check apply --check /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/patches/reactos/0003-ndis-device-power.patch
+exit=0
+git -C /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/m09-patch-check apply /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/patches/reactos/0003-ndis-device-power.patch
+exit=0
+39f09c6a47ce10b0c98d18b3032a2ca0564994a62c3f9bb10089aa033ed6ed78  drivers/network/ndis/CMakeLists.txt
+c450a8bb134be12c59c68b3347380064036f1f7bd66cb04f8d21d8d24496938a  drivers/network/ndis/include/miniport.h
+baab8310d3e822205ff7d024a54a76c18282d69655a9bf36514542b4cfa8c168  drivers/network/ndis/ndis/lifecycle.c
+2a0af03bc5362afae1c4e9cf6c1b1005f166975bb14002e227506958ebc94d6b  drivers/network/ndis/ndis/miniport.c
+fda88175bf56f490b6f797428b0e31d7ffe55398322e1050003b4dfdd78c965c  drivers/network/ndis/ndis/power.c
+03ace3ff3d4c4e767f5c849b91b268f16b0c8f550f825675a3bad6ee33f6ae88  drivers/network/ndis/ndis/protocol.c

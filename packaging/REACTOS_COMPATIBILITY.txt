@@ -1,0 +1,61 @@
+Module: rtl8125.package.reactos_compatibility
+Purpose: Make the operational driver's required NDIS wrapper fixes explicit.
+Created: 2026-10-24
+Architecture: Companion OS source patches; no opaque-context guessing in the driver.
+
+The experimental operational miniport requires all three patches, applied in order:
+  patches/reactos/0001-ndis-halt-context.patch
+  patches/reactos/0002-ndis-callback-rundown.patch
+  patches/reactos/0003-ndis-device-power.patch
+
+The matched ReactOS wrapper passes its private LOGICAL_ADAPTER pointer to Halt
+at two call sites instead of MiniportAdapterContext. Patch 0001 fixes those calls.
+The wrapper also needs lifecycle closing/references around timer/work/protocol
+entry so an already dequeued callback cannot enter driver code after Halt frees
+its context. Patch 0002 supplies that wrapper-owned rundown and reset changes.
+Driver CPU/DMA/IRQ retirement alone cannot correct the wrapper's wrong context
+or prevent a new callback from entering after the driver has returned from Halt.
+Patch 0003 bridges real device power IRPs to the miniport's power OIDs through a
+PASSIVE_LEVEL worker. It restores PCI D0 before resuming the NIC and quiesces the
+NIC before requesting a lower device power state, with pending-request ownership
+and exactly-once completion. The baseline wrapper only forwards these IRPs.
+These are NDIS callback compatibility fixes, not changes to common-buffer DMA.
+
+Build and deployment procedure
+  1. Create a separate OWNED ReactOS source checkout/copy and matching build tree.
+     Keep the installed OS, original SDK snapshot and immutable VM base unchanged.
+     The patch baseline is the audited snapshot identified in the accompanying
+     evidence and these original file SHA256 values:
+       drivers/network/ndis/ndis/miniport.c
+         1a9c9e66e34e054d592574e3b07702370b2561bdbf9cdb156ed061279963f96b
+       drivers/network/ndis/ndis/protocol.c
+         2c17fe479822bf67c11cd6769fb7c5b40a2202b2042d2c11af3a727e1ab4d108
+       drivers/network/ndis/include/miniport.h
+         bdde2efabe9819330d2f1cdda839df19dea1afc450b6f2c7f67d6ce5da10a354
+       drivers/network/ndis/CMakeLists.txt
+         0d107a1d4e7d545c6b2a66cb34132eb26aaf80aa33493908fd0c430fc0e1478d
+  2. Inspect the full changes. From the owned ReactOS source directory run:
+       git apply --check ABSOLUTE_PACKAGE/patches/reactos/0001-ndis-halt-context.patch
+       git apply ABSOLUTE_PACKAGE/patches/reactos/0001-ndis-halt-context.patch
+       git apply --check ABSOLUTE_PACKAGE/patches/reactos/0002-ndis-callback-rundown.patch
+       git apply ABSOLUTE_PACKAGE/patches/reactos/0002-ndis-callback-rundown.patch
+       git apply --check ABSOLUTE_PACKAGE/patches/reactos/0003-ndis-device-power.patch
+       git apply ABSOLUTE_PACKAGE/patches/reactos/0003-ndis-device-power.patch
+     Stop on a failed check. Do not force a patch onto a different wrapper version
+     or assume matching exports establish equivalent lifecycle behavior.
+     Patches 0002 and 0003 add lifecycle.c and power.c and update the real NDIS
+     CMake target. Include those files; copying only miniport.c is incomplete.
+  3. Rebuild the real ndis target using that ReactOS tree's own toolchain. Preserve
+     compiler output, source/patch hashes and resulting ndis.sys SHA256. Compile
+     and link evidence is distinct from runtime validation of these OS changes.
+  4. Deploy that ndis.sys only to the owned guest overlay, offline while stopped,
+     using the guest OS deployment procedure. Keep its previous image available.
+     Boot and verify the expected image/hash before enabling the RTL8125 device.
+  5. Configure this driver with RTL8125_OPERATIONAL=ON and the explicit
+     RTL8125_REACTOS_WRAPPER_PATCHED=ON acknowledgment. It records a compatibility
+     requirement; it does not apply patches or inspect the guest's actual binary.
+
+The complete ordered patches and corresponding driver source accompany this
+candidate. Runtime installation, reset/Halt races, wrapper regression testing,
+NDIS image deployment and physical packet-path qualification remain separate
+validation. A stock affected ReactOS wrapper is not an operational target.

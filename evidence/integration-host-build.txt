@@ -1,0 +1,45 @@
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host
+[  2%] Building CXX object CMakeFiles/rtl8125_core.dir/src/core/descriptor.cpp.o
+[  8%] Built target rtl8125_vfio_check_tests
+[ 10%] Building CXX object CMakeFiles/rtl8125_core.dir/src/core/receive.cpp.o
+[ 13%] Building CXX object CMakeFiles/rtl8125_core.dir/src/core/oid.cpp.o
+[ 16%] Linking CXX static library librtl8125_core.a
+[ 24%] Built target rtl8125_core
+[ 27%] Linking CXX executable rtl8125_probe_collect
+[ 29%] Linking CXX executable rtl8125_vfio_check
+[ 32%] Built target rtl8125_vfio_check
+[ 35%] Built target rtl8125_probe_collect
+[ 37%] Building CXX object CMakeFiles/rtl8125_core_tests.dir/tests/core_tests.cpp.o
+[ 40%] Building CXX object CMakeFiles/rtl8125_oid_tests.dir/tests/oid_tests.cpp.o
+[ 43%] Linking CXX executable rtl8125_core_tests
+[ 45%] Linking CXX executable rtl8125_oid_tests
+[ 45%] Built target rtl8125_core_tests
+[ 45%] Built target rtl8125_oid_tests
+[ 48%] Linking CXX executable rtl8125_resource_tests
+[ 51%] Linking CXX executable rtl8125_probe_log_tests
+[ 54%] Built target rtl8125_probe_log_tests
+[ 56%] Built target rtl8125_resource_tests
+[ 59%] Building CXX object CMakeFiles/rtl8125_hardware.dir/src/hardware/registers.cpp.o
+[ 62%] Building CXX object CMakeFiles/rtl8125_packet.dir/src/core/packet.cpp.o
+[ 64%] Building CXX object CMakeFiles/rtl8125_packet.dir/src/core/filter.cpp.o
+[ 67%] Building CXX object CMakeFiles/rtl8125_hardware.dir/src/hardware/firmware.cpp.o
+[ 70%] Linking CXX static library librtl8125_packet.a
+[ 70%] Built target rtl8125_packet
+[ 72%] Building CXX object CMakeFiles/rtl8125_hardware.dir/src/hardware/phy.cpp.o
+[ 75%] Building CXX object CMakeFiles/rtl8125_packet_tests.dir/tests/packet_tests.cpp.o
+[ 78%] Building CXX object CMakeFiles/rtl8125_hardware.dir/src/hardware/device.cpp.o
+[ 81%] Linking CXX executable rtl8125_packet_tests
+[ 83%] Linking CXX static library librtl8125_hardware.a
+[ 83%] Built target rtl8125_packet_tests
+[ 83%] Built target rtl8125_hardware
+[ 89%] Building CXX object CMakeFiles/rtl8125_hardware_device_tests.dir/tests/hardware_device_tests.cpp.o
+[ 89%] Building CXX object CMakeFiles/rtl8125_hardware_tests.dir/tests/hardware_tests.cpp.o
+[ 91%] Linking CXX executable rtl8125_hardware_tests
+[ 94%] Linking CXX executable rtl8125_hardware_device_tests
+[ 94%] Built target rtl8125_hardware_tests
+[ 97%] Building CXX object CMakeFiles/rtl8125_firmware_check.dir/tests/firmware_file_check.cpp.o
+[ 97%] Built target rtl8125_hardware_device_tests
+[100%] Linking CXX executable rtl8125_firmware_check
+[100%] Built target rtl8125_firmware_check

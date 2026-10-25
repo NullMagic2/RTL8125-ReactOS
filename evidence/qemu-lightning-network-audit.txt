@@ -1,0 +1,26 @@
+Module: rtl8125.evidence.qemu_lightning_network
+Purpose: Verify the user-requested paravirtual network support already exists.
+Created: 2026-10-24 America/Sao_Paulo
+Architecture: Read-only source and deployed-binary inspection; no VM/network changes.
+
+Source root: /home/x/Documents/Codex/2026-10-11/the/work/full-source/Qemu-Lightning-source
+lightning/manager/src/runtime.rs:804 selects virtio-net-pci when paravirtualized;
+otherwise e1000e. NAT/Restricted can use lightning-network stream or user NAT.
+lightning/manager/src/ui.rs:675 exposes Paravirtualized disk & network, with a
+matching-guest-drivers warning; it also changes disk controllers, so it was not
+silently enabled for an existing ReactOS guest.
+lightning/manager/src/tests.rs:78 asserts the VirtIO launch-plan device.
+lightning/reactos/network.cfg already provides rtl8139 + user NAT compatibility.
+../Binaries/bin/qemu-system-x86_64 -device help advertises virtio-net-pci,
+transitional/non-transitional variants, e1000/e1000e and rtl8139.
+-netdev help advertises stream, user, tap, bridge, vhost-user and other backends.
+The deployed lightning-network executable also exists.
+
+No implementation addition was necessary. No external source was modified and
+no existing VM configuration was changed. Paravirtual/shared-host networking
+uses a virtual NIC; it cannot validate this driver's real RTL8125 registers,
+firmware, DMA or interrupt behavior. No actual guest VirtIO driver is claimed.
+Host inventory still has only enp13s0/0000:0d:00.0 with the sole default route;
+sudo requires interactive authentication. No host NIC was detached.
+Official QEMU network model/backend reference:
+https://www.qemu.org/docs/master/system/devices/net.html

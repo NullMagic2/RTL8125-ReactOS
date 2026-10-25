@@ -1,0 +1,9 @@
+076e068af589bb86f5c9b16fda4b69b2f152c72abff9a9fb9df297ee0c0486f2  /home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/src/sdk/include/ddk/ndis.h
+076e068af589bb86f5c9b16fda4b69b2f152c72abff9a9fb9df297ee0c0486f2  /home/x/Documents/Codex/2026-10-21/he/work/reactos/sdk/include/ddk/ndis.h
+20e35887d2c6d4a133a3883ba81043bfbde8c9552970040a295f998b43cf1eb1  /home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release/sdk/include/ddk/ntddk.h
+7a6000c5277bc91ba20fb2dfba77e03a0fe02dc221a7bb976f6409b8951ec6dc  /home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release/sdk/include/ddk/wdm.h
+c22fb43a39f023849b246843cad03241359a565b98211ba93b26d28ed42f64bf  /home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release/sdk/include/psdk/ntdef.h
+59d9abce6bcdfb1b8fa36bee82b041a3bc8b004db9bd4a59d9debdd50eca9436  /home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release/drivers/network/ndis/CMakeFiles/libndis.dir/libndis.a
+17bdbf6b2923642b2c1d770186fe95f59e0ce8b2f742d8eff4457f663ff3de8d  /home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release/ntoskrnl/CMakeFiles/libntoskrnl.dir/libntoskrnl.a
+32cf1d52391429c5f40e8a0d5aa4f17a183d652f172a5e9208f6d1810f44e5dc  /home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release/hal/halx86/CMakeFiles/libhal.dir/libhal.a
+2af5aa32162244f356227efd4f7cc9ff1cf32fc0b408bc0bca495964d6cce56b  Binaries/.build/m01-native/native/rtl8125.sys

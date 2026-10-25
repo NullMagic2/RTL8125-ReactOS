@@ -1,0 +1,48 @@
+Module: rtl8125.evidence.m02_native_contracts
+Purpose: Record real ReactOS SDK production resource-owner contract verification.
+Created: 2026-10-24
+Architecture: User-mode ABI fixture only; no ReactOS guest, kernel, PCI mapping or physical hardware execution.
+
+Compiler: i686-w64-mingw32-g++ GCC 13-win32, C++17, -Wall -Wextra -Werror,
+-fms-extensions -fno-exceptions -fno-rtti -fno-threadsafe-statics.
+SDK source: /home/x/Documents/Codex/2026-10-21/he/work/reactos
+SDK generated DDK/PSDK: /home/x/Documents/Codex/2026-10-21/he/work/ros-build-i386/sdk/include
+No synthetic DDK headers. Real ndis.h, ntddk.h, wdm.h and NT descriptors.
+Production resources.cpp uses real imported NDIS and register functions; the test
+binds their import pointers to local C++ mocks with the exact declared ABI.
+
+Reproduction in this workspace:
+i686-w64-mingw32-g++ @Binaries/.build/m02-host/native-i386.rsp -I/home/x/Documents/Codex/2026-10-21/he/work/reactos/sdk/include/c++ -static-libgcc -static-libstdc++ tests/resources_native_tests.cpp src/reactos/resources.cpp src/core/resources.cpp src/core/chip.cpp -o Binaries/.build/m02-host/resources-native-tests.exe
+WINEPREFIX=$PWD/Binaries/.build/m02-wine WINEDEBUG=-all DISPLAY= wine Binaries/.build/m02-host/resources-native-tests.exe
+
+Final run after PVOID output-parameter cleanup:
+RTL8125 real-SDK resource contracts: 131 checks, 0 failures
+Exit status: 0
+
+Production paths executed: exact adapter/configuration handles, PCI config length,
+two-pass assigned resource query, list allocation/free, first assigned memory BAR
+mapping, checked read-only TxConfig/XID selection, 64-bit physical address above
+4 GiB passed through the i386 NDIS boundary, idempotent release, acquisition while
+already owned, all 8/16/32-bit read/write helpers against a local byte fixture,
+invalid access rejection before register imports, ChipCmd posted-write flush and
+all-ones removal detection. No write helper is invoked during acquisition.
+
+19 fault injections: short PCI config, wrong PCI ID, disabled memory decode,
+size query failure, short/oversized query size, allocation failure, anomalous null
+successful allocation, fill query failure, growing returned size, invalid count,
+short aperture, wrong resource type, absent interrupt, map failure, anomalous map
+failure with pointer, successful null map, all-ones chip read, unsupported XID.
+Every fault verifies empty output, retirement of all acquired allocation/mapping
+ownership, no probe writes, and safe repeated release.
+
+Wine required sandbox escalation for local wineserver IPC (bind blocked in sandbox).
+The win32-only prefix option was unavailable in this installed Wine wow64 build;
+the project-owned default-architecture prefix ran the i386 test successfully.
+This is not ReactOS guest execution, NDIS registration/load evidence, board INTx
+routing or actual XID capture. M02 actual-device XID acceptance remains pending.
+249b3c2a456dc2da17dc50abf93479db7ac159f5596360137a601d8470e3f9ed  src/core/resources.hpp
+d43a3e33c0d805ac1f7707a87bfa880dbdc82b00441fca1c09f82f1823997de8  src/core/resources.cpp
+80ebbdbae366da407837282360b5aa3644b0a3d8ffc5371c266bb14ff8702ca9  src/reactos/resources.hpp
+79e74aa446b5ae723705d5f267e347f4f8684ca1a26122a302c128f9331c9058  src/reactos/resources.cpp
+78db5703fadab24e2f9cd38af248d61becaf8c15de61da2cb32ca571ed42615c  tests/resources_tests.cpp
+dcb1308751fc164ab42cc62960089730a1bb147c1c79b60ffb5614cf9fda5190  tests/resources_native_tests.cpp

@@ -1,0 +1,7 @@
+Rejected: KVM/VFIO group is not accessible to this process.
+Candidate is not eligible for launch. Supply a dedicated, already VFIO-bound
+RTL8125 with no host network interface and an isolated usable group.
+This tool changed no device, binding or network state.
+RTL8125 0000:0d:00.0, current driver r8169
+Host interface present: enp13s0
+IOMMU group 24

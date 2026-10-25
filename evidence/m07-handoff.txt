@@ -1,0 +1,69 @@
+Module: rtl8125.evidence.m07_handoff
+Purpose: Reproduce native IRQ code and distinguish mocked/physical evidence.
+Created: 2026-10-24
+Architecture: M07 source completion; root owns scoring/publication integration.
+
+M07 source100: assigned NDIS registration, real ISR/HandleInterrupt table,
+32bit mask/status/ack/flush, shared/removal recognition, bounded privateDPC
+and passive link dispatch, synchronized close/refdrain/disconnect, explicit
+platform and recovery handoff. Details: evidence/m07-source-audit.txt.
+
+New sources: src/reactos/interrupt.hpp/.cpp.
+New tests: tests/interrupt_native_tests.cpp, tests/interrupt_import_stubs.cpp.
+New module: cmake/interrupt.cmake (root included after datapath).
+Coordinated edits: adapter.hpp/miniport.cpp actualguard+IRQcallbacks;
+native.cmake includes all M03 and M07 TUs once, exposes native_hardware_objects;
+hardware.cmake reuses thoseobjects; datapath.cmake links actual IRQ to packet
+fixture. Probe-only and packet fixtures use explicitly mocked genuine imports.
+Historical packet tests now register/enable the actual mocked IRQ owner and
+exercise actual production DPC dispatch rather than bypass M07 code.
+M04 subsequently owns DMA/hardware fixturelink repair; M08 now owns shared
+adapter/miniport/recovery wiring. No concurrent sharedfile edits remain fromM07.
+
+Configure used:
+cmake -S . -B Binaries/.build/m07-native -DRTL8125_TESTS=OFF
+  -DRTL8125_NATIVE_DRIVER=ON -DRTL8125_GUEST_FIXTURE=ON
+  -DRTL8125_REACTOS_SOURCE=/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/src
+  -DRTL8125_REACTOS_BUILD=/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release
+Compiler: i686-w64-mingw32-g++ GCC13 C++17, actualNT/NDIS headers/importlibs,
+-noexceptions/-nortti/-nostdlib driver. Primary targets:
+rtl8125_native_driver rtl8125_native_interrupt_contract_tests
+rtl8125_native_contract_tests rtl8125_native_datapath_contract_tests
+rtl8125_native_dma_contract_tests rtl8125_native_hardware_contract_tests
+rtl8125_native_resource_contract_tests rtl8125_native_hardware_link_check
+rtl8125_native_datapath_link_check rtl8125_guest_fixture
+
+Last complete M07-era integration snapshot before final M08-thread contract:
+all ten targets compiled/linked, all six mocked ABI executables passed3977checks:
+IRQ374 +miniport201 +packet1090 +DMA2149 +hardware32 +resources131.
+This is a historical complete snapshot, not a current M04/M08 validation claim.
+After replacing production NDISlinkwork with the M08 joinedthread scheduler
+contract and adding beginservice masking/closechecks, actual SYS+IRQ fixture
+compile/link pass and final dedicated IRQ fixture passes385checks,0failures.
+Concurrent M04 realquiesce edits require re-linking its hardware dependencies
+into historical callback/packet fixtures; M04/root own final complete rerun.
+No portablealgorithm changed in M07; root owns combined sanitizer evidence.
+
+Execution uses the previouslyexisting isolated m01-wine prefix with Wine's
+Windowsuser-mode API imports mocked at exact SDK signatures:
+WINEPREFIX=<project>/Binaries/.build/m01-wine WINEDEBUG=-all DISPLAY=
+  wine Binaries/.build/m07-native/interrupt-native/interrupt_contract_tests.exe
+Wine IPC required sandbox escalation; no device access is involved.
+The dedicated fixture calls actual production DriverEntry, uses captured ISR
+callback, and the referenced privateKDPC invokes actual production HandleInterrupt.
+No synthetic replacement OS headers. A mockdevice implements status/W1C/flush;
+mockNDIS workdispatch invokes actual service_interrupt_link atPASSIVE.
+
+Final385 checks include zero/unrelated/shared events, exact32bit registeraccess,
+maskflush-before-ACKflush, ordinary+latched routing metadata, removal/allones,
+registrationfailure, budgetexhaustion and tailcontinuation, unmaskrace injection,
+linkcoalescing/noDPCstorm, queuedwork shutdown, boundedtimeout retention/retry,
+workpublication failure, callbackadmission contention, PHYfailure recovery handoff,
+and actualproduction PnPsurprise-removal closure withoutMMIO.
+
+PE audit: evidence/m07-pe-audit.txt. Imports only ndis.sys,hal.dll,ntoskrnl.exe;
+no C++/CRT dependency. Guestfixture compiles only; it was not executed forM07.
+MSVC/AMD64/kernelinterruptdelivery and physicalqualification remainunexecuted.
+Stable owned source hashes: evidence/m07-source-hashes.txt. Sharedfile handoff
+copies retained under Binaries/.build/m07-handoff for provenance; subsequent
+M08 sharededits intentionally supersede those copies and need fresh evidence.

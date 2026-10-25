@@ -1,0 +1,7 @@
+8d4c0127127432ccf6c60bb1ac1431807b2eabfa70b3f7b86c868161bc1b35a4  Binaries/.build/m01-native/native/rtl8125_m01_guest.sys
+2b73ae424f7d408de1967e848cb30b31cf95778c5a671966a9bf794b13ade67c  Binaries/.build/m01-native/native/miniport_guest_runner.exe
+d823de7d9c0a01e14dc087939e4de9fdd5dc6963265db6202fe1032b930db100  Binaries/.build/m01-guest/validation-v5.iso
+d918211567e3c150fda9e6994c33c0145df6ba0001877e60605481868fb28716  evidence/m01-guest-kernel.txt
+d918211567e3c150fda9e6994c33c0145df6ba0001877e60605481868fb28716  evidence/m01-guest-kernel.txt
+4b4926f6ebffdfbf55efb66edb658f4272436a369af3e210c8e2b9ed781c0791  evidence/m01-guest-results.txt
+c383df2e8dfb49a818f9008ac48950ce7e1aa69838ff364a72cece891c5f3dd3  evidence/m01-guest-final-screen.png

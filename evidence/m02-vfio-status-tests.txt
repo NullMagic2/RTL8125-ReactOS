@@ -1,0 +1,5 @@
+Rejected: VFIO group status could not be read from a character device.
+Rejected: VFIO group status could not be read from a character device.
+Rejected: cannot open the VFIO group for a read-only status query.
+Rejected: cannot open the VFIO group for a read-only status query.
+RTL8125 VFIO preflight contracts: 28 checks, 0 failures (no physical group access)

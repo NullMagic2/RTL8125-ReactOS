@@ -1,0 +1,22 @@
+{
+  "scope": "M08 final source and real native compile/link, runtime/hardware validation separate",
+  "sources_sha256": {
+    "src/reactos/recovery.hpp": "f83e219bc5c2f9d94eda1fabfbbc27901e6fc2b9d87067832aa5f94620177cc5",
+    "src/reactos/recovery.cpp": "15f1c5c0f3a3bb2cae0b7752a780ab69c77763fa2f212254860bc74b8382e36a",
+    "src/reactos/recovery_cpu.hpp": "04d3c4dccb7e12b270b56c125b431eb5918059bfbc8288b49b289ec0f27f6453",
+    "src/reactos/recovery_cpu.cpp": "b2258f8721f1d041d0971b11a3e300c9271adb1195d0a6497c0e0a7e6efd8c6f",
+    "src/reactos/adapter.hpp": "ec303e377c6166242a1123d9d85dfd02c8fa7889e8a2182c75507435abfc06b6",
+    "src/reactos/miniport.cpp": "2ac2e54af1b380f50d47fad6f5f9ee89ed2b762f41e6ffeca7bfe269701cca63",
+    "tests/recovery_native_tests.cpp": "42c9cbdfffa86e164412d1c33df569e25cbc45feeae27f9c40d4902e31eef108",
+    "tests/recovery_ndis_tests.cpp": "4f9a039a4b5b499203d4e875c86b1bce7d9d554fc088860eb916e933f524dbde",
+    "tests/recovery_import_stubs.cpp": "9d1211ffa47dc611fbdac3cb165e07e2e8b086842eb0c8c5075cc880237a25c5",
+    "cmake/recovery.cmake": "f3eb90bcfa93e48bd0731d70aebc8aac649b91aa9b7b4d9925ce64e7b04ce2eb"
+  },
+  "native_probe_sys_sha256": "ecbe34922b232410641320fbe9f85b207f018f933228e7e233334d5a03eedf12",
+  "tests": {
+    "recovery_concurrent_genuine_sdk_abi": 85,
+    "compiled_patched_ndis_abi": 42
+  },
+  "source_implementation_percent": 100,
+  "physical_tests_performed": false
+}

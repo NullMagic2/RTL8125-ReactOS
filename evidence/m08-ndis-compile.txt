@@ -1,0 +1,41 @@
+30stubs.c exit=0
+
+40stubs.c exit=0
+
+50stubs.c exit=0
+
+buffer.c exit=0
+
+cl.c exit=0
+
+cm.c exit=0
+
+co.c exit=0
+
+config.c exit=0
+
+control.c exit=0
+
+efilter.c exit=0
+
+hardware.c exit=0
+
+io.c exit=0
+
+main.c exit=0
+
+lifecycle.c exit=0
+
+memory.c exit=0
+
+miniport.c exit=0
+
+misc.c exit=0
+
+protocol.c exit=0
+
+power.c exit=0
+
+string.c exit=0
+
+time.c exit=0

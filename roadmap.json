@@ -1,0 +1,862 @@
+{
+  "schema_version": 2,
+  "project": "RTL8125-ReactOS",
+  "updated_date": "2026-10-24",
+  "timezone": "America/Sao_Paulo",
+  "scope": "Initial NDIS 5.1 i386 Ethernet driver for RTL8125A/B, MTU 1500, one queue, software checksums, copied DMA buffers. Linux identifies the host card as RTL8125B XID 641; native ReactOS physical identification remains pending.",
+  "implementation_percent": 100.0,
+  "native_miniport_percent": 100,
+  "hardware_validation_percent": 0,
+  "scoring": "Implementation measures source code only; tests never add or subtract implementation credit. Each source milestone has four explicit code criteria. Preserve original four acceptance gates and original weights separately. Code progress weights use M00\u2013M09 original units (96 total), normalized to 100%; M10 is validation-only with zero code weight. Overall code percent = sum(original weight units \u00d7 code percent) / 96. Documentation has no code weight.",
+  "completion_policy": "Mark code criteria complete after source review; track build/model/guest/physical evidence separately. Acceptance gates retain their original evidence requirements. User explicitly revised implementation scoring on 2026-10-24 to exclude testing.",
+  "os_changes": {
+    "dma": "No ReactOS patch planned: existing DMA adapter and common-buffer APIs support the copying design; actual integration remains to be verified.",
+    "interrupts": "The actual PCI configuration advertises INTA (evidence/linux-config.json). No OS patch is planned if assigned INTx works. If the platform requires MSI and the target ReactOS stack cannot deliver it, a separate PCI/HAL/NDIS change is a prerequisite. The advertised pin alone does not prove routing.",
+    "limits": "Copying adds CPU/memory bandwidth cost. Full 2.5 Gb/s throughput is unmeasured. Do not change OS source merely because ScatterGatherListSize is a placeholder.",
+    "ndis_lifecycle": "Operational use requires all three ordered canonical patches: Halt callback context, wrapper callback rundown, device-power IRP bridge. The complete patched NDIS module compiled/linked in an owned copy; the external SDK and running guests remain unchanged. No scatter/gather/common-buffer DMA API patch is needed."
+  },
+  "milestones": [
+    {
+      "id": "M00",
+      "title": "Portable chip and descriptor core",
+      "weight_percent": 8,
+      "dependencies": [],
+      "linux_reference": "r8169_main.c: rtl_init_one, rtl8169_get_mac_version, rtl_desc_bit, TxDesc/RxDesc, rtl_rx",
+      "native_design": "Allocation-free C++17 values; exact PCI family and XID selection; offline descriptor images only.",
+      "gates": [
+        {
+          "description": "Port RTL8125A/B XID rules and firmware filename dependencies; refuse wrong devices, all-ones MMIO and unknown MACs.",
+          "complete": true
+        },
+        {
+          "description": "Encode 16-byte little-endian legacy TX/RX descriptor images with FS/LS/EOR and OWN clear; validate sizes, ring index and 64-bit address interval.",
+          "complete": true
+        },
+        {
+          "description": "Decode receive OWN/error/fragment state and validate actual DMA capacity before subtracting FCS; no packet pointers escape.",
+          "complete": true
+        },
+        {
+          "description": "Pass CPU golden-vector and malformed-boundary checks under ASan/UBSan; compile portable code for GCC 13 i386 and AMD64.",
+          "complete": true
+        }
+      ],
+      "evidence": [
+        "src/core/chip.cpp",
+        "src/core/descriptor.cpp",
+        "tests/core_tests.cpp",
+        "evidence/host-tests.txt",
+        "evidence/i386-build.txt",
+        "evidence/amd64-build.txt"
+      ],
+      "implementation_percent": 100.0,
+      "acceptance_percent": 100,
+      "implementation_weight_units": 8,
+      "implementation_criteria": [
+        {
+          "description": "PCI/XID and firmware-name selection",
+          "complete": true
+        },
+        {
+          "description": "Offline descriptor formats and bounds",
+          "complete": true
+        },
+        {
+          "description": "Shared receive completion decoder",
+          "complete": true
+        },
+        {
+          "description": "Portable allocation-free module/build interfaces",
+          "complete": true
+        }
+      ]
+    },
+    {
+      "id": "M01",
+      "title": "Native NDIS registration and lifecycle",
+      "weight_percent": 8,
+      "dependencies": [
+        "M00"
+      ],
+      "linux_reference": "r8169_main.c: rtl_init_one, rtl_open, rtl_remove_one; ReactOS e1000/ndis.c",
+      "native_design": "Serialized NDIS 5.1 miniport using real ReactOS headers/import libraries; C linkage and NT calling conventions.",
+      "gates": [
+        {
+          "description": "Build and link DriverEntry and the required NDIS callback table against the pinned ReactOS SDK; no synthetic DDK headers.",
+          "complete": true
+        },
+        {
+          "description": "Construct device-owned state; accept Ethernet medium; reject unsupported hardware and every incomplete initialization path without leaked resources.",
+          "complete": true
+        },
+        {
+          "description": "Implement required discovery/capability OIDs with strict input/output lengths, truthful link state and no unsupported offload advertising.",
+          "complete": true
+        },
+        {
+          "description": "Exercise registration, initialization failures and halt in a ReactOS guest; do not report adapter success before later hardware gates exist.",
+          "complete": true
+        }
+      ],
+      "evidence": [
+        "src/reactos/miniport.cpp",
+        "src/reactos/adapter.hpp",
+        "src/core/oid.cpp",
+        "tests/miniport_contract_tests.cpp",
+        "tests/oid_tests.cpp",
+        "cmake/native.cmake",
+        "evidence/m01-summary.txt",
+        "evidence/integration-native-build.txt",
+        "evidence/integration-native-contracts.txt",
+        "evidence/integration-native-pe.txt",
+        "evidence/integration-manifest.json",
+        "evidence/m01-guest-results.txt",
+        "evidence/m01-guest-kernel.txt",
+        "evidence/m01-guest-launch.txt",
+        "evidence/m01-guest-hashes.txt",
+        "tests/miniport_guest_kernel.cpp",
+        "tests/miniport_guest_runner.cpp",
+        "evidence/m01-review.txt"
+      ],
+      "implementation_percent": 100.0,
+      "remaining": "Original M01 gates complete. Actual operational PCI PnP networking, hardware resources and packet-path qualification remain in later milestones.",
+      "acceptance_percent": 100,
+      "implementation_weight_units": 8,
+      "implementation_criteria": [
+        {
+          "description": "Native NDIS registration and callback ABI",
+          "complete": true
+        },
+        {
+          "description": "Per-adapter construction and failed-init cleanup",
+          "complete": true
+        },
+        {
+          "description": "Required OID replies, including 64-bit statistic negotiation",
+          "complete": true
+        },
+        {
+          "description": "Driver-object wrapper ownership and unload handling",
+          "complete": true
+        }
+      ]
+    },
+    {
+      "id": "M02",
+      "title": "Assigned PCI resources and bounded MMIO",
+      "weight_percent": 8,
+      "dependencies": [
+        "M01"
+      ],
+      "linux_reference": "r8169_main.c: rtl_init_one, pcim_iomap_regions, rtl_pci_commit; ReactOS e1000 resources",
+      "native_design": "NdisReadPciSlotInformation, NdisMQueryAdapterResources and NdisMMapIoSpace; adapter-owned mapping with checked offsets.",
+      "gates": [
+        {
+          "description": "Parse bounded assigned resource lists and match PCI 10ec:8125; validate BAR type, aperture, 64-bit addresses and resource availability.",
+          "complete": true
+        },
+        {
+          "description": "Map only the assigned register aperture; provide typed 8/16/32-bit MMIO and posted-write ordering; preserve native addresses on i386.",
+          "complete": true
+        },
+        {
+          "description": "Read TxConfig through the owned mapping and identify the actual XID; record A/B selection and reject removed or unknown hardware.",
+          "complete": false
+        },
+        {
+          "description": "Verify partial initialization unwind, wrong resource types, short apertures and mapping failures with native contracts.",
+          "complete": true
+        }
+      ],
+      "evidence": [
+        "src/core/resources.cpp",
+        "src/reactos/resources.cpp",
+        "tests/resources_tests.cpp",
+        "tests/resources_native_tests.cpp",
+        "evidence/m02-native-contracts.txt",
+        "evidence/integration-host-tests.txt",
+        "evidence/integration-native-contracts.txt",
+        "src/core/probe_log.cpp",
+        "src/tools/probe_collect.cpp",
+        "src/tools/vfio_check.cpp",
+        "evidence/m02-linux-device-probe.txt",
+        "evidence/m02-vfio-candidate-check.txt",
+        "evidence/m02-validation-media.txt",
+        "validation/physical/VM_SETUP.txt",
+        "validation/physical/rtl8125-probe.inf",
+        "validation/physical/qemu-vfio-template.json",
+        "evidence/m02-relaunch-review.txt",
+        "evidence/m02-overlap-tests.txt",
+        "evidence/m02-vfio-status-tests.txt"
+      ],
+      "implementation_percent": 100.0,
+      "remaining": "Implementation complete. Separate validation: run the native read-only PCI/XID probe on an actual RTL8125 in ReactOS. Only the active host NIC is present; no passthrough or disconnection has been authorized after the connectivity impact was explained.",
+      "acceptance_percent": 75,
+      "implementation_weight_units": 8,
+      "implementation_criteria": [
+        {
+          "description": "PCI/resource parsing and full-aperture overlap rejection",
+          "complete": true
+        },
+        {
+          "description": "Assigned BAR mapping and typed bounded MMIO",
+          "complete": true
+        },
+        {
+          "description": "Native TxConfig/XID read, family selection and rejection",
+          "complete": true
+        },
+        {
+          "description": "Cleanup, bounded diagnostics and read-only VFIO preflight",
+          "complete": true
+        }
+      ],
+      "work_status": "implementation_complete_validation_pending"
+    },
+    {
+      "id": "M03",
+      "title": "MAC, EPHY, PHY and firmware bring-up",
+      "weight_percent": 20,
+      "dependencies": [
+        "M02"
+      ],
+      "linux_reference": "r8169_main.c: rtl_hw_init_8125, rtl_hw_start_8125, rtl_hw_start_8125_common, rtl_hw_start_8125a_2, rtl_hw_start_8125b; r8169_phy_config.c; r8169_firmware.c; realtek_phy.c",
+      "native_design": "Bounded OCP/EPHY/MDIO operations and passive workers replace Linux phylib, firmware loader, delays and workqueues.",
+      "gates": [
+        {
+          "description": "Port indirect register primitives with timeouts, checked MMIO access, explicit failures and serialized ownership; no unbounded busy-wait.",
+          "complete": true
+        },
+        {
+          "description": "Port exact A/B reset, out-of-band exit, EPHY, PHY and common MAC sequences in Linux order, including legacy descriptor mode and link/EEE policy.",
+          "complete": true
+        },
+        {
+          "description": "Implement bounded firmware format/opcode validation and execution with step/time budgets and fixed-name passive NT file acquisition; document separate firmware redistribution terms.",
+          "complete": true
+        },
+        {
+          "description": "Implement autonegotiation and truthful 10/100/1000/2500 Mb/s link reporting; verify sequencing and failure cleanup in a device model and then on the selected card.",
+          "complete": false
+        }
+      ],
+      "evidence": [
+        "src/hardware/registers.cpp",
+        "src/hardware/firmware.cpp",
+        "src/hardware/phy.cpp",
+        "src/reactos/hardware_init.cpp",
+        "tests/hardware_tests.cpp",
+        "tests/firmware_file_check.cpp",
+        "tests/dma_native_tests.cpp",
+        "cmake/hardware.cmake",
+        "evidence/m03-summary.txt",
+        "evidence/m03-firmware-format.txt",
+        "evidence/m03-firmware-terms.txt",
+        "evidence/integration-host-tests.txt",
+        "evidence/integration-native-contracts.txt",
+        "src/hardware/device.cpp",
+        "tests/hardware_device_tests.cpp",
+        "evidence/m03-finish-summary.txt",
+        "evidence/m03-finish-hashes.txt",
+        "evidence/m03-finish-device-tests.txt",
+        "evidence/m03-finish-native-contracts.txt"
+      ],
+      "implementation_percent": 100,
+      "work_status": "implementation_complete_validation_pending",
+      "remaining": "No remaining M03 source gap. Physical A/B initialization/link validation remains pending. The completed M07 interrupt and M08 recovery modules are integrated into the operational build.",
+      "acceptance_percent": 75,
+      "implementation_weight_units": 20,
+      "implementation_criteria": [
+        {
+          "description": "Exclusive bounded indirect register services",
+          "complete": true
+        },
+        {
+          "description": "Complete A/B MAC/reset/OOB/ASPM and PHY sequencing",
+          "complete": true
+        },
+        {
+          "description": "Bounded firmware interpreter and native fixed-name loader",
+          "complete": true
+        },
+        {
+          "description": "Autonegotiation, native MAC identity and link management",
+          "complete": true
+        }
+      ]
+    },
+    {
+      "id": "M04",
+      "title": "DMA adapter, common buffers and ownership",
+      "weight_percent": 12,
+      "dependencies": [
+        "M02"
+      ],
+      "linux_reference": "r8169_main.c: rtl8169_init_ring, rtl_set_rx_tx_desc_registers, rtl8169_mark_to_asic, rtl8169_cleanup; ReactOS ndis/io.c and memory.c",
+      "native_design": "Initialize the existing NDIS DMA adapter, allocate fixed common buffers at PASSIVE_LEVEL and copy packets; no scatter/gather fast path.",
+      "gates": [
+        {
+          "description": "Use NdisMInitializeScatterGatherDma before NdisMAllocateSharedMemory; initially request 32-bit DMA and reject any returned range outside the selected DMA mask.",
+          "complete": true
+        },
+        {
+          "description": "Allocate and own aligned TX/RX rings plus fixed packet buffers; validate logical bus addresses, sizes and every allocation/unwind path.",
+          "complete": true
+        },
+        {
+          "description": "Implement live descriptor access and native barriers: populate payload/address first, publish OWN last, acquire completed status before reading payload; never treat offline images as live rings.",
+          "complete": true
+        },
+        {
+          "description": "Prove DMA stopped before freeing buffers, including failed reset, partial startup and removal; verify ownership under wrap, timeout and late completion.",
+          "complete": false
+        }
+      ],
+      "evidence": [
+        "src/reactos/dma.hpp",
+        "src/reactos/dma.cpp",
+        "src/core/descriptor_bits.hpp",
+        "tests/dma_native_tests.cpp",
+        "evidence/m04-summary.txt",
+        "evidence/m04-native-pe.txt",
+        "evidence/integration-native-build.txt",
+        "evidence/integration-native-contracts.txt",
+        "evidence/m04-summary.txt",
+        "src/reactos/hardware_io.cpp",
+        "evidence/m04-finish-native-tests.txt",
+        "evidence/m04-finish-hardware-tests.txt"
+      ],
+      "implementation_percent": 100,
+      "work_status": "implementation_complete_validation_pending",
+      "remaining": "M04 source complete: actual A/B quiesce, PCI containment/drain, explicit bus-master enable and M08 retirement integration. Physical DMA validation remains separate; full runtime/OS-wrapper integration awaits M08/M09 handoff.",
+      "acceptance_percent": 75,
+      "implementation_weight_units": 12,
+      "implementation_criteria": [
+        {
+          "description": "NDIS DMA adapter and address-mask handling",
+          "complete": true
+        },
+        {
+          "description": "Common-buffer rings, arenas and unwind ownership",
+          "complete": true
+        },
+        {
+          "description": "Live descriptor publication/completion with native barriers",
+          "complete": true
+        },
+        {
+          "description": "Complete hardware-drain and callback-retirement integration",
+          "complete": true
+        }
+      ]
+    },
+    {
+      "id": "M05",
+      "title": "Transmit path",
+      "weight_percent": 10,
+      "dependencies": [
+        "M03",
+        "M04"
+      ],
+      "linux_reference": "r8169_main.c: rtl8169_start_xmit, rtl8169_tx_clear, rtl_tx, rtl8169_doorbell, rtl8125_quirk_udp_padto",
+      "native_design": "MiniportSend copies a bounded NDIS buffer chain into a reserved common buffer and completes accepted pending packets exactly once.",
+      "gates": [
+        {
+          "description": "Validate and gather input buffer chains; apply minimum Ethernet padding and Linux RTL8125 UDP/PTP padding quirks with checked packet parsing; software checksums only.",
+          "complete": true
+        },
+        {
+          "description": "Reserve ring slots, write frame and descriptor, publish OWN, and use the RTL8125 16-bit TxPoll doorbell at 0x90.",
+          "complete": true
+        },
+        {
+          "description": "Handle completion, wrap and ring-full backpressure without double completion, premature buffer reuse or loss of packet ownership.",
+          "complete": true
+        },
+        {
+          "description": "Verify Ethernet/ARP/IPv4 packet bytes at a peer and measure sustained TX; stress ring exhaustion and pending completion during reset.",
+          "complete": false
+        }
+      ],
+      "evidence": [
+        "src/core/packet.cpp",
+        "src/core/filter.cpp",
+        "src/core/receive.cpp",
+        "src/reactos/datapath.cpp",
+        "tests/packet_tests.cpp",
+        "tests/datapath_native_tests.cpp",
+        "cmake/datapath.cmake",
+        "evidence/m05-summary.txt",
+        "evidence/m05-host-tests.txt",
+        "evidence/m05-native-contracts.txt",
+        "evidence/m05-native-pe.txt",
+        "src/reactos/adapter.hpp",
+        "src/reactos/datapath_adapter.cpp",
+        "src/reactos/miniport.cpp",
+        "evidence/m05-production-summary.txt",
+        "evidence/m05-production-guest-kernel.txt",
+        "evidence/m05-production-guest-launch.txt",
+        "evidence/m05-production-hashes.json"
+      ],
+      "implementation_percent": 100,
+      "acceptance_percent": 75,
+      "implementation_weight_units": 10,
+      "implementation_criteria": [
+        {
+          "description": "Bounded packet gathering and RTL8125 padding",
+          "complete": true
+        },
+        {
+          "description": "TX ring reservation, publication and doorbell",
+          "complete": true
+        },
+        {
+          "description": "Backpressure and exactly-once pending completion",
+          "complete": true
+        },
+        {
+          "description": "Production Send/service/lifecycle wiring with prerequisite guards",
+          "complete": true
+        }
+      ],
+      "work_status": "implementation_complete_validation_pending",
+      "remaining": "No remaining M05 source gap: real production Send/OID/stat/service/lifecycle dispatch is implemented. Physical TX/peer/reset/throughput validation is separate. Missing M07 IRQ and M08 recovery keep Initialize fail-closed.",
+      "callable_component_implementation_percent": 100
+    },
+    {
+      "id": "M06",
+      "title": "Receive path and packet filters",
+      "weight_percent": 10,
+      "dependencies": [
+        "M03",
+        "M04"
+      ],
+      "linux_reference": "r8169_main.c: rtl_rx, rtl8169_mark_to_asic, rtl_set_rx_mode, rtl_set_rx_config_features",
+      "native_design": "Preallocated NDIS packet/buffer pools; initial NdisMIndicateReceivePacket with NDIS_STATUS_RESOURCES forces synchronous consumption/copy.",
+      "gates": [
+        {
+          "description": "Drain completed descriptors with a bounded budget; validate flags, capacity and frame policy before copying or indicating data.",
+          "complete": true
+        },
+        {
+          "description": "Implement the synchronous receive indication contract and packet-pool ownership; hardware buffers remain reserved until copying is complete.",
+          "complete": true
+        },
+        {
+          "description": "Implement directed/broadcast/multicast/promiscuous filters and multicast list OIDs; disable unsupported VLAN/checksum/jumbo offload features.",
+          "complete": true
+        },
+        {
+          "description": "Verify peer-to-guest frame bytes, dropped/error counters, ring wrap, fragmented or corrupt descriptors and overload without leaking packets.",
+          "complete": false
+        }
+      ],
+      "evidence": [
+        "src/core/packet.cpp",
+        "src/core/filter.cpp",
+        "src/core/receive.cpp",
+        "src/reactos/datapath.cpp",
+        "tests/packet_tests.cpp",
+        "tests/datapath_native_tests.cpp",
+        "cmake/datapath.cmake",
+        "evidence/m06-summary.txt",
+        "evidence/m05-host-tests.txt",
+        "evidence/m05-native-contracts.txt",
+        "evidence/m05-native-pe.txt",
+        "src/reactos/adapter.hpp",
+        "src/reactos/datapath_adapter.cpp",
+        "src/reactos/miniport.cpp",
+        "evidence/m05-production-summary.txt",
+        "evidence/m05-production-guest-kernel.txt",
+        "evidence/m05-production-guest-launch.txt",
+        "evidence/m05-production-hashes.json"
+      ],
+      "implementation_percent": 100,
+      "acceptance_percent": 75,
+      "implementation_weight_units": 10,
+      "implementation_criteria": [
+        {
+          "description": "Budgeted RX validation, copying and rearm",
+          "complete": true
+        },
+        {
+          "description": "Preallocated synchronous NDIS receive indication",
+          "complete": true
+        },
+        {
+          "description": "Packet-filter/multicast OIDs and register programming",
+          "complete": true
+        },
+        {
+          "description": "Production RX/OID/activation/lifecycle wiring with prerequisite guards",
+          "complete": true
+        }
+      ],
+      "work_status": "implementation_complete_validation_pending",
+      "remaining": "No remaining M06 source gap: real production RX/OID/service/lifecycle dispatch is implemented. Physical receive/overload/legacy-wrapper validation is separate. Missing M07 IRQ and M08 recovery keep Initialize fail-closed.",
+      "callable_component_implementation_percent": 100
+    },
+    {
+      "id": "M07",
+      "title": "Interrupt recognition and bounded DPCs",
+      "weight_percent": 8,
+      "dependencies": [
+        "M02",
+        "M04"
+      ],
+      "linux_reference": "r8169_main.c: rtl8169_interrupt, rtl_get_events, rtl_ack_events, rtl_irq_disable, rtl_irq_enable; ReactOS NdisMRegisterInterrupt",
+      "native_design": "Use existing NDIS line-interrupt registration first. MSI is a conditional OS/platform dependency, not assumed available.",
+      "gates": [
+        {
+          "description": "Verify ReactOS assigns a usable INTx route; register its resource through NdisMRegisterInterrupt and record actual delivery on the selected platform.",
+          "complete": false
+        },
+        {
+          "description": "Implement shared-line ISR recognition, 32-bit RTL8125 mask/status semantics at 0x38/0x3c, removal detection and correct mask/ack ordering.",
+          "complete": true
+        },
+        {
+          "description": "Bound DPC work, drain RX/TX/link events and rearm without lost-wakeup races, interrupt storms or polling-only success claims.",
+          "complete": true
+        },
+        {
+          "description": "Demonstrate correct delivery under load and concurrent stop. If INTx is unusable and MSI unsupported, explicitly track the required ReactOS PCI/HAL/NDIS patch as a separate prerequisite.",
+          "complete": false
+        }
+      ],
+      "evidence": [
+        "src/reactos/interrupt.hpp",
+        "src/reactos/interrupt.cpp",
+        "tests/interrupt_native_tests.cpp",
+        "evidence/m07-handoff.txt",
+        "evidence/m07-native-abi.txt",
+        "evidence/m07-source-audit.txt"
+      ],
+      "implementation_percent": 100,
+      "acceptance_percent": 50,
+      "implementation_weight_units": 8,
+      "implementation_criteria": [
+        {
+          "description": "Assigned-route NDIS interrupt registration",
+          "complete": true
+        },
+        {
+          "description": "Shared-line ISR mask/status/acknowledgement",
+          "complete": true
+        },
+        {
+          "description": "Bounded DPC drains and race-safe rearming",
+          "complete": true
+        },
+        {
+          "description": "Interrupt stop/removal and platform fallback handling",
+          "complete": true
+        }
+      ],
+      "work_status": "implementation_complete_validation_pending",
+      "remaining": "M07 source complete: assigned INTx owner, native ISR/private tracked DPC and passive link scheduling contract are integrated with the completed M08 worker and rundown. Actual IRQ delivery and platform MSI feasibility remain validation."
+    },
+    {
+      "id": "M08",
+      "title": "Reset, hang detection, halt and power",
+      "weight_percent": 8,
+      "dependencies": [
+        "M05",
+        "M06",
+        "M07"
+      ],
+      "linux_reference": "r8169_main.c: rtl_reset_work, rtl8169_down, rtl8169_net_suspend, rtl8169_net_resume, rtl_shutdown",
+      "native_design": "Explicit adapter state machine with passive recovery and synchronized DIRQL/DPC/timer retirement.",
+      "gates": [
+        {
+          "description": "Implement MiniportCheckForHang and MiniportReset with bounded recovery, generation tracking and accurate AddressingReset semantics.",
+          "complete": true
+        },
+        {
+          "description": "Stop DMA and serialize ISR/DPC/timer callbacks before completing packets, releasing pools, deregistering interrupts or unmapping BARs.",
+          "complete": true
+        },
+        {
+          "description": "Implement required NDIS/NT power and shutdown behavior without blocking at DISPATCH_LEVEL; restore filters, PHY and ring ownership after reset.",
+          "complete": true
+        },
+        {
+          "description": "Stress failed initialization, disabled adapter, cable removal, pending TX, repeated resets, suspend/resume and removal with no late use-after-free.",
+          "complete": false
+        }
+      ],
+      "evidence": [
+        "src/reactos/recovery.cpp",
+        "src/reactos/recovery_cpu.cpp",
+        "src/reactos/miniport.cpp",
+        "tests/recovery_native_tests.cpp",
+        "tests/recovery_ndis_tests.cpp",
+        "evidence/m08-summary.txt",
+        "evidence/m08-recovery-contracts.txt",
+        "evidence/m08-ndis-contracts.txt",
+        "evidence/m08-source-manifest.json",
+        "evidence/m08-patch-manifest.json",
+        "evidence/m08-patch-apply.txt"
+      ],
+      "implementation_percent": 100,
+      "acceptance_percent": 75,
+      "implementation_weight_units": 8,
+      "implementation_criteria": [
+        {
+          "description": "Hang/reset state and recovery generations",
+          "complete": true
+        },
+        {
+          "description": "ISR/DPC/timer/packet retirement fence",
+          "complete": true
+        },
+        {
+          "description": "Power/shutdown and hardware state restoration",
+          "complete": true
+        },
+        {
+          "description": "Failed initialization, reset and removal recovery paths",
+          "complete": true
+        }
+      ],
+      "work_status": "implementation_complete_validation_pending",
+      "remaining": "Source complete. Independent validation: rebuilt patched NDIS in an actual guest; SMP callback/CPU rundown, power IRPs, operational startup/Halt/unload and physical-card reset/removal. The external SDK and VM images were not modified."
+    },
+    {
+      "id": "M09",
+      "title": "Driver build, exact INF and installation",
+      "weight_percent": 4,
+      "dependencies": [
+        "M08"
+      ],
+      "linux_reference": "ReactOS e1000/CMakeLists.txt, ndis.h and native miniport packaging conventions",
+      "native_design": "Future operational networking .sys and exact-device demand-start INF. A fail-closed read-only probe binary now exists; operational driver packaging remains pending.",
+      "gates": [
+        {
+          "description": "Build/link the actual i386 .sys in the ReactOS toolchain; inspect imports, entry point, ABI and absence of C++ runtime dependencies.",
+          "complete": true
+        },
+        {
+          "description": "Verify the C++17 source on GCC 13 and MSVC 2022 separately; qualify any AMD64 native build separately from portable-library cross-compilation.",
+          "complete": false
+        },
+        {
+          "description": "Create exact RTL8125 INF/service binding and an explicit install/remove/recovery procedure without broad Realtek-family matches.",
+          "complete": true
+        },
+        {
+          "description": "Install, reboot, disable/enable and uninstall in an isolated ReactOS test system; retain logs and a recoverable setup.",
+          "complete": false
+        }
+      ],
+      "evidence": [
+        "cmake/driver_sources.cmake",
+        "cmake/native.cmake",
+        "cmake/package.cmake",
+        "packaging/rtl8125.inf",
+        "packaging/INSTALL.txt",
+        "packaging/BUILD.txt",
+        "packaging/FIRMWARE.txt",
+        "packaging/REACTOS_COMPATIBILITY.txt",
+        "packaging/reactos/CMakeLists.txt",
+        "evidence/m09-implementation.txt",
+        "evidence/m09-candidate-integrity.txt",
+        "Binaries/.build/m09-operational/package/rtl8125-i386-6b3797171995598e/BUILD_INFO.txt",
+        "src/installer/main.cpp",
+        "src/installer/backend.cpp",
+        "src/installer/model.cpp",
+        "src/installer/package_contract.hpp",
+        "cmake/installer.cmake",
+        "packaging/SETUP.txt",
+        "evidence/installer-review.txt",
+        "evidence/installer-package-integrity.txt"
+      ],
+      "implementation_percent": 100,
+      "acceptance_percent": 50,
+      "implementation_weight_units": 4,
+      "implementation_criteria": [
+        {
+          "description": "Operational-driver native build integration",
+          "complete": true
+        },
+        {
+          "description": "Compiler/architecture-specific build inputs",
+          "complete": true
+        },
+        {
+          "description": "Exact operational-driver INF/service binding",
+          "complete": true
+        },
+        {
+          "description": "Operational install/remove/recovery packaging",
+          "complete": true
+        }
+      ],
+      "work_status": "implementation_complete_validation_pending",
+      "remaining": "Source complete; operational i386 driver and native GUI installer published as an experimental candidate. MSVC execution, actual guest installation/reboot/disable-enable/removal, patched-wrapper runtime and physical network qualification remain pending. Firmware is not bundled."
+    },
+    {
+      "id": "M10",
+      "title": "Physical network qualification",
+      "weight_percent": 4,
+      "dependencies": [
+        "M09"
+      ],
+      "linux_reference": "Selected RTL8125 hardware and externally observed Ethernet traffic",
+      "native_design": "Real ReactOS hardware validation; CPU tests and emulated e1000 networking cannot satisfy this milestone.",
+      "gates": [
+        {
+          "description": "Record ReactOS build, XID, firmware version, BARs, DMA ranges and actual interrupt mode for PCI 10ec:8125 revision 05.",
+          "complete": false
+        },
+        {
+          "description": "Complete DHCP, ARP, DNS, ping and bidirectional TCP/UDP against a peer; include 100 Mb/s, 1 Gb/s and 2.5 Gb/s where peer equipment permits.",
+          "complete": false
+        },
+        {
+          "description": "Run sustained transfer, ring exhaustion, reset and cable-replug tests; record CPU cost, packet loss and measured throughput for the copying design.",
+          "complete": false
+        },
+        {
+          "description": "Publish exact passing hardware/build combinations and unresolved limits; verify reboot and recovery without relying on the Linux driver.",
+          "complete": false
+        }
+      ],
+      "evidence": [],
+      "implementation_percent": null,
+      "acceptance_percent": 0,
+      "implementation_weight_units": 0,
+      "implementation_criteria": [],
+      "work_status": "validation_pending"
+    }
+  ],
+  "native_miniport_percent_scope": "M01 registration and lifecycle acceptance gates only; this is not total native networking readiness.",
+  "networking_operational": false,
+  "probe_binary": "Binaries/rtl8125-probe-i386.sys",
+  "verification": {
+    "host_asan_ubsan_checks": 16922,
+    "native_mock_abi_checks": 3599,
+    "reactos_guest_tested": true,
+    "hardware_tested": false,
+    "msvc_tested": false,
+    "native_amd64_tested": false,
+    "guest_scope": "M01 production registration/callbacks and wrapper unload through labelled isolated kernel fixture; no physical device or networking.",
+    "reactos_guest_kernel_checks": 70,
+    "reactos_guest_cycles": 2,
+    "hardware_model_checks": 2562,
+    "native_dma_firmware_mock_checks": 2149,
+    "installed_firmware_format_only": true,
+    "verification_scope": "Historical combined M03/M05/M06 snapshots remain separately identified. Latest M04/M07/M08/M09 component evidence is scoped separately; no new full-runtime guest or physical test is claimed.",
+    "native_callback_mock_checks": 199,
+    "native_datapath_mock_checks": 1088,
+    "native_hardware_bridge_mock_checks": 32,
+    "packet_linked_guest_kernel_checks": 70,
+    "packet_linked_guest_cycles": 2,
+    "operational_guest_tested": false,
+    "latest_component_checks": [
+      {
+        "scope": "M04 genuine-SDK DMA mock suite",
+        "checks": 2245,
+        "result": "passed"
+      },
+      {
+        "scope": "M07 genuine-SDK IRQ mock suite",
+        "checks": 385,
+        "result": "passed"
+      },
+      {
+        "scope": "M08 concurrent genuine-SDK recovery mock suite",
+        "checks": 85,
+        "result": "passed"
+      },
+      {
+        "scope": "M08 actual compiled patched-NDIS source, modeled kernel imports",
+        "checks": 42,
+        "result": "passed"
+      },
+      {
+        "scope": "M09 host package ASan/UBSan suite",
+        "checks": 1065,
+        "result": "passed"
+      }
+    ]
+  },
+  "progress_revision": "2026-10-24: all source milestones M00\u2013M09 complete100%. Implementation score100%, testing excluded. M10 remains validation-only. Operational i386 candidate staged with complete source/INF and three required ReactOS NDIS patches. Guest install, MSVC execution and physical Ethernet qualification remain pending; no working-hardware certification claimed.",
+  "validation_media": "Binaries/rtl8125-probe-validation.iso",
+  "acceptance_percent": 73.0,
+  "paravirtual_network": {
+    "qemu_lightning_support": "already_implemented_and_deployed_device_verified",
+    "guest_device": "virtio-net-pci",
+    "manager_option": "Paravirtualized disk & network",
+    "shared_host_backends": [
+      "lightning-network stream",
+      "user NAT"
+    ],
+    "reactos_compatibility": "VirtIO needs a matching guest driver; existing ReactOS preset uses rtl8139 plus user NAT. The manager switch also changes disk devices.",
+    "hardware_validation": "Virtual NIC connectivity does not exercise the RTL8125 driver or replace physical PCI/MMIO/DMA/IRQ validation.",
+    "evidence": "evidence/qemu-lightning-network-audit.txt",
+    "guest_runtime_status": "verified_started_DHCP_and_source_bound_TCP_transfer",
+    "guest_driver": "Bundled ReactOS NetKVM (separate from this RTL8125 driver)",
+    "guest_ipv4": "10.0.3.15",
+    "fallback": "Previous RTL8139 launch configuration retained for rollback; active VM uses VirtIO only",
+    "runtime_evidence": "evidence/shared-network.json",
+    "host_nic_unchanged": true,
+    "default_route_verified": true
+  },
+  "integration_snapshot": "evidence/integration-source-snapshot.json",
+  "operational_candidate": {
+    "status": "published_with_native_installer_not_guest_or_hardware_qualified",
+    "path": "Binaries/RTL8125B-ReactOS-Setup-i386",
+    "sys_sha256": "6b3797171995598e999e10960ecd57cc24145b7c43dd1826a3edb1ca719ec158",
+    "source_archive_sha256": "4b2c04cbe6eb2927e42cad57fcacbe42850d00651095888ff5be387af747fb07",
+    "manifest_files_verified": 21,
+    "firmware_bundled": false,
+    "required_patches": [
+      "patches/reactos/0001-ndis-halt-context.patch",
+      "patches/reactos/0002-ndis-callback-rundown.patch",
+      "patches/reactos/0003-ndis-device-power.patch"
+    ],
+    "inf_sha256": "2b118674d9d8682a1f2983c94ce7b8bf68f161a435da58b08ce9195a2e5ab928"
+  },
+  "installer_enhancement": {
+    "status": "published_experimental_candidate",
+    "language": "C++17",
+    "platform": "ReactOS i386 Win32 GUI",
+    "confirmed_device_label": "RTL8125B",
+    "confirmed_hardware_id": "PCI\\VEN_10EC&DEV_8125&SUBSYS_7E271462&REV_05",
+    "generic_device_label": "RTL8125",
+    "scope": "Native per-device installation, firmware and patched-NDIS preflight, progress, recovery and scoped removal. Additional packaging enhancement; original milestone source scores remain unchanged.",
+    "implementation_percent": 100,
+    "installer_path": "Binaries/RTL8125B-ReactOS-Setup-i386/RTL8125-Setup.exe",
+    "package": "Binaries/RTL8125B-ReactOS-Setup-i386.zip",
+    "installer_sha256": "0acfcd99204a4a6afb1cd468834d5f17b626fc9f5b23e891d5d89d0a9f29079e",
+    "evidence": "evidence/installer-review.txt",
+    "validation": "43 policy +1065 package sanitizer checks; 60 independent SHA256 checks; 11 actual-backend Wine denial checks; five preview pages and full interactive preview; normal and800x600 layout checks. Actual ReactOS installation and physical-card validation pending.",
+    "zip_sha256": "e1774d3e152fb637740e244ca07a8314d6d456f7c4508cb9ce60907a483ffd67",
+    "source_archive_sha256": "4b2c04cbe6eb2927e42cad57fcacbe42850d00651095888ff5be387af747fb07",
+    "source_files_verified": 275,
+    "manifest_files_verified": 21,
+    "preview": "evidence/installer-preview-clean.png",
+    "ui_revision": "Removed requested header/sidebar text; review layout compacted; preview remains identified in native window title."
+  },
+  "source_snapshot": {
+    "date": "2026-10-24",
+    "directory": "Binaries/RTL8125B-source-snapshot-2026-10-24",
+    "archive": "Binaries/RTL8125B-source-snapshot-2026-10-24.tar.gz",
+    "sha256": "4b2c04cbe6eb2927e42cad57fcacbe42850d00651095888ff5be387af747fb07",
+    "manifest_files": 275,
+    "scope": "Matching complete corresponding source for current installer and driver package; src/installer/main.cpp is the revised GUI."
+  },
+  "guest_deployment": {
+    "status": "staged_on_preserved_selected_RX7900_VM",
+    "driver_bound": false,
+    "patched_ndis_boot_verified": true,
+    "firmware_validated_in_guest": true,
+    "oem_inf": "C:\\ReactOS\\inf\\oem6.inf",
+    "controlled_vm_installer": true,
+    "physical_passthrough_performed": false,
+    "physical_validation": "Pending separately; shared networking does not validate the RTL8125A/B miniport",
+    "evidence": "evidence/vm-installation.json",
+    "shared_network": "VirtIO/NetKVM working; Linux host network stays online"
+  }
+}

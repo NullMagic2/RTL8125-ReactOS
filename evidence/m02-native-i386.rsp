@@ -1,0 +1,13 @@
+-std=c++17 -fms-extensions -fno-exceptions -fno-rtti -fno-threadsafe-statics -DNDIS51_MINIPORT -DNDIS_MINIPORT_DRIVER -DNDIS_LEGACY_MINIPORT=1 -D__REACTOS__ -D_X86_ -D_M_IX86 -DWINVER=0x502 -D_WIN32_WINNT=0x502 -DNTDDI_VERSION=0x05020100
+-I/home/x/Documents/Codex/2026-10-21/he/work/reactos/sdk/include/crt
+-I/home/x/Documents/Codex/2026-10-21/he/work/reactos/sdk/include/vcruntime
+-I/home/x/Documents/Codex/2026-10-21/he/work/reactos/sdk/include/ddk
+-I/home/x/Documents/Codex/2026-10-21/he/work/reactos/sdk/include/ndk
+-I/home/x/Documents/Codex/2026-10-21/he/work/reactos/sdk/include/psdk
+-I/home/x/Documents/Codex/2026-10-21/he/work/reactos/sdk/include/reactos
+-I/home/x/Documents/Codex/2026-10-21/he/work/reactos/sdk/include
+-I/home/x/Documents/Codex/2026-10-21/he/work/ros-build-i386/sdk/include
+-I/home/x/Documents/Codex/2026-10-21/he/work/ros-build-i386/sdk/include/ddk
+-I/home/x/Documents/Codex/2026-10-21/he/work/ros-build-i386/sdk/include/psdk
+-I/home/x/Documents/Codex/2026-10-21/he/work/reactos/sdk/lib/pseh/include
+-Wall -Wextra -Werror

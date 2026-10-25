@@ -1,0 +1,18 @@
+[ 12%] Building CXX object CMakeFiles/rtl8125_core.dir/src/core/chip.cpp.o
+[ 25%] Building CXX object CMakeFiles/rtl8125_core.dir/src/core/descriptor.cpp.o
+[ 37%] Building CXX object CMakeFiles/rtl8125_core.dir/src/core/oid.cpp.o
+[ 50%] Building CXX object CMakeFiles/rtl8125_core.dir/src/core/resources.cpp.o
+[ 62%] Building CXX object CMakeFiles/rtl8125_core.dir/src/core/probe_log.cpp.o
+[ 75%] Linking CXX static library librtl8125_core.a
+[ 75%] Built target rtl8125_core
+[ 87%] Building CXX object CMakeFiles/rtl8125_probe_collect.dir/src/tools/probe_collect.cpp.o
+[100%] Linking CXX executable rtl8125_probe_collect
+[100%] Built target rtl8125_probe_collect
+[ 75%] Built target rtl8125_core
+[ 87%] Building CXX object CMakeFiles/rtl8125_probe_log_tests.dir/tests/probe_log_tests.cpp.o
+[100%] Linking CXX executable rtl8125_probe_log_tests
+[100%] Built target rtl8125_probe_log_tests
+[ 75%] Built target rtl8125_core
+[ 87%] Building CXX object CMakeFiles/rtl8125_resource_tests.dir/tests/resources_tests.cpp.o
+[100%] Linking CXX executable rtl8125_resource_tests
+[100%] Built target rtl8125_resource_tests

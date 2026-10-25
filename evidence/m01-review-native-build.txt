@@ -1,0 +1,9 @@
+[ 16%] Generating native/src_core_chip.cpp.obj
+[ 33%] Generating native/src_core_oid.cpp.obj
+[ 50%] Generating native/src_core_resources.cpp.obj
+[ 66%] Generating native/src_reactos_resources.cpp.obj
+[ 83%] Generating native/src_reactos_miniport.cpp.obj
+[100%] Generating native/rtl8125.sys
+[100%] Built target rtl8125_native_driver
+[ 16%] Generating native/miniport_contract_tests.exe
+[100%] Built target rtl8125_native_contract_tests

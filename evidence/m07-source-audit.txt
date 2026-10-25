@@ -1,0 +1,92 @@
+Module: rtl8125.evidence.m07_source_audit
+Purpose: Distinguish implemented IRQ ownership from platform/driver validation.
+Created: 2026-10-24
+Architecture: M07 source100; acceptance gates retain their original scope.
+
+Source references inspected locally, without network assumptions:
+- Pinned Linux v6.12 adc218676eef25575469234709c2d87185ca223a:
+  third_party/linux/r8169_main.c enum rtl8125_registers lines334-345;
+  interrupt event bits lines363-375; rtl_get_events/rtl_ack_events/
+  rtl_irq_disable/rtl_irq_enable lines1488-1518; rtl8169_interrupt
+  lines4677-4709; rtl8169_poll lines4750-4764; irq_mask line5126.
+- Matching ReactOS source path:
+  /home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/src
+  drivers/network/ndis/ndis/io.c HandleDeferredProcessing lines17-45,
+  ServiceRoutine lines47-108, NdisMDeregisterInterrupt lines700-715,
+  NdisMRegisterInterrupt lines941-1018.
+  drivers/network/ndis/ndis/miniport.c NdisMSynchronizeWithInterrupt lines3029-3037.
+  drivers/network/ndis/ndis/misc.c ndisProcWorkItemHandler and
+  NdisScheduleWorkItem lines500-534.
+  ntoskrnl/ke/dpc.c KeFlushQueuedDpcs lines920-959.
+  sdk/include/ddk/ndis.h actual NDIS5.1 characteristics and APIs.
+  Critical SDK/import identity is separately retained in m01 SDK evidence.
+
+Completed source responsibilities:
+1. Native NdisMRegisterInterrupt uses assigned vector, level, sharing and line
+   mode, requests the actual registered ISR for shared/exclusive routes, masks
+   and commits before connection, rejects unsupported message resources and
+   invalid mappings/metadata. OS status propagates; no guessed IRQ or MSI API.
+2. Native ISR always initializes outputs. Zero/unrelated shared-line status is
+   unrecognized. The Linux low16 all-ones removal rule stops further BAR writes.
+   Known event mask0x2f = RxOK|RxErr|TxOK|TxErr|LinkChg uses 32bit register0x38/0x3c.
+   Recognized events are mask/write+postedflush, W1C observedknownbits+flush,
+   accumulated, then queued. Unknown bits are not broadly acknowledged.
+3. Native private KDPC is referenced before enqueue, coalesces duplicate queue
+   requests, calls the actual registered production HandleInterrupt, and bounds
+   each TX/RX poll at64 descriptors. A budget-exhausted pass keeps interrupts
+   masked and schedules a later callback. Packet callback CAS admission raises
+   short callback bodies toDISPATCH; no spinlock crosses NDIS indication or
+   completion. Link sampling runs PASSIVE through the M03 query service.
+   Final status is checked before and after enable under interrupt synchronization;
+   pending events remask/requeue, and events later than finalread assert the line.
+   An inflight passive link query cannot create a link-only DPC storm.
+4. M07 closes scheduler admission under NdisMSynchronizeWithInterrupt, masks
+   and flushes (skipsMMIO on knownremoval), removes queued privateDPCs, waits
+   tracked references boundedly atPASSIVE, then disconnects. Timeout retains
+   the owner/mapping. No timeout or IRQfence is claimed as DMA retirement.
+   PnP/shutdown request closure; real recovery/power execution remainsM08.
+
+ReactOS constraints handled explicitly:
+- Audited HandleDeferredProcessing does not acquire the serialized adapter gate;
+  therefore the driver supplies AdapterDispatchGuard around actual packet OID,
+  Send and DPC dispatch. Reentrant/concurrent entry is rejected, not trusted.
+- Audited MDeregisterInterrupt only calls IoDisconnectInterrupt and updates
+  wrapper bookkeeping; it does not drain its InterruptDpc. Therefore this ISR
+  returns QueueMiniportHandleInterrupt=FALSE and queues its own tracked KDPC.
+  The real production ISR/HandleInterrupt table entries remain registered.
+- KeFlushQueuedDpcs checks queuedepth and does not itself prove completion of an
+  alreadyexecuting remote DPC with zeroqueue. M07 objectrefzero covers object
+  accesses only; driver-code unload rendezvous is explicitly an M08 obligation.
+- NDIS workitem callbacks have no join object proving the callback code returned.
+  Final M07 requires an actual M08 joinedworker scheduler installed in
+  interrupts.schedule_link before enable. service_interrupt_link claims a
+  queued request exactlyonce; afterclose it cancels withoutPHY I/O and releases
+  its reference. The recoverythread must cancel its own queuedlink before
+  retire_interrupt, then join for module unloading. No NDIS workitem fallback
+  or fake successful scheduler exists in production.
+
+M08 handoff:
+- PASSIVE register_interrupt -> real prepare_packet_path/activate_hardware ->
+  activate_packet_path returnsrunning -> enable_interrupt -> Initialize success
+  only after all independent recovery/DMA gates are satisfied.
+- <=DISPATCH close_interrupt_admission(adapter, removed) closes and masks IRQs.
+- Owning joinedthread: close, service_interrupt_link tocancelownpendingrequest,
+  retire_interrupt, then independent timer/recovery/ordinarycaller/CPUcode fence.
+- A failed fence retains all owners. After full retirement, M08 may placement
+  reconstruct the closed InterruptOwner before a new actual registration.
+- IRQ faults and linkread failures expose closing/faulted/removed/recovery_required
+  to the recoveryowner. No broad reset/power algorithm is duplicated in M07.
+
+Independent validation and prerequisites:
+- No actual INTx routing, interruptdeliveryunderload, physical DMA or networking
+  has been executed. MSI availability remains platform/OS qualification. If
+  assigned INTx does not work and no usable MSI path exists, ReactOS PCI/HAL/NDIS
+  enablement is a separately tracked prerequisite; this source does not assert
+  any specific board requires that patch.
+- Production Initialize at this handoff remains the read-only failclosed probe.
+  M08 startup/reset/power/unload and M04 DMA qualification are independent.
+- No host NIC reset, MMIO write, binding change, bus-master change, VFIO detach,
+  or physical VM launch was performed. Host networking remains attached.
+- User-directed implementation percentages exclude tests/physical acceptance.
+  All four M07 implementation criteria are implemented; original physical/load
+  acceptance gates must not be checked from these model results alone.

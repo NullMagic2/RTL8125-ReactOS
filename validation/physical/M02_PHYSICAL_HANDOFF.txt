@@ -1,0 +1,98 @@
+Module: rtl8125.evidence.m02_physical_handoff
+Purpose: Define the remaining actual-device ReactOS probe and its reproducible capture.
+Created: 2026-10-24
+Architecture: Dedicated RTL8125 PCI passthrough into an isolated i386 ReactOS guest;
+read-only native miniport probe, followed by fail-closed initialization.
+
+Current evidence and exact blocker
+
+The host currently exposes only PCI 0000:0d:00.0 as RTL8125 (10ec:8125, rev05),
+bound to r8169 with its live Linux interface up at 1000 Mb/s. Read-only journal
+logs identify this actual device as RTL8125B/XID641. Its first memory BAR is BAR2,
+64 KiB at 0xdf800000; BAR4 is only 16 KiB. The IOMMU group also contains
+0000:05:0a.0. See evidence/m02-linux-device-probe.txt for original commands/output.
+
+The user selected a VM with a separate RTL8125 for passthrough. A separate
+non-host-network adapter is not currently present. Attaching the host's active
+0000:0d:00.0 would require changing its ownership and disconnecting live networking,
+so it cannot be substituted for the requested dedicated-card setup. The remaining
+M02 actual-device acceptance gate needs that additional card or another explicitly
+owned physical ReactOS test setup. No Linux MMIO dump, replay fixture, virtual
+network model or Linux XID alone passes that original native ReactOS gate.
+
+Safe media and guest preparation
+
+1. Supply a dedicated RTL8125 and record its PCI BDF, full hardware ID, current
+   driver, associated interfaces and IOMMU group. Build target rtl8125_vfio_check
+   and run the resulting tool as rtl8125_vfio_check DOMAIN:BUS:SLOT.FUNCTION
+   against that explicit BDF. It requires the dedicated card already bound to
+   vfio-pci, no host network interfaces, an eligible IOMMU group, and accessible
+   KVM/VFIO group nodes. It changes no driver binding. It rejects the host adapter,
+   a card carrying host routes, and an unsafe/shared ownership configuration.
+   Do not run detach/reset/rebind commands against the active host adapter.
+2. Use a new project-owned ReactOS i386 disk/overlay and the debug build matching
+   the source/build provenance recorded for Binaries/rtl8125-probe-i386.sys.
+   Existing guest disks or images in other chats remain outside this test setup.
+   Keep a pristine disposable guest copy for recovery; this miniport intentionally
+   returns NDIS_STATUS_NOT_SUPPORTED after a successful read-only chip probe.
+3. Put the current probe SYS and the bundle's exact PCI10EC:8125 Net-class INF on
+   a separate read-only ISO. Keep the source SYS hash and ReactOS build ID beside
+   the captured serial log. Preserve the ISO manifest and root-generated launch
+   configuration. Use the root package's actual artifact names, not guessed paths.
+4. Configure QEMU with the guarded dedicated VFIO device and its own guest disk;
+   capture COM1 to a new host file, for example with -serial file:probe-serial.log.
+   Boot the guest's serial-debug option (COM1/115200). QEMU legacy machine/PCI/INTx
+   assignment and real DMA/interrupt delivery remain separate validation concerns;
+   this M02 probe registers no interrupt and starts no DMA.
+5. Within the guest use the hardware wizard/Device Manager to associate the
+   included exact-device INF with the passed-through RTL8125. A bare sc start of
+   the SYS is insufficient: real PCI/config/resource acquisition requires the
+   PnP Net-class association and NDIS WrapperConfigurationContext.
+6. Save a guest screenshot of the hardware ID, the precise ReactOS build and the
+   complete host serial capture. Expected device status is initialization failure
+   because the packet path is intentionally incomplete; do not expect connectivity.
+   Remove the association or restore the disposable guest copy for recovery.
+
+Expected production capture format
+
+The driver prints a versioned begin line, three diagnostic lines, then an end
+line. Values below are field descriptions, not a fabricated physical transcript:
+  RTL8125: probe begin v1
+  RTL8125: rev <hex> BAR<decimal> address <high32hex>:<low32hex> length <hex>
+  RTL8125: IRQ vector <decimal> level <decimal> flags <hex> TxConfig <hex>
+  RTL8125: probe XID <hex>, MAC family <decimal>; datapath incomplete
+  RTL8125: probe end status c00000bb
+
+Only successful native acquisition produces the diagnostic triple. The final
+c00000bb is NDIS_STATUS_NOT_SUPPORTED: the read-only identification completed,
+then initialization deliberately refused to advertise working networking. Failure
+before the triple should retain its actual end status for diagnosis. Do not edit
+or fill missing values into the original capture. Full TxConfig bits cannot be
+reconstructed from the Linux XID-only log.
+
+Collector reproduction
+
+Build through root CMake targets rtl8125_probe_collect and rtl8125_probe_log_tests.
+Standalone host build, if needed:
+  g++ -std=c++17 -Wall -Wextra -Wpedantic -Werror -fno-exceptions -fno-rtti -Isrc/core src/tools/probe_collect.cpp src/core/probe_log.cpp src/core/resources.cpp src/core/chip.cpp -o Binaries/.build/m02-host/rtl8125_probe_collect
+Run on an actual external serial capture with a NEW output pathname:
+  Binaries/.build/m02-host/rtl8125_probe_collect probe-serial.log probe-capture.json
+
+The collector bounds input at 64 MiB and each line at 512 bytes. It requires the
+complete marked consecutive diagnostic sequence, validates numeric widths,
+aperture/address intervals, assigned line-interrupt fields and TxConfig/XID/family
+agreement using production chip/resource rules. A new begin, unexpected line,
+truncation or invalid field discards the partial attempt; fields from separate
+attempts are never intentionally joined. Existing output files are never replaced.
+
+Exit0: complete record matches stable identity of the known Linux card (rev05,
+BAR2, RTL8125B/XID641). Exit4: complete supported record has another identity;
+this can be expected for a different dedicated card and needs explicit hardware
+provenance review. Exit3: no complete valid probe. Exit2: I/O/argument/input-budget
+failure. The JSON always labels capture origin as unverified and never marks the
+physical gate complete automatically: a parser cannot prove where text originated.
+
+Acceptance requires the complete original capture plus external provenance tying
+it to the dedicated passed-through physical card and actual ReactOS build. Only
+then may the roadmap's M02 actual XID gate be completed. This still proves no
+MAC/PHY setup, interrupt delivery, DMA retirement or packet traffic.

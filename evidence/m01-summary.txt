@@ -1,0 +1,74 @@
+Module: rtl8125.evidence.m01
+Purpose: Record reproducible native registration/OID evidence and honest limits.
+Created: 2026-10-24 America/Sao_Paulo
+Origin: Production C++ objects compiled against genuine existing ReactOS SDK.
+
+M01 gate 1: complete. GCC 13-win32 i686-w64-mingw32-g++ builds/links PE32
+rtl8125.sys with NT native subsystem and actual _DriverEntry@8 entry. Imports
+are exclusively ndis.sys, ntoskrnl.exe and hal.dll. No C++ runtime, exception,
+RTTI, constructor table or allocating operator new dependency. Link disables
+automatic imports, stdcall fixups and pseudo-relocations; no exports required.
+
+M01 gate 2: complete in source and native-ABI fixture. Per-device nonpaged state,
+Ethernet-medium selection, allocation failure and probe failure all unwind their
+owned resources. A successful PCI/resource/XID probe returns NOT_SUPPORTED and
+unwinds too: there is no successful network adapter or packet path. NDIS does
+not call Halt after failed Initialize, so Initialize explicitly owns cleanup.
+
+M01 gate 3: complete conservative discovery/OID implementation. Real SDK OIDs,
+strict query/set lengths and initialized byte counts; disconnected link, zero
+speed/buffer availability, no fabricated MAC, no unsupported offload/power
+advertisement, nonzero filters refused. A zero filter/empty multicast state is
+accepted only as inactive state; bounded lookahead uses shared frame limits.
+
+M01 gate 4: complete. Genuine ReactOS kernel execution in the isolated owned
+guest: two real production DriverEntry/NDIS 5.1 registrations succeed; the actual
+production unload handler is checked; 35 labelled kernel callback checks pass
+per load; two service load/stop cycles invoke real production wrapper unload;
+service deletion and runner end-failures both return zero. The guest-only
+anonymous control device makes SCM unload possible under ReactOS policy and is
+deleted before delegating to production unload. This fixture is not physical
+driver execution or operational PnP Ethernet initialization/removal evidence.
+
+The guest-tested production lifecycle retains its wrapper in an I/O-manager-
+owned driver-object extension, registers NdisMRegisterUnloadHandler and calls
+NdisTerminateWrapper exactly once on unload. Driver-extension failure cleans
+the wrapper before returning from DriverEntry. This fixes the missing wrapper
+unload owner found during real guest testing, without mutable global state.
+
+Verification:
+- evidence/m01-native-contract-tests.txt: production DriverEntry and callback
+  table, wrapper/registration failure ownership, media/IRQL/allocation/probe
+  failure, successful fail-closed probe, all OID dispatch cases, short/null
+  buffers, setters, send/reset and halt. Import pointers are test-only mocks;
+  the genuine SDK definitions and production object files are unchanged.
+- evidence/m01-guest-kernel.txt: full actual ReactOS kernel/runner serial log.
+  m01-guest-results.txt extracts driver/runner results (70 checks, zero failures,
+  two registrations, two wrapper unloads, two successful start/stop cycles).
+  m01-guest-hashes.txt and m01-guest-launch.txt pin and reproduce the exact guest
+  source, driver, runner, initial-attached ISO and read-only base image.
+- tests/oid_tests.cpp: host production byte helpers under ASan/UBSan (parent
+  integrated host test command/results are separate).
+- evidence/m01-native-pe.txt and m01-native-symbols.txt: complete PE/import and
+  symbol inspection. m01-sdk-hashes.txt identifies critical SDK/libs and binary.
+
+External SDK source is a read-only pre-existing copied ReactOS source tree at
+/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/src.
+Matching generated headers/import libs are in sibling build-release. The copied
+tree has no .git directory; the critical inputs are pinned by saved SHA-256s,
+not by a claim that the whole copy is pristine. Its ndis.h hash equals the
+inspected checkout's ndis.h at a97c8a2cdcf6a9a7f5cc543951a02ccb7a80d8ca.
+No files in the external source/build trees were modified.
+
+Reproduction (run from project directory; paths are cache inputs, not defaults):
+cmake -S . -B Binaries/.build/m01-native -DRTL8125_TESTS=OFF -DRTL8125_NATIVE_DRIVER=ON -DRTL8125_REACTOS_SOURCE=/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/src -DRTL8125_REACTOS_BUILD=/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release
+cmake --build Binaries/.build/m01-native --target rtl8125_native_driver rtl8125_native_contract_tests rtl8125_native_resource_contract_tests -j2
+mkdir -p Binaries/.build/m01-wine
+WINEPREFIX="$PWD/Binaries/.build/m01-wine" WINEDEBUG=-all wine Binaries/.build/m01-native/native/miniport_contract_tests.exe
+
+Wine and QEMU need local server sockets outside the sandbox's restricted IPC;
+their fixture execution received automatic escalation approval. The Windows
+ABI mocks call no hardware APIs; genuine guest kernel fixtures have no NIC or
+physical device attached and start no hardware/DMA/interrupts. GCC 13 i386 is verified;
+MSVC 2022 and native AMD64 remain unverified. This sys is an incomplete probe
+artifact, with no operational networking package or Ethernet support claim.

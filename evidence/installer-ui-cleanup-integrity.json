@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-24",
+  "scope": "Installer UI text removal; matching full source snapshot. No native driver installation.",
+  "outer_manifest_files": 21,
+  "source_manifest_files": 275,
+  "source_archive_members": 299,
+  "source_snapshot": "Binaries/RTL8125B-source-snapshot-2026-10-24",
+  "source_archive": "Binaries/RTL8125B-source-snapshot-2026-10-24.tar.gz",
+  "installer_sha256": "0acfcd99204a4a6afb1cd468834d5f17b626fc9f5b23e891d5d89d0a9f29079e",
+  "zip_sha256": "e1774d3e152fb637740e244ca07a8314d6d456f7c4508cb9ce60907a483ffd67",
+  "source_sha256": "4b2c04cbe6eb2927e42cad57fcacbe42850d00651095888ff5be387af747fb07",
+  "preserved_previous_release": "Binaries/.build/installer-ui-cleanup/previous-public-release",
+  "source_main_matches_workspace": true
+}

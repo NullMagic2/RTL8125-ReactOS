@@ -1,0 +1,70 @@
+Module: rtl8125.evidence.packaging_implementation
+Purpose: Separate M09 source completion from compiler, guest and physical evidence.
+Created: 2026-10-24
+Architecture: Candidate operational build/package; no host or guest installation.
+
+Implemented source criteria
+  1. Actual operational native driver build: canonical RTL8125_OPERATIONAL=1
+     compiles the real Initialize/start_recovery path, not the read-only probe.
+     Shared production source inventory includes actual firmware, DMA, packet,
+     IRQ and recovery owners. Default builds remain explicitly probe-mode.
+  2. Compiler/architecture inputs: standalone GCC i686-w64-mingw32 with actual
+     matching SDK/generated headers/import libraries and explicit i386 guard;
+     separate real ReactOS in-tree CMake adapter for GCC/MSVC 2022 C++17 using
+     compiler-native NDIS/kernel/HAL import targets. AMD64 is rejected.
+  3. Exact operational INF: NTx86-only Net class, sole PCI\VEN_10EC&DEV_8125 ID,
+     demand-start Rtl8125 service, exact rtl8125.sys association; no broad family
+     matches, root default install, boot-start service, catalog or signature claim.
+  4. Install/remove/recovery package: exact Device Manager procedure, recoverable
+     owned guest overlay, serial/debug/hash capture, scoped uninstall/orphaned
+     service removal/offline recovery, separate firmware acquisition, required
+     ordered OS compatibility patches, full corresponding GPL source and hashes.
+
+Verification achieved
+  Actual GCC 13-win32 operational i386 -nostdlib PE link succeeded against the
+  matched ReactOS SDK. PE checks require native subsystem, executable entry,
+  only NDIS/kernel/HAL DLL imports, no TLS/CLR/static constructor sections and
+  the actual compiled operational startup diagnostic. Exact INF is checked.
+  The ordinary published probe is rejected from operational package staging.
+  1,065 host model checks pass ASan/UBSan with leak detection disabled under
+  process tracing. Models exercise truncation, invalid RVA/raw mappings, import
+  and runtime sections, unsafe PCI/service bindings and probe/operational markers.
+  CMake rejects unacknowledged OS compatibility, AMD64 and a host x86_64 compiler.
+
+Verification not achieved
+  MSVC 2022 binary execution/build, operational guest installation/reboot/
+  disable-enable/uninstall, actual wrapper runtime behavior, physical A/B link,
+  traffic and IRQ/DMA/power correctness remain unverified. A MinGW build/model
+  does not qualify MSVC or AMD64. Firmware is not bundled. No host PCI binding,
+  MMIO, bus-master or network state was modified. No guest was installed by M09.
+  The wrapper patch acknowledgment records a dependency, not proof that a guest
+  loaded a patched ndis.sys. The original SDK tree and immutable VM base remain
+  unchanged. A virtual NIC plus shared-host networking cannot validate RTL8125.
+
+Owned artifact boundaries
+  Binaries/.build/m09-operational contains build/staging intermediates. Root
+  publishes reviewed final artifacts and documentation. The required ordered
+  OS patch set is supplied by M08; archive only after its final source freeze.
+  Source implementation completion and all remaining validation are separate.
+
+Final source handoff
+  M09 source implementation: 100 percent across all four source criteria.
+  M08's final ordered patch hashes match its m08-patch-manifest.json. The
+  documented git apply --check/apply commands passed on a fresh owned baseline
+  copy including NDIS CMakeLists.txt; the external SDK was left unchanged.
+  Fresh operational candidate staged successfully at:
+    Binaries/.build/m09-operational/package/rtl8125-i386-6b3797171995598e
+  SYS SHA256:
+    6b3797171995598e999e10960ecd57cc24145b7c43dd1826a3edb1ca719ec158
+  Corresponding source archive SHA256:
+    dfd0f1fb39f6e4ae459defc695b330761e56dcaee1fe73f2b38028fe0edb026a
+  Exact NTx86 INF SHA256:
+    076b0c4640ca8d92559b94fa558b156cb62614c711d52ab9315b81076a38c9fd
+  Package manifest verified all 14 outer files and 241 corresponding-source
+  files; all 263 archive members match the staged source bytes. No SYS, firmware,
+  VM disk or Binaries intermediate occurs within the source archive. Full
+  candidate integrity is recorded in m09-candidate-integrity.txt.
+  Historical miniport/datapath/interrupt ABI executables link successfully even
+  in the operational configuration by using an explicitly separate probe entry
+  object; this M09 pass did not execute those user-mode ABI fixtures.
+  All owned M09 source/build files are frozen for root review/publication.

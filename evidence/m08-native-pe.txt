@@ -1,0 +1,9 @@
+Origin: actual production SYS linked against real ReactOS import libraries.
+Subsystem		00000001	(NT native)
+	DLL Name: ndis.sys
+	0001419c  <none>  00b2  NdisMDeregisterAdapterShutdownHandler
+	DLL Name: hal.dll
+	DLL Name: ntoskrnl.exe
+	00014238  <none>  029c  KeSetSystemAffinityThread
+	00014250  <none>  0396  PsCreateSystemThread
+	00014254  <none>  03ea  PsTerminateSystemThread

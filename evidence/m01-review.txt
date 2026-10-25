@@ -1,0 +1,53 @@
+Module: rtl8125.evidence.m01_review
+Purpose: Record the concrete conservative-OID issue found by the relaunched M01 agent.
+Created: 2026-10-24 America/Sao_Paulo
+Architecture: Focused query formatting change; M01 gates and original evidence retained.
+
+Finding:
+The five general statistics OIDs always returned a 32-bit scalar and 4 bytes
+written, including requests with at least 8 bytes of storage. The current probe
+has zero counters, so this did not fabricate traffic, but the query contract
+could not represent 64-bit statistics and did not report the supported width.
+
+Primary references consulted:
+https://learn.microsoft.com/en-us/windows-hardware/drivers/network/querying-64-bit-statistics-oids
+https://learn.microsoft.com/en-us/previous-versions/windows/hardware/network/ff550490(v=vs.85)
+The former documents counter request negotiation and the gigabit counter-width
+requirement; the latter documents the actual NDIS 5 query callback and output
+length contract. Modern HLK was not run or claimed as ReactOS compatibility.
+
+Fix:
+src/core/oid.hpp/.cpp owns allocation-free copy_counter_information. It emits
+explicit little-endian x86 counter bytes, returns low 32 bits for capacity 4..7,
+returns all 64 bits for capacity >=8, and rejects capacity <4 without writing.
+Valid replies and short-buffer results report a supported width of 8 bytes.
+Null nonempty storage is refused. rtl8125_query applies this only to
+OID_GEN_XMIT_OK, OID_GEN_RCV_OK, OID_GEN_XMIT_ERROR, OID_GEN_RCV_ERROR and
+OID_GEN_RCV_NO_BUFFER. Ethernet alignment/collision OIDs retain 32-bit replies.
+
+Validation:
+- GCC 15.2 host ASan/UBSan: 68 production-helper checks passed, 0 failed.
+  A golden 0x8877665544332211 counter catches loss of its nonzero high word;
+  capacities 0..10, unaligned output, untouched guards/tail, null output and
+  maximum size/count values verify negotiation and bounded copying.
+  Leak detection disabled for the same process-tracing limitation as prior work.
+- GCC 13-win32 i386 builds/links production rtl8125.sys using the real matched
+  ReactOS SDK/import libraries. PE imports remain only ndis.sys, hal.dll and
+  ntoskrnl.exe, with NT native subsystem 5.2.
+- Real-SDK production callback fixture under Wine: 199 checks passed, 0 failed.
+  The additional 115 checks exercise all five actual SDK OID constants over
+  capacities 0..10 and null output; guarded buffers verify exact byte writes.
+  Wine imports are test-only mocks and do not imply guest/hardware execution.
+
+Evidence:
+m01-review-oid-tests.txt, m01-review-native-build.txt,
+m01-review-native-contracts.txt, m01-review-native-pe.txt, m01-review-hashes.txt.
+
+No lifecycle, registration/unload, adapter ownership, resource acquisition or
+initialization code changed. The original genuine ReactOS guest transcript of
+70 checks/two load-unload cycles and its exact source/binary hashes are retained
+as historical lifecycle evidence. No guest rerun was needed for the isolated
+byte-formatting correction; new OID behavior is covered by host and SDK fixtures.
+The driver still initializes only a read-only probe and fails NOT_SUPPORTED
+after successful resource/XID acquisition. Counters remain truthfully zero,
+there is no successful network adapter, and no DMA/interrupt/packet path starts.

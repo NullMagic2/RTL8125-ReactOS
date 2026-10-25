@@ -1,0 +1,301 @@
+--- a/drivers/network/ndis/ndis/miniport.c
++++ b/drivers/network/ndis/ndis/miniport.c
+@@ -479,53 +479,44 @@
+     MiniWorkItemComplete(Adapter, NdisWorkItemResetRequested);
+ }
+ 
+-VOID NTAPI
+-MiniRequestComplete(
+-    IN NDIS_HANDLE MiniportAdapterHandle,
+-    IN NDIS_STATUS Status)
+-{
+-    PLOGICAL_ADAPTER Adapter = (PLOGICAL_ADAPTER)MiniportAdapterHandle;
+-    PNDIS_REQUEST Request;
++/* Complete the exact request supplied by the caller. Clear global admission
++ * before invoking a protocol or signalling an internal synchronous waiter. */
++static VOID
++MiniFinishRequest(PLOGICAL_ADAPTER Adapter, PNDIS_REQUEST Request, NDIS_STATUS Status)
++{
+     PNDIS_REQUEST_MAC_BLOCK MacBlock;
+     KIRQL OldIrql;
+-
+-    NDIS_DbgPrint(DEBUG_MINIPORT, ("Called.\n"));
+-
++    if (Request == NULL)
++        return;
+     KeRaiseIrql(DISPATCH_LEVEL, &OldIrql);
+-
+-    KeAcquireSpinLockAtDpcLevel(&Adapter->NdisMiniportBlock.Lock);
+-    Request = Adapter->NdisMiniportBlock.PendingRequest;
+-    KeReleaseSpinLockFromDpcLevel(&Adapter->NdisMiniportBlock.Lock);
+-
+     MacBlock = (PNDIS_REQUEST_MAC_BLOCK)Request->MacReserved;
+-
+-    /* We may or may not be doing this request on behalf of an adapter binding */
+     if (MacBlock->Binding != NULL)
+     {
+-        /* We are, so invoke its request complete handler */
+         if (MacBlock->Binding->RequestCompleteHandler != NULL)
+-        {
+-            (*MacBlock->Binding->RequestCompleteHandler)(
+-                MacBlock->Binding->ProtocolBindingContext,
+-                Request,
+-                Status);
+-        }
++            MacBlock->Binding->RequestCompleteHandler(
++                MacBlock->Binding->ProtocolBindingContext, Request, Status);
+     }
+     else
+     {
+-        /* We are doing this internally, so we'll signal this event we've stashed in the MacBlock */
+         ASSERT(MacBlock->Unknown1 != NULL);
+-        ASSERT(MacBlock->Unknown3 == NULL);
+         MacBlock->Unknown3 = UlongToPtr(Status);
+         KeSetEvent(MacBlock->Unknown1, IO_NO_INCREMENT, FALSE);
+     }
+-
+-    KeAcquireSpinLockAtDpcLevel(&Adapter->NdisMiniportBlock.Lock);
++    KeLowerIrql(OldIrql);
++    MiniWorkItemComplete(Adapter, NdisWorkItemRequest);
++}
++
++VOID NTAPI
++MiniRequestComplete(NDIS_HANDLE MiniportAdapterHandle, NDIS_STATUS Status)
++{
++    PLOGICAL_ADAPTER Adapter = MiniportAdapterHandle;
++    PNDIS_REQUEST Request;
++    KIRQL OldIrql;
++    KeAcquireSpinLock(&Adapter->NdisMiniportBlock.Lock, &OldIrql);
++    Request = Adapter->NdisMiniportBlock.PendingRequest;
+     Adapter->NdisMiniportBlock.PendingRequest = NULL;
+-    KeReleaseSpinLockFromDpcLevel(&Adapter->NdisMiniportBlock.Lock);
+-    KeLowerIrql(OldIrql);
+-
+-    MiniWorkItemComplete(Adapter, NdisWorkItemRequest);
++    KeReleaseSpinLock(&Adapter->NdisMiniportBlock.Lock, OldIrql);
++    MiniFinishRequest(Adapter, Request, Status);
+ }
+ 
+ VOID NTAPI
+@@ -1357,26 +1348,8 @@
+ 
+           case NdisWorkItemRequest:
+             NdisStatus = MiniDoRequest(Adapter, (PNDIS_REQUEST)WorkItemContext);
+-
+-            if (NdisStatus == NDIS_STATUS_PENDING)
+-              break;
+-
+-            Adapter->NdisMiniportBlock.PendingRequest = (PNDIS_REQUEST)WorkItemContext;
+-            switch (((PNDIS_REQUEST)WorkItemContext)->RequestType)
+-              {
+-                case NdisRequestQueryInformation:
+-                  NdisMQueryInformationComplete((NDIS_HANDLE)Adapter, NdisStatus);
+-                  break;
+-
+-                case NdisRequestSetInformation:
+-                  NdisMSetInformationComplete((NDIS_HANDLE)Adapter, NdisStatus);
+-                  break;
+-
+-                default:
+-                  NDIS_DbgPrint(MIN_TRACE, ("Unknown NDIS request type.\n"));
+-                  break;
+-              }
+-            Adapter->NdisMiniportBlock.PendingRequest = NULL;
++            if (NdisStatus != NDIS_STATUS_PENDING)
++                MiniFinishRequest(Adapter, (PNDIS_REQUEST)WorkItemContext, NdisStatus);
+             break;
+ 
+           default:
+@@ -2511,18 +2484,6 @@
+   return IoCallDriver(Adapter->NdisMiniportBlock.NextDeviceObject, Irp);
+ }
+ 
+-NTSTATUS
+-NTAPI
+-NdisIPower(
+-    _In_ PDEVICE_OBJECT DeviceObject,
+-    _In_ PIRP Irp)
+-{
+-  PLOGICAL_ADAPTER Adapter = DeviceObject->DeviceExtension;
+-
+-  PoStartNextPowerIrp(Irp);
+-  IoSkipCurrentIrpStackLocation(Irp);
+-  return PoCallDriver(Adapter->NdisMiniportBlock.NextDeviceObject, Irp);
+-}
+ 
+ NTSTATUS
+ NTAPI
+@@ -3542,8 +3503,18 @@
+ MiniDoRequest(PLOGICAL_ADAPTER Adapter, PNDIS_REQUEST Request)
+ {
+     NDIS_STATUS Status;
++    KIRQL OldIrql;
+     if (!MiniAcquireLifecycleReference(Adapter))
+         return NDIS_STATUS_CLOSING;
++    KeAcquireSpinLock(&Adapter->NdisMiniportBlock.Lock, &OldIrql);
++    if (Adapter->NdisMiniportBlock.PendingRequest != NULL)
++    {
++        KeReleaseSpinLock(&Adapter->NdisMiniportBlock.Lock, OldIrql);
++        MiniReleaseLifecycleReference(Adapter);
++        return NDIS_STATUS_RESOURCES;
++    }
++    Adapter->NdisMiniportBlock.PendingRequest = Request;
++    KeReleaseSpinLock(&Adapter->NdisMiniportBlock.Lock, OldIrql);
+     Status = MiniDoRequestActive(Adapter, Request);
+     MiniReleaseLifecycleReference(Adapter);
+     return Status;
+--- a/drivers/network/ndis/include/miniport.h
++++ b/drivers/network/ndis/include/miniport.h
+@@ -212,4 +212,8 @@
+ VOID NTAPI MiniportHangDpc(PKDPC Dpc, PVOID Context, PVOID Argument1, PVOID Argument2);
+ NDIS_STATUS NTAPI ProSend(NDIS_HANDLE Binding, PNDIS_PACKET Packet);
+ 
++NTSTATUS NTAPI NdisIPower(PDEVICE_OBJECT DeviceObject, PIRP Irp);
++
++NDIS_STATUS MiniSetInformation(PLOGICAL_ADAPTER Adapter, NDIS_OID Oid, ULONG Size, PVOID Buffer, PULONG BytesRead);
++
+ BOOLEAN MiniCloseLifecycle(PLOGICAL_ADAPTER Adapter);
+--- a/drivers/network/ndis/CMakeLists.txt
++++ b/drivers/network/ndis/CMakeLists.txt
+@@ -30,6 +30,7 @@
+     ndis/miniport.c
+     ndis/misc.c
+     ndis/protocol.c
++    ndis/power.c
+     ndis/string.c
+     ndis/time.c
+     include/ndissys.h)
+--- /dev/null
++++ b/drivers/network/ndis/ndis/power.c
+@@ -0,0 +1,131 @@
++/*
++ * PROJECT:     ReactOS NDIS library
++ * LICENSE:     GPL-2.0-only
++ * PURPOSE:     Ordered passive NDIS device-power IRP transitions
++ * COPYRIGHT:   Copyright 2026 RTL8125 ReactOS port contributors
++ */
++#include "ndissys.h"
++
++/* Device power IRPs cannot execute PHY or reset polling at dispatch level.
++ * The I/O work item owns FDO lifetime until its routine returns. A separate
++ * reference protects the D0 lower-driver completion before work publication. */
++typedef struct _NDIS_POWER_WORK
++{
++    PDEVICE_OBJECT DeviceObject;
++    PIRP Irp;
++    PIO_WORKITEM WorkItem;
++    NDIS_DEVICE_POWER_STATE State;
++    BOOLEAN LowerCompleted;
++} NDIS_POWER_WORK, *PNDIS_POWER_WORK;
++
++static VOID NTAPI
++NdisPowerWorker(PDEVICE_OBJECT DeviceObject, PVOID Context)
++{
++    PNDIS_POWER_WORK Work = Context;
++    PLOGICAL_ADAPTER Adapter = DeviceObject->DeviceExtension;
++    PIRP Irp = Work->Irp;
++    BOOLEAN LowerCompleted = Work->LowerCompleted;
++    NTSTATUS Status = LowerCompleted ? Irp->IoStatus.Status : STATUS_SUCCESS;
++    NDIS_STATUS NdisStatus;
++    ULONG BytesRead;
++
++    if (NT_SUCCESS(Status))
++    {
++        if (!MiniAcquireLifecycleReference(Adapter))
++            Status = STATUS_DELETE_PENDING;
++        else
++        {
++            /* MiniDoRequest atomically reserves PendingRequest; a competing
++             * protocol OID fails this power attempt without overwriting it. */
++            NdisStatus = MiniSetInformation(Adapter, OID_PNP_SET_POWER,
++                sizeof(Work->State), &Work->State, &BytesRead);
++            if (NdisStatus != NDIS_STATUS_SUCCESS)
++                Status = STATUS_UNSUCCESSFUL;
++            MiniReleaseLifecycleReference(Adapter);
++        }
++    }
++    IoFreeWorkItem(Work->WorkItem);
++    ObDereferenceObject(Work->DeviceObject);
++    ExFreePool(Work);
++
++    if (LowerCompleted)
++    {
++        Irp->IoStatus.Status = Status;
++        IoCompleteRequest(Irp, IO_NO_INCREMENT);
++    }
++    else
++    {
++        PoStartNextPowerIrp(Irp);
++        if (NT_SUCCESS(Status))
++        {
++            /* Dx: NIC quiescence and DMA retirement preceded lower PCI power. */
++            IoSkipCurrentIrpStackLocation(Irp);
++            PoCallDriver(Adapter->NdisMiniportBlock.NextDeviceObject, Irp);
++        }
++        else
++        {
++            Irp->IoStatus.Status = Status;
++            IoCompleteRequest(Irp, IO_NO_INCREMENT);
++        }
++    }
++}
++
++static NTSTATUS NTAPI
++NdisPowerLowerComplete(PDEVICE_OBJECT DeviceObject, PIRP Irp, PVOID Context)
++{
++    PNDIS_POWER_WORK Work = Context;
++    UNREFERENCED_PARAMETER(DeviceObject);
++    UNREFERENCED_PARAMETER(Irp);
++    IoQueueWorkItem(Work->WorkItem, NdisPowerWorker, DelayedWorkQueue, Work);
++    return STATUS_MORE_PROCESSING_REQUIRED;
++}
++
++NTSTATUS
++NTAPI
++NdisIPower(PDEVICE_OBJECT DeviceObject, PIRP Irp)
++{
++    PLOGICAL_ADAPTER Adapter = DeviceObject->DeviceExtension;
++    PIO_STACK_LOCATION Stack = IoGetCurrentIrpStackLocation(Irp);
++    PNDIS_POWER_WORK Work;
++    if (Stack->MinorFunction != IRP_MN_SET_POWER ||
++        Stack->Parameters.Power.Type != DevicePowerState ||
++        Adapter->NdisMiniportBlock.PnPDeviceState != NdisPnPDeviceStarted)
++    {
++        PoStartNextPowerIrp(Irp);
++        IoSkipCurrentIrpStackLocation(Irp);
++        return PoCallDriver(Adapter->NdisMiniportBlock.NextDeviceObject, Irp);
++    }
++    Work = ExAllocatePool(NonPagedPool, sizeof(*Work));
++    if (Work == NULL)
++        goto AllocationFailure;
++    RtlZeroMemory(Work, sizeof(*Work));
++    Work->WorkItem = IoAllocateWorkItem(DeviceObject);
++    if (Work->WorkItem == NULL)
++    {
++        ExFreePool(Work);
++        goto AllocationFailure;
++    }
++    Work->DeviceObject = DeviceObject;
++    Work->Irp = Irp;
++    Work->State = (NDIS_DEVICE_POWER_STATE)Stack->Parameters.Power.State.DeviceState;
++    Work->LowerCompleted = Work->State == NdisDeviceStateD0;
++    ObReferenceObject(DeviceObject);
++    IoMarkIrpPending(Irp);
++    if (Work->LowerCompleted)
++    {
++        /* D0: PCI power and BAR decoding are restored before the NIC restart. */
++        IoCopyCurrentIrpStackLocationToNext(Irp);
++        IoSetCompletionRoutine(Irp, NdisPowerLowerComplete, Work, TRUE, TRUE, TRUE);
++        PoStartNextPowerIrp(Irp);
++        PoCallDriver(Adapter->NdisMiniportBlock.NextDeviceObject, Irp);
++    }
++    else
++        IoQueueWorkItem(Work->WorkItem, NdisPowerWorker, DelayedWorkQueue, Work);
++    return STATUS_PENDING;
++
++AllocationFailure:
++    PoStartNextPowerIrp(Irp);
++    Irp->IoStatus.Status = STATUS_INSUFFICIENT_RESOURCES;
++    IoCompleteRequest(Irp, IO_NO_INCREMENT);
++    return STATUS_INSUFFICIENT_RESOURCES;
++}

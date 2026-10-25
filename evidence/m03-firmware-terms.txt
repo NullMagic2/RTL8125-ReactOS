@@ -1,0 +1,20 @@
+Module: rtl8125.evidence.firmware_terms
+Purpose: Identify terms accompanying the installed firmware checked without execution.
+Created: 2026-10-24
+
+Installed package notice:
+  /usr/share/doc/linux-firmware-realtek/copyright
+  SHA256 dce6c9232740adf8673988fa30be108bcb37f5b61c319ae451236e8b95020953
+  Files rtl_nic/*: Realtek Semiconductor Corporation, copyright 2011-2013,
+  Redistributable-r8169 terms. The separate listed USB firmware exceptions do
+  not include rtl8125a-3.fw or rtl8125b-2.fw. Distribution in hexadecimal or an
+  equivalent format requires the accompanying copyright notice.
+
+Primary upstream matching terms and exact A/B filenames:
+  https://kernel.googlesource.com/pub/scm/linux/kernel/git/firmware/linux-firmware.git/+/refs/tags/20250211/WHENCE
+  WHENCE blob 19d0f7184257e912a6bfd4650e12771458454f1f, r8169 section.
+
+This GPL-2.0-only driver project does not relicense Realtek firmware. No blob is
+included in source, distribution or published probe package. The installed
+compressed file was decompressed into owned .build storage for format-only
+validation. It was never executed against a register model or physical device.

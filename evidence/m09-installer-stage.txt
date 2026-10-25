@@ -1,0 +1,7 @@
+[ 33%] Built target rtl8125_setup
+[100%] Built target rtl8125_package_check
+Package metadata passes: i386 native PE, executable entry, operational build marker, NDIS/kernel-only imports, exact PCI/service INF
+This check does not establish successful guest installation or networking
+-- Candidate staged without installation: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/m09-installer/installer-base/rtl8125-i386-6b3797171995598e
+-- Installer candidate staged without installation: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/m09-installer/installer-release/RTL8125B-ReactOS-Setup-i386.zip
+[100%] Built target rtl8125_installer_package

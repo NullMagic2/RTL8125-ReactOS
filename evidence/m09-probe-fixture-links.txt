@@ -1,0 +1,11 @@
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/m09-operational
+[  0%] Generating native/contract_miniport.obj
+[ 11%] Generating native/src_reactos_recovery.cpp.obj
+[ 22%] Generating native/miniport_contract_tests.exe
+[100%] Built target rtl8125_native_contract_tests
+[ 11%] Generating datapath-native/datapath_contract_tests.exe
+[100%] Built target rtl8125_native_datapath_contract_tests
+[  0%] Generating interrupt-native/interrupt_contract_tests.exe
+[100%] Built target rtl8125_native_interrupt_contract_tests

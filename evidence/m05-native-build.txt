@@ -1,0 +1,2 @@
+[  6%] Generating datapath-native/datapath_contract_tests.exe
+[100%] Built target rtl8125_native_datapath_contract_tests

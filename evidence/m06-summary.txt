@@ -1,0 +1,73 @@
+Supersession notice (2026-10-24): this first-pass callable-component report is historical. Production callback/ownership wiring is now complete; see evidence/m05-production-summary.txt for the current100% source assessment and separate pending validation.
+
+Module: rtl8125.evidence.m06_summary
+Purpose: Record synchronous copied RX/filter implementation and OS-specific limits.
+Created: 2026-10-24 (America/Sao_Paulo)
+
+Implemented code:
+- src/core/receive.hpp/.cpp extracts the pre-existing single receive decoder
+  unchanged from descriptor.hpp/.cpp into a container-free shared native contract.
+  Native SDK SAL macros clash with libstdc++ array internals; the offline encoder
+  remains host-only and is never a live ring. No duplicate decoder was introduced.
+- poll_receive consumes at most min(budget,256) acquired completions through
+  existing DmaOwner; rejects error/fragment/bounds/FCS errors, runt frames under60
+  and VLAN/QinQ. It copies into separate fixed nonpaged storage before indicating
+  or rearming; OWN remains clear throughout the indication callback.
+- Startup allocates one NDIS packet and one MDL once, with single-element packet/
+  buffer-pool requests. Each received packet uses NDIS_STATUS_RESOURCES and full
+  lookahead: synchronous consumption permits immediate reuse, with no miniport
+  per-packet allocation, ReturnPacket callback or retained NDIS receive packet.
+  Packet length/cache, Ethernet header size, checksum and VLAN metadata are reset
+  before each indication. Partial pool/packet/MDL failures unwind exactly once.
+- Actual ReactOS NdisAllocateBufferPool returns SUCCESS and null handle; acquisition
+  is tracked separately and NdisAllocateBuffer accepts that handle. Both actual
+  null and conventional nonnull handle behavior are covered by real-SDK fixtures.
+- Bounded current-filter/multicast-list query/set OID helpers support directed,
+  broadcast, exact multicast list(32), all multicast and promiscuous filters.
+  Invalid flags, lengths, unicast/broadcast list entries and oversize lists leave
+  software state unchanged. Hardware multicast hash uses Linux ethernet CRC,
+  word reversal/byte swaps and MAR4-before-MAR0 ordering. Software exact filtering
+  eliminates hash collisions. Query max-list matches32; no offloads are advertised.
+- Explicit startup clears RX error/runt acceptance and inner/outer VLAN extraction,
+  disables RxChkSum, programs RxMaxSize1519 and arms existing DMA RX slots.
+  Filter updates preserve unrelated register bits and flush posted writes; partial
+  hardware programming failure stops admission and leaves accepted software state.
+
+Validation completed:
+- Shared M05 packet/filter host suite8,335 ASan/UBSan checks; existing core1,555.
+- Shared genuine-SDK native fixture863 mocked checks; includes all256 RX slots,
+  bounded budgets/OWN waits/wrap, full payload copies without FCS, synchronous
+  reentrancy/release rejection, post-indication rearm, invalid flags/lengths,
+  runt/VLAN, exact foreign-unicast drop, promiscuous admission, OID lengths,
+  hardware bit preservation, allocation failures and active-DMA release refusal.
+- Real i386 kernel-link check imports only NDIS/HAL/kernel services; no C++ runtime.
+
+Matching ReactOS implementation audit:
+/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/src/drivers/network/ndis/ndis/buffer.c:
+NdisAllocateBufferPool(367-385) returns successful null handle; NdisAllocateBuffer
+ignores pool, allocates MDL and builds it for nonpaged memory; NdisFreeBufferPool
+is a no-op. Miniport still allocates its MDL only at passive startup.
+ndis/ndis/miniport.c:MiniIndicateReceivePacket(292-429) handles RESOURCES by calling
+legacy ReceiveHandler with an internally allocated/copied full lookahead, then
+returns ownership immediately. Thus NDIS wrapper internally allocates per RX even
+though the miniport does not; performance is unmeasured. That implementation
+omits ReceiveCompleteHandler in this path. tcpip/datalink/lan.c:ProtocolReceiveComplete
+(557) is currently a no-op. The standard public packet indication contract is
+retained; no private-wrapper hack or OS source edit was made. Other legacy
+protocol completion compatibility needs guest validation and possibly an NDIS fix.
+
+Implementation versus validation:
+- Original M06 gates1/2/3 have callable implementation; gate4 is peer/overload/
+  physical validation and remains pending. All source-level packet components
+  above exist, with explicit production integration still gated by M03/M07/M08.
+- Production Initialize, OID callbacks and receive behavior remain the fail-closed
+  probe: no callable datapath activation is wired to it. Ring-base/engine enable,
+  real interrupt service, MAC/link and reset/fencing require their own milestones.
+- No peer-to-guest capture, real interrupt/DMA stress, operational packet guest
+  test or physical card evidence exists. Mocked ABI/model checks do not certify it.
+
+Pinned algorithm attribution:
+Linuxv6.12 adc218676eef25575469234709c2d87185ca223a:
+third_party/linux/r8169_main.c rtl_rx, rtl8169_mark_to_asic, rtl_set_rx_mode,
+rtl_set_rx_config_features, rtl8169_set_features. Adapted C++ retains GPL-2.0-only.
+Build/test commands and common logs are in evidence/m05-summary.txt and m05-*.

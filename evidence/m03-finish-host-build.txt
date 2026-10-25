@@ -1,0 +1,5 @@
+[ 50%] Built target rtl8125_core
+[ 85%] Built target rtl8125_hardware
+[ 92%] Building CXX object CMakeFiles/rtl8125_hardware_device_tests.dir/tests/hardware_device_tests.cpp.o
+[100%] Linking CXX executable rtl8125_hardware_device_tests
+[100%] Built target rtl8125_hardware_device_tests

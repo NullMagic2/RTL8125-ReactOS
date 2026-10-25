@@ -1,0 +1,380 @@
+--- a/drivers/network/ndis/ndis/miniport.c
++++ b/drivers/network/ndis/ndis/miniport.c
+@@ -48,6 +48,7 @@
+     NdisMedium1394,
+     NdisMediumMax
+ };
++
+ 
+ /* global list and lock of Miniports NDIS has registered */
+ LIST_ENTRY MiniportListHead;
+@@ -475,6 +476,7 @@
+     }
+ 
+     KeReleaseSpinLock(&Adapter->NdisMiniportBlock.Lock, OldIrql);
++    MiniWorkItemComplete(Adapter, NdisWorkItemResetRequested);
+ }
+ 
+ VOID NTAPI
+@@ -899,7 +901,7 @@
+ }
+ 
+ NDIS_STATUS
+-MiniReset(
++MiniResetActive(
+     PLOGICAL_ADAPTER Adapter)
+ /*
+  * FUNCTION: Resets the miniport
+@@ -946,7 +948,7 @@
+ }
+ 
+ VOID NTAPI
+-MiniportHangDpc(
++MiniportHangDpcActive(
+         PKDPC Dpc,
+         PVOID DeferredContext,
+         PVOID SystemArgument1,
+@@ -972,9 +974,15 @@
+         return;
+ 
+     /* There is, so fire the worker */
++    /* Reserve before publication, including a worker not yet entered. Close
++     * waits this reservation too; a following Start cannot reuse an old worker. */
++    if (!MiniAcquireLifecycleReference(Adapter))
++        return;
+     IoWorkItem = IoAllocateWorkItem(Adapter->NdisMiniportBlock.DeviceObject);
+     if (IoWorkItem)
+         IoQueueWorkItem(IoWorkItem, MiniportWorker, DelayedWorkQueue, IoWorkItem);
++    else
++        MiniReleaseLifecycleReference(Adapter);
+ }
+ 
+ VOID
+@@ -1104,7 +1112,7 @@
+ }
+ 
+ NDIS_STATUS
+-MiniDoRequest(
++MiniDoRequestActive(
+     PLOGICAL_ADAPTER Adapter,
+     PNDIS_REQUEST NdisRequest)
+ /*
+@@ -1220,7 +1228,7 @@
+ 
+ VOID
+ NTAPI
+-MiniportWorker(IN PDEVICE_OBJECT DeviceObject, IN PVOID Context)
++MiniportWorkerActive(IN PDEVICE_OBJECT DeviceObject, IN PVOID Context)
+ {
+   PLOGICAL_ADAPTER Adapter = DeviceObject->DeviceExtension;
+   KIRQL OldIrql, RaiseOldIrql;
+@@ -1525,9 +1533,10 @@
+ 
+   NDIS_DbgPrint(DEBUG_MINIPORT, ("Called.\n"));
+ 
+-  if(Adapter->BugcheckContext->ShutdownHandler) {
++  if (Adapter->BugcheckContext && Adapter->BugcheckContext->ShutdownHandler) {
+     KeDeregisterBugCheckCallback(Adapter->BugcheckContext->CallbackRecord);
+     IoUnregisterShutdownNotification(Adapter->NdisMiniportBlock.DeviceObject);
++    Adapter->BugcheckContext->ShutdownHandler = NULL;
+   }
+ }
+ 
+@@ -1920,6 +1929,10 @@
+    */
+ 
+   NDIS_DbgPrint(DEBUG_MINIPORT, ("Start Device %wZ\n", &Adapter->NdisMiniportBlock.MiniportName));
++  if (Adapter->LifecycleReferences != 0 || Adapter->WorkQueueHead != NULL ||
++      Adapter->NdisMiniportBlock.FirstPendingPacket != NULL)
++      return STATUS_DEVICE_BUSY;
++  Adapter->LifecycleClosing = FALSE;
+ 
+   NDIS_DbgPrint(MAX_TRACE, ("Inserting adapter 0x%x into adapter list\n", Adapter));
+ 
+@@ -2222,6 +2235,10 @@
+ {
+   PLOGICAL_ADAPTER Adapter = (PLOGICAL_ADAPTER)DeviceObject->DeviceExtension;
+ 
++  if (!MiniCloseLifecycle(Adapter))
++      return STATUS_DEVICE_BUSY;
++  NdisMDeregisterAdapterShutdownHandler(Adapter);
++
+   /* Remove adapter from adapter list for this miniport */
+   ExInterlockedRemoveEntryList(&Adapter->MiniportListEntry, &Adapter->NdisMiniportBlock.DriverHandle->Lock);
+ 
+@@ -2272,12 +2289,17 @@
+     PIRP Irp)
+ {
+   PLOGICAL_ADAPTER Adapter = DeviceObject->DeviceExtension;
+-  PMINIPORT_BUGCHECK_CONTEXT Context = Adapter->BugcheckContext;
+-  ADAPTER_SHUTDOWN_HANDLER ShutdownHandler = Context->ShutdownHandler;
+-
+-  ASSERT(ShutdownHandler);
+-
+-  ShutdownHandler(Context->DriverContext);
++  PMINIPORT_BUGCHECK_CONTEXT Context;
++  ADAPTER_SHUTDOWN_HANDLER ShutdownHandler;
++
++  if (MiniAcquireLifecycleReference(Adapter))
++  {
++      Context = Adapter->BugcheckContext;
++      ShutdownHandler = Context ? Context->ShutdownHandler : NULL;
++      if (ShutdownHandler)
++          ShutdownHandler(Context->DriverContext);
++      MiniReleaseLifecycleReference(Adapter);
++  }
+ 
+   Irp->IoStatus.Status = STATUS_SUCCESS;
+   Irp->IoStatus.Information = 0;
+@@ -2344,7 +2366,18 @@
+ {
+     NTSTATUS Status;
+     PLOGICAL_ADAPTER Adapter = DeviceObject->DeviceExtension;
+-    
++
++    if (!MiniCloseLifecycle(Adapter))
++    {
++        /* REMOVE cannot be failed. Forward it but retain this wrapper/device
++         * and its attachment: a callback timeout is not permission to free. */
++        ObReferenceObject(DeviceObject);
++        Irp->IoStatus.Status = STATUS_SUCCESS;
++        IoSkipCurrentIrpStackLocation(Irp);
++        return IoCallDriver(Adapter->NdisMiniportBlock.NextDeviceObject, Irp);
++    }
++    NdisMDeregisterAdapterShutdownHandler(Adapter);
++
+     if (Adapter->NdisMiniportBlock.SymbolicLinkName.Buffer)
+     {
+         IoSetDeviceInterfaceState(&Adapter->NdisMiniportBlock.SymbolicLinkName, FALSE);
+@@ -2611,6 +2644,9 @@
+ 
+   Adapter = (PLOGICAL_ADAPTER)DeviceObject->DeviceExtension;
+   KeInitializeSpinLock(&Adapter->NdisMiniportBlock.Lock);
++  KeInitializeEvent(&Adapter->LifecycleDrained, NotificationEvent, TRUE);
++  Adapter->LifecycleReferences = 0;
++  Adapter->LifecycleClosing = FALSE;
+   InitializeListHead(&Adapter->ProtocolListHead);
+ 
+   Status = IoRegisterDeviceInterface(PhysicalDeviceObject,
+@@ -3488,4 +3524,54 @@
+     return Adapter->NdisMiniportBlock.DeviceContext;
+ }
+ 
++
++/* These wrappers reserve entry before every ordinary request, hang/reset or
++ * worker callback. Release happens only after the miniport routine returns. */
++NDIS_STATUS
++MiniReset(PLOGICAL_ADAPTER Adapter)
++{
++    NDIS_STATUS Status;
++    if (!MiniAcquireLifecycleReference(Adapter))
++        return NDIS_STATUS_CLOSING;
++    Status = MiniResetActive(Adapter);
++    MiniReleaseLifecycleReference(Adapter);
++    return Status;
++}
++
++NDIS_STATUS
++MiniDoRequest(PLOGICAL_ADAPTER Adapter, PNDIS_REQUEST Request)
++{
++    NDIS_STATUS Status;
++    if (!MiniAcquireLifecycleReference(Adapter))
++        return NDIS_STATUS_CLOSING;
++    Status = MiniDoRequestActive(Adapter, Request);
++    MiniReleaseLifecycleReference(Adapter);
++    return Status;
++}
++
++VOID NTAPI
++MiniportHangDpc(PKDPC Dpc, PVOID Context, PVOID Argument1, PVOID Argument2)
++{
++    PLOGICAL_ADAPTER Adapter = Context;
++    if (!MiniAcquireLifecycleReference(Adapter))
++        return;
++    MiniportHangDpcActive(Dpc, Context, Argument1, Argument2);
++    MiniReleaseLifecycleReference(Adapter);
++}
++
++VOID NTAPI
++MiniportWorker(PDEVICE_OBJECT DeviceObject, PVOID Context)
++{
++    PLOGICAL_ADAPTER Adapter = DeviceObject->DeviceExtension;
++    if (!MiniAcquireLifecycleReference(Adapter))
++    {
++        IoFreeWorkItem((PIO_WORKITEM)Context);
++        MiniReleaseLifecycleReference(Adapter); /* Publication reservation. */
++        return;
++    }
++    MiniportWorkerActive(DeviceObject, Context);
++    MiniReleaseLifecycleReference(Adapter); /* Callback entry. */
++    MiniReleaseLifecycleReference(Adapter); /* Publication reservation. */
++}
++
+ /* EOF */
+--- a/drivers/network/ndis/include/miniport.h
++++ b/drivers/network/ndis/include/miniport.h
+@@ -87,6 +87,9 @@
+ typedef struct _LOGICAL_ADAPTER
+ {
+     NDIS_MINIPORT_BLOCK         NdisMiniportBlock;      /* NDIS defined fields */
++    ULONG                      LifecycleReferences;
++    BOOLEAN                    LifecycleClosing;
++    KEVENT                     LifecycleDrained;
+     PNDIS_MINIPORT_WORK_ITEM    WorkQueueHead;          /* Head of work queue */
+     PNDIS_MINIPORT_WORK_ITEM    WorkQueueTail;          /* Tail of work queue */
+     LIST_ENTRY                  ListEntry;              /* Entry on global list */
+@@ -201,3 +204,12 @@
+     NDIS_WORK_ITEM_TYPE  WorkItemType);
+ 
+ /* EOF */
++
++/* Wrapper-owned callback rundown; acquisition is <= DISPATCH_LEVEL. */
++BOOLEAN MiniAcquireLifecycleReference(PLOGICAL_ADAPTER Adapter);
++VOID MiniReleaseLifecycleReference(PLOGICAL_ADAPTER Adapter);
++
++VOID NTAPI MiniportHangDpc(PKDPC Dpc, PVOID Context, PVOID Argument1, PVOID Argument2);
++NDIS_STATUS NTAPI ProSend(NDIS_HANDLE Binding, PNDIS_PACKET Packet);
++
++BOOLEAN MiniCloseLifecycle(PLOGICAL_ADAPTER Adapter);
+--- a/drivers/network/ndis/ndis/protocol.c
++++ b/drivers/network/ndis/ndis/protocol.c
+@@ -386,7 +386,7 @@
+ }
+ 
+ NDIS_STATUS
+-proSendPacketToMiniport(PLOGICAL_ADAPTER Adapter, PNDIS_PACKET Packet)
++proSendPacketToMiniportActive(PLOGICAL_ADAPTER Adapter, PNDIS_PACKET Packet)
+ {
+ #if WORKER_TEST
+    MiniQueueWorkItem(Adapter, NdisWorkItemSend, Packet, FALSE);
+@@ -470,7 +470,7 @@
+ }
+ 
+ NDIS_STATUS NTAPI
+-ProSend(
++ProSendActive(
+     IN  NDIS_HANDLE     MacBindingHandle,
+     IN  PNDIS_PACKET    Packet)
+ /*
+@@ -1373,3 +1373,28 @@
+ }
+ 
+ /* EOF */
++
++/* Packet callbacks use the same close gate as timers and request workers. */
++NDIS_STATUS NTAPI
++ProSend(NDIS_HANDLE Binding, PNDIS_PACKET Packet)
++{
++    PADAPTER_BINDING AdapterBinding = GET_ADAPTER_BINDING(Binding);
++    PLOGICAL_ADAPTER Adapter = AdapterBinding->Adapter;
++    NDIS_STATUS Status;
++    if (!MiniAcquireLifecycleReference(Adapter))
++        return NDIS_STATUS_CLOSING;
++    Status = ProSendActive(Binding, Packet);
++    MiniReleaseLifecycleReference(Adapter);
++    return Status;
++}
++
++NDIS_STATUS
++proSendPacketToMiniport(PLOGICAL_ADAPTER Adapter, PNDIS_PACKET Packet)
++{
++    NDIS_STATUS Status;
++    if (!MiniAcquireLifecycleReference(Adapter))
++        return NDIS_STATUS_CLOSING;
++    Status = proSendPacketToMiniportActive(Adapter, Packet);
++    MiniReleaseLifecycleReference(Adapter);
++    return Status;
++}
+--- a/drivers/network/ndis/CMakeLists.txt
++++ b/drivers/network/ndis/CMakeLists.txt
+@@ -25,6 +25,7 @@
+     ndis/hardware.c
+     ndis/io.c
+     ndis/main.c
++    ndis/lifecycle.c
+     ndis/memory.c
+     ndis/miniport.c
+     ndis/misc.c
+--- /dev/null
++++ b/drivers/network/ndis/ndis/lifecycle.c
+@@ -0,0 +1,80 @@
++/*
++ * PROJECT:     ReactOS NDIS library
++ * LICENSE:     GPL-2.0-only
++ * PURPOSE:     Miniport callback admission and CPU rundown
++ * COPYRIGHT:   Copyright 2026 RTL8125 ReactOS port contributors
++ */
++#include "ndissys.h"
++
++/* A wrapper callback reference spans the complete miniport call, including its
++ * epilogue. Queued I/O workers separately hold their device/extension through
++ * IopWorkItemCallback. A closed worker never enters miniport code. */
++BOOLEAN
++MiniAcquireLifecycleReference(PLOGICAL_ADAPTER Adapter)
++{
++    KIRQL OldIrql;
++    BOOLEAN Acquired = FALSE;
++    KeAcquireSpinLock(&Adapter->NdisMiniportBlock.Lock, &OldIrql);
++    if (!Adapter->LifecycleClosing)
++    {
++        if (Adapter->LifecycleReferences++ == 0)
++            KeClearEvent(&Adapter->LifecycleDrained);
++        Acquired = TRUE;
++    }
++    KeReleaseSpinLock(&Adapter->NdisMiniportBlock.Lock, OldIrql);
++    return Acquired;
++}
++
++VOID
++MiniReleaseLifecycleReference(PLOGICAL_ADAPTER Adapter)
++{
++    KIRQL OldIrql;
++    KeAcquireSpinLock(&Adapter->NdisMiniportBlock.Lock, &OldIrql);
++    ASSERT(Adapter->LifecycleReferences != 0);
++    if (--Adapter->LifecycleReferences == 0)
++        KeSetEvent(&Adapter->LifecycleDrained, IO_NO_INCREMENT, FALSE);
++    KeReleaseSpinLock(&Adapter->NdisMiniportBlock.Lock, OldIrql);
++}
++
++BOOLEAN
++MiniCloseLifecycle(PLOGICAL_ADAPTER Adapter)
++{
++    KIRQL OldIrql;
++    KAFFINITY Active, Mask;
++    ULONG Processor;
++    BOOLEAN Visited = TRUE;
++    LARGE_INTEGER Timeout;
++    ASSERT(KeGetCurrentIrql() == PASSIVE_LEVEL);
++    KeAcquireSpinLock(&Adapter->NdisMiniportBlock.Lock, &OldIrql);
++    Adapter->LifecycleClosing = TRUE;
++    KeReleaseSpinLock(&Adapter->NdisMiniportBlock.Lock, OldIrql);
++    KeCancelTimer(&Adapter->NdisMiniportBlock.WakeUpDpcTimer.Timer);
++    KeRemoveQueueDpc(&Adapter->NdisMiniportBlock.WakeUpDpcTimer.Dpc);
++    /* Cancel/remove cannot catch a KDPC already dequeued before its first
++     * reference acquisition. A PASSIVE visit to every processor follows the
++     * return of that processor's old DISPATCH-level callback. No new timer
++     * publication is possible after cancellation. KeFlushQueuedDpcs alone
++     * does not cover this case in the matched ReactOS implementation. */
++    Active = KeQueryActiveProcessors();
++    if (!Active)
++        return FALSE;
++    for (Processor = 0; Processor < sizeof(KAFFINITY) * 8; ++Processor)
++    {
++        Mask = (KAFFINITY)1 << Processor;
++        if (!(Active & Mask))
++            continue;
++        KeSetSystemAffinityThread(Mask);
++        if (KeGetCurrentProcessorNumber() != Processor)
++        {
++            Visited = FALSE;
++            break;
++        }
++    }
++    KeRevertToUserAffinityThread();
++    if (!Visited)
++        return FALSE;
++    Timeout.QuadPart = -100000000;
++    return KeWaitForSingleObject(&Adapter->LifecycleDrained, Executive,
++                                 KernelMode, FALSE, &Timeout) == STATUS_SUCCESS;
++}
++

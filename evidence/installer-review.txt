@@ -1,0 +1,41 @@
+Module: rtl8125.installer.independent_review
+Purpose: Record source, host-policy, backend-denial and GUI checks of native setup.
+Created: 2026-10-24
+Architecture: Root review; no operational ReactOS installation or hardware traffic.
+
+Confirmed card label: RTL8125B, exactly.
+Full HWID: PCI\VEN_10EC&DEV_8125&SUBSYS_7E271462&REV_05.
+Generic fallback: RTL8125. Manufacturer Realtek; driver provider this project.
+Reviewed INF .NTx86.HW FriendlyName application and matched ReactOS Device Manager
+FriendlyName precedence in actual setupapi/devinst.c and devmgmt/DeviceNode.cpp.
+
+Source review corrections completed:
+- Protected reboot and recovery evidence, including inherited child-key ACLs.
+- Hash and lock payload/NDIS/firmware before mutation; no OS updater.
+- Preserve initial recovery point across reinstalls and failed later attempts.
+- Fixed missing firmware-directory handling on a first installation.
+- Reject shared-driver changes while another instance uses Rtl8125.
+- Validate previous INF/binary identity; DI_NOFILECOPY binding restoration.
+- Unsupported or same-service live rollback reports offline recovery requirements.
+- FAT recovery integrity uses protected registry hashes; no assumed file ACLs.
+- Device and generic model names are bounded to exact RTL8125 identities.
+
+GCC15.2 host ASan/UBSan: 43 policy checks + 1,065 package checks passed.
+LeakSanitizer was disabled because sandbox ptrace prevents its operation.
+Independent SHA256 comparisons against Python hashlib: 60 checks passed, lengths
+0,1,55,56,63,64,65,127,128,129,4096,1000000 and chunks1,7,64,65,16384.
+Actual GCC13 i386 backend fixture in isolated Wine: 11 checks passed; all preview
+operations were no-ops and every non-preview mutation was denied. No HKLM setup
+journal was created. Wine uses WOW64 on this host; WINEARCH=win32 is unavailable.
+
+Visual checks: all five pages at normal size, client1040x720; device, requirements
+and review at800x600 desktop, client769x533. All actions visible. Corrected GDI
+checkmarks avoid font-dependent glyphs; short sidebar avoids clipping. Interactive
+Continue -> Requirements -> Review -> Preview installation -> asynchronous
+progress -> Preview complete also passed. Screens visibly identify preview.
+
+No real driver install, OS component replacement, host NIC detachment, MMIO access,
+VFIO change, physical networking, actual removal or native guest result is claimed.
+SHA256 b33235064abae0948b0b394818e57bc3ca16a2f5f3589021636251ebcb61dca1  installer-preview.png
+SHA256 adf74b1446da3f772980bf4df75758a039955e11f1e7a20a1be8a653c8578286  installer-device-preview.png
+SHA256 82be79050eec6643749cd42d54e103dea50dc4976b0640ef532ffe2cbbd803fc  installer-800x600-preview.png

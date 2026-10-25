@@ -1,0 +1,146 @@
+Module: rtl8125.evidence.m03_finish
+Purpose: Separate complete M03 source implementation from pending physical qualification.
+Created: 2026-10-24
+
+M03 SOURCE IMPLEMENTATION: 100%.
+This supersedes the incomplete source inventory in m03-summary.txt. Testing is
+separate from implementation credit, as the user explicitly required. Original
+physical-card acceptance requirements are preserved; no physical evidence is
+claimed. M07 interrupt and M08 recovery orchestration remain separate code work.
+
+Implemented source:
+  src/hardware/registers.*: existing exclusive sticky-error register sessions
+  now also own bounded native PCI configuration and exact CSI command encoding,
+  including actual PCI function, completion polarity, delays and byte enables.
+  Native extended config rejection falls back to CSI for the 0x70f ASPM latency
+  byte, preserving other bytes. All operations retain finite count/time budgets.
+
+  src/hardware/phy.*: complete pinned RTL8125A PHY sequence added alongside B:
+  all paged masks, the two B87 parameter pairs, exact fifteen coefficient values
+  followed by twenty-five zero writes, A43 parameters, exact firmware placement,
+  bounded firmware-reset polling, post-firmware A tuning, 10M GPHY, ALDPS and
+  A EEE tuning. Existing B tuning and both EPHY tables remain source-exact.
+
+  src/hardware/device.*: complete callable A/B device services added. They check
+  the exact PCI identity, traverse the PCIe capability list with cycle/length
+  bounds, disable PCIe ASPM/CLKREQ with readback, set/read back 4096-byte MRRS,
+  program initial A/B RxConfig, mask/ack IRQs and commit posted writes, perform
+  RXDV gating, A/B FIFO readiness (including B StopReq/IntrMitigate), OOB exit,
+  link-list FIFO setup and bounded MAC reset. The backup/current station address
+  is read bytewise, validated as nonzero unicast and programmed in Linux order;
+  no address is invented. The native card reports PHY ID 0x001cc840 via read-only
+  Linux sysfs; the implementation accepts Linux's internal generic 0x001cc800 or
+  B 0x001cc840 identities and requires actual 2.5G capability. PHY resume clears
+  power-down and preserves rtlgen_resume's 20 ms delay before tuning. Tuning is
+  followed by a bounded soft reset and real autonegotiation advertisement.
+
+  The full A/B MAC start configuration ports CPlus policy, EEE idle timer,
+  interrupt coalescing disable, ASPM latency before EPHY, complete common MAC
+  OCP ordering/masks, UPS/L23 handling, exact e614/e63e generation differences,
+  legacy descriptor selection, eb54 pulse, e00e poll, MAC EEE timing tuning and
+  RXDV ungating. Initial implementation deliberately leaves platform/chip ASPM
+  and CLKREQ disabled: NT platform-wide ASPM arbitration is not qualified. Both
+  standard EEE advertisements and pause are disabled; Linux PHY/MAC tuning is
+  retained. Advertised 10/100 modes derive from actual BMSR abilities, 1000 full
+  from extended abilities, and 2500 full from actual Realtek capability. No 5/10G,
+  hardware checksum, TSO, VLAN stripping or jumbo feature is advertised.
+
+  initialize_device leaves initialized=true, running=false, IRQs masked and
+  engines stopped. Explicit activate_device requires two disjoint aligned genuine
+  below 4 GiB ring intervals, writes high halves before low halves, sets the bounded
+  receive maximum_frame_size+FCS+1 (1519) independently of the fixed 2048-byte
+  DMA arena and starts TX/RX with software offload policy. Preconfigured M06
+  directed/broadcast/multicast/promiscuous accepts survive activation; error/runt
+  accepts are cleared. IRQ enable belongs to M07. Caller must already expose/arm the
+  actual DMA owner and qualify IRQ/recovery services. No production Initialize
+  call exists while those prerequisites remain absent.
+
+  LinkState reads double BMSR latch-low status, requires autonegotiation enabled
+  and complete, decodes actual downshift rate from the Linux RTLGEN_SPEED_MASK
+  register and reads actual MAC duplex/link status. A stable final BMSR reread is
+  required. Down/error/incomplete negotiation clears speed/duplex; unsupported
+  5/10G encodings and impossible half duplex at 1000/2500 are rejected.
+
+  src/reactos/hardware_init.*: genuine NT/NDIS bridge implements
+  initialize_hardware, activate_hardware and query_hardware_link. HardwareAccess
+  owns the stable assigned mapping, actual adapter handle and PCI function;
+  FirmwareBlob records the selected immutable version. Wrong IRQL, mismatched
+  firmware identity and concurrent claim reject before access. Native full-init
+  budget is 900000 operations, 9 s delay, 15 s elapsed; every indirect poll is finite.
+  On a started failure, the failed scope releases before a fresh bounded scope
+  masks IRQs, rejects RX, stops engines and locks config. Recovery_required stays
+  set. Containment never certifies DMA retirement or permits buffer release.
+
+Native/API handoff to M05/M06:
+  Header src/reactos/hardware_init.hpp, namespace rtl8125::reactos:
+    HardwareState { hardware::DeviceState device; }
+    initialize_hardware(HardwareAccess&, const FirmwareBlob&, HardwareState&)
+    activate_hardware(HardwareAccess&, HardwareState&, const hardware::RingConfiguration&)
+    query_hardware_link(HardwareAccess&, const HardwareState&, hardware::LinkState&)
+  DeviceState fields version, permanent_address[6], initialized, running,
+  recovery_required. LinkState fields up, speed_mbps, full_duplex,
+  autoneg_complete. The datapath agent accepted and uses this actual state.
+
+Verification, separate from source completion:
+  Host GCC 15.2.0, ASan+UBSan: existing register/firmware/PHY suite 2562 checks;
+  new full A/B device suite 3788 checks; zero failures. New checks include all
+  A coefficient writes in order, exact A/B differences, native/CSI latency paths,
+  real advertised capability policy, station MAC, high-before-low ring bases,
+  every basic PCI/MMIO failure in initialization and activation, sticky errors,
+  independent containment, FIFO/MAC/PHY reset timeouts, PCI cycles, wrong PHY,
+  missing capability, all link rates/down states, invalid DMA ranges/overlap,
+  preconfigured RX filter/MTU preservation across activation and removal. LeakSanitizer stays disabled due process tracing, as documented.
+  GCC 13-win32 genuine matched ReactOS i386 SDK production object/link checks
+  pass with exceptions/RTTI/runtime disabled. Combined kernel PE imports only
+  ndis.sys, hal.dll, ntoskrnl.exe; no C++ runtime DLL.
+  New genuine-SDK user-mode native bridge fixture 32 checks pass under Wine;
+  production initialize/activate/link/containment code runs with mocked imported
+  NT/NDIS and register/PCI model callbacks. Existing DMA/firmware regression 2149
+  checks pass. These are not kernel execution or physical DMA/packet evidence.
+  MSVC 2022, AMD64 native, physical A/B firmware/reset/link behavior unvalidated.
+
+Installed A firmware: format only, never executed against model or hardware.
+  /usr/lib/firmware/rtl_nic/rtl8125a-3.fw.zst decompressed only in owned .build.
+  3456 bytes, 838 instructions, code offset 96; rtl8125a-3_0.0.1 08/24/19 validates.
+  Compressed SHA256 a4bc3e1bd2a2e4f14bf9c15fc27987ed8c1ef5ff97980ff6705365a514545b31
+  File SHA256 3f6c328af0ceff5969c729edf0f535e8bb2a9b9e05d15b6be3199a3e6d421b99
+  Existing m03-firmware-terms.txt applies. No firmware is distributed.
+
+Reproduction:
+  cmake -S . -B Binaries/.build/m03-finish-host -DRTL8125_SANITIZERS=ON -DCMAKE_BUILD_TYPE=Debug
+  cmake --build Binaries/.build/m03-finish-host --target rtl8125_hardware_tests rtl8125_hardware_device_tests rtl8125_firmware_check -j2
+  ASAN_OPTIONS=detect_leaks=0 Binaries/.build/m03-finish-host/rtl8125_hardware_tests
+  ASAN_OPTIONS=detect_leaks=0 Binaries/.build/m03-finish-host/rtl8125_hardware_device_tests
+  cmake -S . -B Binaries/.build/m03-finish-native -DRTL8125_TESTS=OFF -DRTL8125_NATIVE_DRIVER=ON -DRTL8125_REACTOS_SOURCE=/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/src -DRTL8125_REACTOS_BUILD=/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release
+  cmake --build Binaries/.build/m03-finish-native --target rtl8125_native_hardware_contract_tests rtl8125_native_dma_contract_tests rtl8125_native_hardware_link_check -j2
+  WINEPREFIX=$PROJECT/Binaries/.build/m01-wine WINEDEBUG=-all DISPLAY= wine Binaries/.build/m03-finish-native/hardware-native/hardware_contract_tests.exe
+  WINEPREFIX=$PROJECT/Binaries/.build/m01-wine WINEDEBUG=-all DISPLAY= wine Binaries/.build/m03-finish-native/hardware-native/dma_contract_tests.exe
+  PROJECT means the absolute project path; coordinate shared prefix use first.
+
+Original gates: serialized access and firmware source/evidence stay complete;
+full A/B MAC/PHY source gate now complete; actual selected-card 10/100/1000/2500
+transitions and platform qualification remain unverified. Only the active host
+RTL8125 exists; it was never detached, reset, written or assigned to a VM.
+Paravirtualized networking does not validate these RTL8125 hardware sequences.
+
+Final integration review correction:
+  Root found that initial activation overwrote M06's RX filter and MTU register.
+  The final source preserves low 4 accepts, clears error/runt accepts and sets
+  RxMaxSize 1519 from shared frame/FCS policy. Fixed DMA arena 2048 validation is
+  separate. Both A/B model and genuine-SDK bridge regressions cover this fix.
+  Shared frame_limits.hpp now owns 256 descriptors, 2048-byte DMA buffers and the
+  16-byte legacy descriptor size; dma.hpp keeps its established public aliases.
+  Wrong/changed PCI identity now rejects before state can request containment,
+  so unknown hardware receives neither initialization nor cleanup writes.
+  Final totals: 6350 host M03 checks (2562+3788), 32 native bridge checks and 2149
+  native DMA/firmware regression checks. Physical hardware validation stays 0%.
+
+Native timing review correction:
+  The actual ReactOS NdisMSleep implementation in drivers/network/ndis/ndis/
+  miniport.c always sets a kernel timer and waits. It would round each Linux
+  1/10/25/100-us indirect poll to a scheduler tick. Final HardwareAccess delay
+  uses KeStallExecutionProcessor only for waits up to 100 us, in bounded chunks of
+  at most 50 us; larger waits remain passive NdisMSleep. The genuine-SDK bridge
+  checks both paths and each stall bound. The existing DMA fixture gained only
+  the required mocked HAL import, with root approval. Final native bridge 32 and
+  DMA/firmware 2149 checks pass. Kernel imports remain NDIS/HAL/NT only.

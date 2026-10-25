@@ -1,0 +1,150 @@
+Module: rtl8125.provenance
+Purpose: Record unchanged references and Linux-derived authored operations.
+Created: 2026-10-24
+Architecture: source_manifest.json pins bytes; this file explains the derivation.
+
+Linux source reference
+  Repository: https://github.com/torvalds/linux
+  Tag: v6.12
+  Commit: adc218676eef25575469234709c2d87185ca223a
+  Annotated tag: 06090c9b622a7e1f797e775db4c035e0d779b76e
+  Chosen as a reproducible baseline with RTL8125A/B paths, not a latest-kernel claim.
+  Downloaded unchanged using the tag; GitHub's tag API resolves it to the commit.
+  SHA-256 inventories identify the imported bytes; no signature verification claim.
+
+Unchanged source under third_party/linux
+  r8169_main.c        drivers/net/ethernet/realtek/r8169_main.c
+  r8169.h             drivers/net/ethernet/realtek/r8169.h
+  r8169_phy_config.c  drivers/net/ethernet/realtek/r8169_phy_config.c
+  r8169_firmware.c    drivers/net/ethernet/realtek/r8169_firmware.c
+  r8169_firmware.h    drivers/net/ethernet/realtek/r8169_firmware.h
+  realtek_phy.c       drivers/net/phy/realtek.c (local filename disambiguates the layer)
+  GPL-2.0.txt         LICENSES/preferred/GPL-2.0
+
+The r8169 files carry GPL-2.0-only. They retain the copyright notices of
+ShuChen (2002), Francois Romieu (2003-2007), and other upstream contributors.
+realtek_phy.c carries GPL-2.0+ and the Freescale Semiconductor (2004) notice;
+its named author is Johnson Leung. Its original notices remain intact.
+The authored Linux-derived C++ core is distributed under GPL-2.0-only.
+The included GPL text contains the upstream SPDX usage preamble and full license.
+No proprietary Realtek driver source or firmware binaries are imported.
+
+Authored adaptation map
+  src/core/chip.cpp
+    Linux rtl_init_one TxConfig/XID extraction and rtl8169_get_mac_version's
+    RTL_GIGA_MAC_VER_61 (0x609) and RTL_GIGA_MAC_VER_63 (0x641) table entries.
+    The A/B firmware names come from rtl_chip_infos and FIRMWARE_8125* macros.
+    All other MAC families remain outside this port's initial support scope.
+  src/core/descriptor.hpp and descriptor.cpp
+    Linux TxDesc/RxDesc legacy 16-byte layout and rtl_desc_bit flags,
+    rtl8169_start_xmit single-fragment FS/LS/EOR formatting and rtl_rx
+    OWN/error/fragment/length/FCS semantics. Explicit bounds checks and
+    allocation-free byte encoding replace kernel structs and pointer casts.
+    OWN publication, DMA barriers, actual rings and RTL8125 packet padding
+    are NOT ported by these offline value helpers.
+  tests/core_tests.cpp
+    Golden wire/XID vectors based on the pinned layout, plus authored malformed
+    range and length checks. These are CPU-only tests and make no hardware claim.
+
+Requested document imports (unchanged snapshots)
+  Source project: Add XTX 7900 drivers to ReactOS
+  Source root: /home/x/Documents/Codex/2026-10-21/he/outputs/rx7900-reactos
+  STYLE_GUIDE.md -> docs/imported/rx7900/STYLE_GUIDE.md
+  ARCHITECTURE.md -> docs/imported/rx7900/ARCHITECTURE.md
+  SHA-256 and capture date are recorded in evidence/source_manifest.json.
+  Active root documents adapt conventions only. Radeon implementation status
+  and physical-GPU architecture are not attributed to this network driver.
+
+ReactOS reference inspection (no runtime source copied)
+  Local reference: /home/x/Documents/Codex/2026-10-21/he/work/reactos
+  HEAD at inspection: a97c8a2cdcf6a9a7f5cc543951a02ccb7a80d8ca
+  Inspected working-tree bytes are hashed separately because this is a shared,
+  potentially modified checkout; HEAD does not certify every file is pristine.
+  drivers/network/dd/e1000/ndis.c and hardware.c: native miniport/resource example.
+  drivers/network/ndis/ndis/io.c: DMA adapter setup and line-interrupt registration.
+  drivers/network/ndis/ndis/memory.c: common-buffer lifetime and PASSIVE allocation.
+  sdk/include/ddk/ndis.h: target NDIS declarations.
+
+M01/M02 native foundation added 2026-10-24
+  src/core/frame_limits.hpp owns the shared Ethernet size policy, extracted from
+  the existing descriptor contract without changing its behavior.
+  src/core/oid.hpp/.cpp and src/reactos/miniport.cpp use real NDIS declarations
+  for callback/OID ABI and authored checked buffer/state handling.
+  src/core/resources.hpp/.cpp and src/reactos/resources.hpp/.cpp adapt the
+  first-memory-BAR selection, TxConfig/XID probe and ChipCmd posted-write flush
+  policy from Linux rtl_init_one/rtl_pci_commit. NT resource decoding, native
+  resource ownership and failure cleanup are authored integration code.
+  Existing SDK declarations/import libraries are consumed read-only, not copied
+  into authored sources or replaced with synthetic headers.
+  evidence/integration-manifest.json records critical matching native SDK inputs,
+  production/test source hashes and the published probe hash. The native source
+  copy is ros-build-release-i386-smp-private/src with generated SDK in its sibling
+  build-release; it has no .git directory. Its ndis.h matches the original audit
+  checkout hash, but no pristine-whole-tree or current-HEAD claim is made.
+  The two real-SDK user-mode fixture executables bind imported NDIS/NT functions
+  to local C++ mocks. They verify production object contracts and never invoke
+  physical devices or constitute ReactOS guest/kernel execution.
+
+M01 genuine guest evidence and validation tools added 2026-10-24
+  Production driver-object extension ownership and NDIS wrapper unload follow
+  the real NT/NDIS ABI. tests/miniport_guest_kernel.cpp compiles the unchanged
+  production callbacks with a renamed entry point and uses genuine OS imports.
+  Its anonymous control device exists only in the fixture to support the guest
+  SCM unload policy; it is not a production network device or legacy flag hack.
+  src/core/probe_log.* and src/tools/probe_collect.cpp parse bounded diagnostics;
+  their output never certifies physical execution from a text record alone.
+  src/tools/vfio_check.cpp performs authored read-only Linux sysfs/device-node
+  checks. It does not bind, detach, reset or start a VM. The physical validation
+  INF matches PCI VEN_10EC/DEV_8125 only; its CD is probe-only and non-bootable.
+
+M03/M04 callable implementation added 2026-10-24
+  src/hardware/registers.* adapts Linux MAC/PHY OCP, EPHY, ERI, paged MDIO and
+  MAC MCU transactions from r8169_main.c with explicit errors, exclusive sequence
+  ownership and operation/delay/time bounds.
+  src/hardware/firmware.* adapts r8169_firmware.c formats, opcodes and control
+  flow; malformed input, overlapping headers and unbounded execution are refused.
+  src/hardware/phy.* adapts the exact RTL8125A/B EPHY entries and RTL8125B PHY
+  tuning sub-sequences from r8169_main.c and r8169_phy_config.c. Full A/B MAC,
+  out-of-band, PCI ASPM, A-PHY and autonegotiation integration remain incomplete.
+  src/reactos/hardware_init.* provides authored native exclusive I/O callbacks
+  and fixed-name PASSIVE_LEVEL NT firmware file acquisition.
+  src/reactos/dma.* adapts legacy ring layout and OWN ordering from r8169_main.c
+  to real NDIS 32-bit common buffers, native barriers and explicit retirement.
+  No fast scatter/gather mapping is assumed. Reset/bus-master checks and modeled
+  callbacks do not establish physical DMA retirement or M08 synchronization.
+  All modules remain callable but unwired to production Initialize. The published
+  probe performs no register writes, firmware execution or DMA setup. Their model
+  and real-SDK mocked-import fixtures are identified separately in evidence.
+  No firmware binary is included. Firmware license terms are separate from the
+  GPL driver source; fixed filenames alone grant no redistribution permission.
+
+Firmware terms verified for M03
+  evidence/m03-firmware-terms.txt records the installed linux-firmware-realtek
+  copyright file hash and upstream WHENCE tag 20250211 reference. The r8169
+  firmware notice identifies Realtek Semiconductor Corporation 2011-2013 and
+  permits distribution in hexadecimal/equivalent form with its copyright notice.
+  Any future firmware package must retain that notice separately from driver GPL.
+  The installed RTL8125B blob was read for format validation only, retained in
+  owned intermediate storage and excluded from the validation/source archives.
+  src/core/descriptor_bits.hpp shares the existing exact Linux descriptor masks
+  between offline encoders and native rings without host container/DDK conflicts.
+
+Completed M03/M05/M06 source integration, 2026-10-24
+  hardware/device.* adapts pinned A/B OOB, FIFO, reset, PCIe/CSI, MAC setup,
+  ring activation and PHY autoneg/link algorithms. phy.* adds the full A tuning
+  tables and firmware order. ASPM/CLKREQ remain disabled pending NT platform
+  arbitration, and EEE/pause advertisements remain disabled as explicit policy.
+  KeStallExecutionProcessor supplies bounded short udelay semantics; larger waits
+  stay passive. Activation preserves M06 accept filters and the1519-byte RX limit.
+  core/receive.* extracts the prior decoder unchanged; packet.* ports the exact
+  Linux RTL8125 UDP/PTP padding, and filter.* ports multicast CRC/hash ordering.
+  reactos/datapath* and actual miniport callbacks bind those values to copied
+  common buffers, pending TX ownership, synchronous RESOURCES RX and bounded
+  packet service. They retain packets/mappings on unproven retirement and require
+  actual M03 state plus future M07/M08 orchestration. No test-only network driver
+  or private NDIS-wrapper hack replaces the production callback table.
+  NDIS wrapper source inspection found internal RX-lookahead allocation and no
+  ReceiveCompleteHandler call in its RESOURCES path; TCP/IP completion is a no-op
+  in this snapshot. Broader legacy-protocol compatibility remains validation work.
+  Historical M01 and new M05 NIC-less kernel regressions are captured separately;
+  neither is physical DMA/interrupt/network evidence. No external OS source changed.

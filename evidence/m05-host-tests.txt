@@ -1,0 +1,6 @@
+Origin: GCC15.2 ASan/UBSan execution from Binaries/.build/m05-host; process tracing requires ASAN_OPTIONS=detect_leaks=0.
+Command: ASAN_OPTIONS=detect_leaks=0 ctest --test-dir Binaries/.build/m05-host -R 'rtl8125_(packet|core)_boundaries' --verbose
+Observed: RTL8125 core:1555 checks,0 failures.
+Observed:8335 packet/filter checks,0 failures.
+Observed:100% tests passed,0 tests failed out of2.
+Scope: Portable memory/algorithm boundaries only; no kernel/hardware/peer validation.

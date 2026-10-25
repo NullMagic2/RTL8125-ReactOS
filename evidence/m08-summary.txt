@@ -1,0 +1,129 @@
+Module: rtl8125.evidence.m08
+Purpose: Frozen M08 implementation, actual build contracts and independent validation limits.
+Created: 2026-10-24
+Architecture: Recovery owns whole-adapter lifecycle; M04 owns hardware DMA retirement.
+
+SOURCE IMPLEMENTATION: 100% within the published A/B, MTU1500, copied DMA,
+serialized NDIS5.1 scope. Testing/guest/physical qualification is separate.
+
+Production integration
+- Actual MiniportCheckForHang detects a five-second TX stall with live link,
+  genuine progress and pending packets; device/IRQ/packet faults also report hang.
+- Actual MiniportReset is bounded at <=DISPATCH, rejects duplicate ownership and
+  power/removal races, assigns a generation and returns PENDING. One persistent
+  system thread performs PASSIVE retirement/reinitialization and completes once.
+- The matching ReactOS wrapper publishes ResetStatus=PENDING after ResetHandler
+  returns; completion checks the genuine SDK block under its real lock, without
+  magic offsets, before reporting completion. The worker retries publication on
+  bounded timed wakes; no timeout fabricates a completion or lifetime proof.
+- AddressingReset is FALSE because desired directed/broadcast/multicast filters,
+  multicast addresses and lookahead are restored before successful completion.
+  Desired filters survive an unsuccessful restart and a later retry.
+- The same joinable system thread services M07 passive PHY/link work and power.
+  No unjoinable NDIS work-item callback tail remains in this driver's link path.
+- Actual power OIDs queue scalar D0..D3 requests. Dx closes/fences/retires owners,
+  then powers down PHY BMCR; actual PCI power is delegated to NDIS/PnP. D0 performs
+  full PHY/firmware/MAC/IRQ/ring/filter reinitialization. Wake is not advertised.
+- Shutdown at high IRQL performs only bounded interrupt/engine containment and
+  retains ownership; it never sleeps, allocates, queues or frees at high IRQL.
+- Production PnP and Halt close admission; Halt joins the actual system-thread
+  object with ObReferenceObjectByHandle(*PsThreadType)/KeWaitForSingleObject.
+  Thread termination completes before firmware, callback storage or image release.
+- The complete CPU fence permanently closes the ordinary packet CAS gate (-1),
+  waits for the current callback, closes actual IRQ scheduling, cancels pending
+  link service, retires M07 tracked IRQ/private DPCs, then visits every active CPU
+  at PASSIVE to follow any prior DISPATCH epilogue. No timer or polling timeout
+  grants permission to free device-accessible buffers.
+- M04 real quiesce/reset/PCI bus-master/drain retirement is the sole hardware DMA
+  proof. DmaOwner survives release/reacquire, preserving the NDIS-owned DMA adapter.
+- Actual FDO and DriverObject references preserve the wrapper logical block, DMA
+  adapter, Adapter and image on failed retirement. Driver-wide unload retries
+  retained owners and releases only after real thread/CPU/DMA retirement.
+- Shutdown registration installed by NdisMSetAttributesEx is deregistered once
+  before every successful Adapter destruction, including failed read-only probes.
+- Default Initialize remains a read-only fail-closed probe. Explicit operational
+  builds use actual BUS_MASTER attributes, NdisMGetDeviceProperty FDO/PDO identity,
+  actual PDO DevicePropertyAddress device/function validation and driver-object
+  extension lookup, then call the real start_recovery orchestration. No caller
+  ready boolean substitutes for assigned IRQ, firmware, hardware, DMA or lifecycle.
+
+Necessary ReactOS target compatibility patchset (ordered, canonical patches/reactos)
+0001-ndis-halt-context.patch:
+  Both Stop/Remove wrapper sites pass MiniportAdapterContext, as required by the
+  actual ABI and existing e1000 miniport. No opaque-layout guessing in our driver.
+0002-ndis-callback-rundown.patch:
+  Real wrapper lifecycle gate/reference protects ordinary request/send/reset,
+  hang KDPC and passive worker callbacks. Work references precede queue publication,
+  including callbacks not entered yet. Close cancels/removes the periodic hang KDPC,
+  visits CPUs to catch a KDPC dequeued before acquiring its reference, then waits
+  the real drain event before Halt. Closed workers cannot re-enter miniport code.
+  Stop timeout returns BUSY; Remove forwards but retains its device/attachment.
+  Start refuses residual wrapper queues/pending packets instead of reusing their
+  previous ownership. Existing unsent protocol queue cleanup is not invented.
+  Async reset completion resumes queued reset work. Shutdown notification removal
+  is null-safe/idempotent and the ordinary shutdown callback joins wrapper rundown.
+0003-ndis-device-power.patch:
+  Real NDIS power IRP bridge uses an I/O work item: D0 restores the lower PCI device
+  before calling the driver's power OID; Dx quiesces the driver before lower power.
+  FDO references span lower completion and work publication. Every allocation,
+  lower failure and OID failure completes/forwards the original IRP exactly once.
+  PendingRequest is atomically reserved; competing requests cannot overwrite each
+  other. Completion uses the exact request and opens admission before callbacks.
+  Initial D0 before the miniport starts forwards without invoking unset callbacks.
+
+These patches modify only owned source mirrors during this session. Shared external
+ReactOS source/build snapshots and boot images were not changed. Rebuild all NDIS
+objects because LOGICAL_ADAPTER has new private fields. A build compatibility ack
+does not prove the running guest actually contains the patchset.
+
+Actual evidence
+- GCC13 i686-w64-mingw32-g++: production C++17 native SYS links against matching real
+  ReactOS headers/generated SDK/import libraries, no mocked imports in the SYS.
+- 85 genuine-SDK recovery checks pass under Wine. The actual recovery object runs
+  concurrent Win32 threads/events through mocked kernel ABI imports; hardware,
+  IRQ, packet owners and CPU affinity facade are explicitly modeled. Covers repeated
+  reset generations, wrapper publication delay, restored filters, power cycles,
+  repeated D0, startup failures, failed reset/retry, removal, join/fence failure,
+  FDO/image retention and invalid IRQL. This is not kernel/hardware evidence.
+- 42 compiled patched-NDIS checks pass under Wine, linking actual lifecycle.c and
+  power.c compiled against real private wrapper headers. Kernel/lower-device APIs
+  are mocked. Covers close admission/reference boundaries, late worker rejection,
+  D0/Dx order, initial D0, allocation/OID/lower failures and exact IRP/FDO ownership.
+- All 21 actual patched NDIS CMake translation units compile with the matched SDK
+  GNU99 flags, fatal implicit-function/pointer-ABI errors; complete owned NDIS SYS
+  links against genuine ntoskrnl/hal imports. Existing upstream C stays in C; driver
+  and test implementation remains C++17. See m08-ndis-compile/link evidence.
+- All three ordered patches apply with --fuzz=0 to a fresh owned baseline mirror;
+  every resulting source matches the separately compiled tree byte-for-byte.
+- Exact baseline/patch/candidate hashes: evidence/m08-patch-manifest.json.
+- Reproducible CMake fixture targets: rtl8125_native_recovery_contract_tests and
+  rtl8125_patched_ndis_contract_tests, with RTL8125_PATCHED_NDIS_SOURCE set to the
+  owned patched drivers/network/ndis directory.
+
+Audited source and proof boundaries
+- Matched ReactOS miniport.c: MiniReset/MiniResetComplete, MiniportHangDpc,
+  MiniDoRequest/MiniRequestComplete, MiniportWorker, Stop/Remove, NdisIPower,
+  NdisMSetAttributesEx and shutdown registration/deregistration.
+- Matched ntoskrnl io/iomgr/iowork.c: IoQueueWorkItem references the device and
+  IopWorkItemCallback dereferences only after WorkerRoutine returns.
+- Matched ntoskrnl ke/dpc.c: KeFlushQueuedDpcs only examines queue depth, so it is
+  insufficient for an already-running KDPC epilogue. Admission close plus actual
+  queued reference drain precedes this driver's/patch's CPU affinity rendezvous.
+- Matched ke/thrdobj.c: KeSetSystemAffinityThread changes affinity under the
+  dispatcher lock; lowering to PASSIVE schedules the thread on its allowed CPU.
+  Running PASSIVE on every fixed active i386 CPU follows its old DISPATCH callback.
+- Matched io/iomgr/driver.c: IopDeleteDriver unmaps DriverSection when the driver
+  object is finally deleted; retained DriverObject/FDO references prevent this
+  final deletion. No pointer-lifetime assumption is substituted for thread/DPC
+  code retirement; explicit references are retained on any unproved retirement.
+- Linux v6.12 pinned r8169_main.c rtl8169_down/up and suspend/resume informed
+  ordering; Linux workqueues/NAPI/PHY ownership are not imported into NT.
+
+Independent validation still required
+- Actual running guest with rebuilt patched NDIS, SMP CPU-rendezvous qualification,
+  OS power IRPs and native DriverEntry/Initialize/Halt/Unload integration.
+- Assigned INTx delivery and hardware DMA drain, reset, link, TX/RX, power/removal
+  cycles on a dedicated RTL8125. No host NIC operation, passthrough, MMIO write,
+  bus-master change, firmware execution or VM was performed by this agent.
+- GNU compile/ABI checks do not prove MSVC runtime or physical support. M09 owns
+  toolchain/package qualification and publication. Existing published probe kept.

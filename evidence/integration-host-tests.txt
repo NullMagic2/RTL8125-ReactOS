@@ -1,0 +1,80 @@
+UpdateCTestConfiguration  from :/home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host/DartConfiguration.tcl
+Test project /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1
+    Start 1: rtl8125_core_boundaries
+
+1: Test command: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host/rtl8125_core_tests
+1: Working Directory: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host
+1: Test timeout computed to be: 10000000
+1: RTL8125 core: 1555 checks, 0 failures
+1/8 Test #1: rtl8125_core_boundaries ..........   Passed    0.00 sec
+test 2
+    Start 2: rtl8125_oid_boundaries
+
+2: Test command: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host/rtl8125_oid_tests
+2: Working Directory: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host
+2: Test timeout computed to be: 10000000
+2: OID boundary checks: 68 passed, 0 failed
+2/8 Test #2: rtl8125_oid_boundaries ...........   Passed    0.00 sec
+test 3
+    Start 3: rtl8125_resource_boundaries
+
+3: Test command: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host/rtl8125_resource_tests
+3: Working Directory: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host
+3: Test timeout computed to be: 10000000
+3: RTL8125 resources: 315 checks, 0 failures
+3/8 Test #3: rtl8125_resource_boundaries ......   Passed    0.00 sec
+test 4
+    Start 4: rtl8125_probe_log_boundaries
+
+4: Test command: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host/rtl8125_probe_log_tests
+4: Working Directory: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host
+4: Test timeout computed to be: 10000000
+4: RTL8125 probe-log parser: 271 checks, 0 failures (synthetic text only)
+4/8 Test #4: rtl8125_probe_log_boundaries .....   Passed    0.00 sec
+test 5
+    Start 5: rtl8125_vfio_readiness
+
+5: Test command: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host/rtl8125_vfio_check_tests
+5: Working Directory: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host
+5: Test timeout computed to be: 10000000
+5: Rejected: VFIO group status could not be read from a character device.
+5: Rejected: VFIO group status could not be read from a character device.
+5: Rejected: cannot open the VFIO group for a read-only status query.
+5: Rejected: cannot open the VFIO group for a read-only status query.
+5: RTL8125 VFIO preflight contracts: 28 checks, 0 failures (no physical group access)
+5/8 Test #5: rtl8125_vfio_readiness ...........   Passed    0.00 sec
+test 6
+    Start 6: rtl8125_hardware_models
+
+6: Test command: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host/rtl8125_hardware_tests
+6: Working Directory: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host
+6: Test timeout computed to be: 10000000
+6: RTL8125 hardware/firmware models: 2562 checks, 0 failures
+6/8 Test #6: rtl8125_hardware_models ..........   Passed    0.01 sec
+test 7
+    Start 7: rtl8125_hardware_device_models
+
+7: Test command: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host/rtl8125_hardware_device_tests
+7: Working Directory: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host
+7: Test timeout computed to be: 10000000
+7: RTL8125 complete hardware models: 3788 checks, 0 failures
+7/8 Test #7: rtl8125_hardware_device_models ...   Passed    0.03 sec
+test 8
+    Start 8: rtl8125_packet_boundaries
+
+8: Test command: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host/rtl8125_packet_tests
+8: Working Directory: /home/x/.codex/.chatgpt-projects/g-p-6ad0a91780508191b66fc2909fc44507/rtl8125-reactos/Binaries/.build/integration-host
+8: Test timeout computed to be: 10000000
+8: 8335 packet/filter checks, 0 failures
+8/8 Test #8: rtl8125_packet_boundaries ........   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Total Test time (real) =   0.07 sec

@@ -1,0 +1,109 @@
+{
+  "module": "rtl8125.evidence.m05_m06_production",
+  "date": "2026-10-24",
+  "scope": "Production packet wiring, genuine-SDK fixtures and actual NIC-less guest lifecycle regression. No physical networking claim.",
+  "files": [
+    {
+      "path": "src/reactos/adapter.hpp",
+      "sha256": "d4cc1ccf491336fa5d184b186c7b8c0f0c4de2e450a16c04eb31e951c840bbc7"
+    },
+    {
+      "path": "src/reactos/miniport.cpp",
+      "sha256": "7da296463a45d815f3b08028001875443e9fcb54beeea4e8ed0c1d60785b2b32"
+    },
+    {
+      "path": "src/reactos/datapath_adapter.cpp",
+      "sha256": "7e4e631f70be807eb1a009b89519459c88eed81921d76fa2e28dd3dace6db854"
+    },
+    {
+      "path": "src/reactos/datapath.hpp",
+      "sha256": "04e324c2dab9a5a6a2f432a07794a7f3184391e461ee51a141b82f391f373ceb"
+    },
+    {
+      "path": "src/reactos/datapath.cpp",
+      "sha256": "5db018b6136e9ed1ead74275f078f9907006722f103e5b7ea5c4269b9b9d0737"
+    },
+    {
+      "path": "src/core/packet.hpp",
+      "sha256": "8a5cf6c885ca8040e1455b3e85bb6a8c36c0e1019d9f822baf41dc429b4ca928"
+    },
+    {
+      "path": "src/core/packet.cpp",
+      "sha256": "a0b84608cd7db43c896592020d4e87176c1ecdb5a903d49e1474efdf1c91a39c"
+    },
+    {
+      "path": "src/core/filter.hpp",
+      "sha256": "eb4a5ccd6e8248dff6f1caaaa0d87479379b4fbd576f7b9260e530d78cdd6a8a"
+    },
+    {
+      "path": "src/core/filter.cpp",
+      "sha256": "c7429bf25cf46eae64bebbea89f617d172cdbcf96f9eed0e54cd388028c04369"
+    },
+    {
+      "path": "src/core/receive.hpp",
+      "sha256": "9c81562e2015425870483efc23e89942595354816344ec180b3e1d6059cf7fec"
+    },
+    {
+      "path": "src/core/receive.cpp",
+      "sha256": "0c9479cafa91af514071b3b155764670fba98cda4c7b8928443f6e1b03a1c1da"
+    },
+    {
+      "path": "tests/miniport_contract_tests.cpp",
+      "sha256": "773c4cd2e23bf13cc3e847b504db31207da2758ede1b39f4ad562f0c26744763"
+    },
+    {
+      "path": "tests/datapath_native_tests.cpp",
+      "sha256": "b4e0d74cb23955b7a52e7304ef07207ba5c69fb8cafdcecaf5738dc2db2d354a"
+    },
+    {
+      "path": "tests/datapath_import_stubs.cpp",
+      "sha256": "5bf9cbd2c6ad2f978ef70b247dae64a979569430c3d08b418faa3c17551cfaf0"
+    },
+    {
+      "path": "tests/miniport_guest_kernel.cpp",
+      "sha256": "e6d2e85fb63c77dcba90aa81dd04023b1b632a78f2ebcf617fbfa76f3f36a7ba"
+    },
+    {
+      "path": "tests/miniport_guest_runner.cpp",
+      "sha256": "f8dccc1fc861d03719ea9cfdf4022543bccab56faecca1e5464d75d484fd84b7"
+    },
+    {
+      "path": "cmake/native.cmake",
+      "sha256": "aa5bd0f87b996a1722341dd0ba8fc8e8aa18618519581506f6158245b807dc79"
+    },
+    {
+      "path": "cmake/datapath.cmake",
+      "sha256": "dec51e37e724ba9a9ce07e4bb780b6b4b815b784cc4fdd636b40673a5775c1ad"
+    },
+    {
+      "path": "Binaries/.build/m05-native/native/rtl8125.sys",
+      "sha256": "79d1046b2981b2aa03f2ff525e635cebc08183f526c2758ba67dbf61d1e50a6d"
+    },
+    {
+      "path": "Binaries/.build/m05-native/native/rtl8125_m01_guest.sys",
+      "sha256": "799666afe38556f8e4faeb5dd6fa908e64bbcb3c83f08cd34be68eb5f0769722"
+    },
+    {
+      "path": "Binaries/.build/m05-native/native/miniport_guest_runner.exe",
+      "sha256": "d734b60dc6cc822e82ce52e01d7ab232a252cc25c412e8934972265654db846a"
+    },
+    {
+      "path": "Binaries/.build/m05-native/native/miniport_contract_tests.exe",
+      "sha256": "ebcf9e665b366a592ccef3db71db3d855966371cbe740f8a321349f83853b44c"
+    },
+    {
+      "path": "Binaries/.build/m05-native/datapath-native/datapath_contract_tests.exe",
+      "sha256": "f426c6d936ac55612a23103520449278e73220aaa8251b371abef82097b242c4"
+    },
+    {
+      "path": "Binaries/.build/m05-guest/production-validation.iso",
+      "sha256": "e12f3fd94a710832a4ebda4db04533a44fb0dcc74786c485f17c9cfe5d367de1"
+    }
+  ],
+  "immutable_guest_base": {
+    "path": "/home/x/Documents/Codex/2026-10-21/he/work/gdi-stack-safe-snapshot.qcow2",
+    "sha256": "8761f26e97807dd6e03bbbfd4b27558f3d5ee0adb4e7fc478f77e038cdc007f4",
+    "expected_previous_sha256": "8761f26e97807dd6e03bbbfd4b27558f3d5ee0adb4e7fc478f77e038cdc007f4",
+    "unchanged": true
+  }
+}

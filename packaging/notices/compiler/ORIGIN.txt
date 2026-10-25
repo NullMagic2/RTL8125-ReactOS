@@ -1,0 +1,20 @@
+Module: rtl8125.package.compiler_runtime_notices
+Purpose: Preserve notices accompanying the statically linked GUI compiler runtimes.
+Created: 2026-10-24
+Architecture: Applies to the user-mode installer, not the freestanding kernel SYS.
+
+The installer is built with i686-w64-mingw32-g++ (GCC) 13-win32 and static
+libstdc++/libgcc/MinGW startup components. It dynamically imports ReactOS Win32
+system DLLs, including msvcrt.dll; no compiler runtime DLL is bundled.
+
+Unchanged notice copies:
+  GCC-copyright.txt: /usr/share/doc/gcc-mingw-w64-base/copyright
+    Includes GCC Runtime Library Exception 3.1 and the distributor's provenance.
+    The distributor's text references its packaging history; actual compiler
+    identity is independently recorded in the build evidence.
+  MinGW-copyright.txt: /usr/share/doc/mingw-w64-i686-dev/copyright
+  GPL-3.txt: /usr/share/common-licenses/GPL-3
+
+The authored installer/driver source remains under the project's GPL-2.0-only
+license. Preserve these accompanying runtime notices when redistributing the
+installer executable. Realtek firmware is separate and is not bundled.

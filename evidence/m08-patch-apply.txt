@@ -1,0 +1,17 @@
+0001-ndis-halt-context.patch exit=0
+patching file drivers/network/ndis/ndis/miniport.c
+
+0002-ndis-callback-rundown.patch exit=0
+patching file drivers/network/ndis/ndis/miniport.c
+patching file drivers/network/ndis/include/miniport.h
+patching file drivers/network/ndis/ndis/protocol.c
+patching file drivers/network/ndis/CMakeLists.txt
+patching file drivers/network/ndis/ndis/lifecycle.c
+
+0003-ndis-device-power.patch exit=0
+patching file drivers/network/ndis/ndis/miniport.c
+patching file drivers/network/ndis/include/miniport.h
+patching file drivers/network/ndis/CMakeLists.txt
+patching file drivers/network/ndis/ndis/power.c
+
+All final patched sources exactly match separately compiled owned source. External source untouched.

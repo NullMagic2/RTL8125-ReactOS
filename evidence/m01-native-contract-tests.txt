@@ -1,0 +1,1 @@
+Native SDK miniport contract checks: 84 passed, 0 failed

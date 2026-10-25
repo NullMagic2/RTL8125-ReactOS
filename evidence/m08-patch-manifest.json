@@ -1,0 +1,25 @@
+{
+  "scope": "M08 ordered ReactOS compatibility patchset; source/build evidence, not guest or hardware validation",
+  "baseline_root": "/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/src/drivers/network/ndis",
+  "baseline_sha256": {
+    "ndis/miniport.c": "1a9c9e66e34e054d592574e3b07702370b2561bdbf9cdb156ed061279963f96b",
+    "include/miniport.h": "bdde2efabe9819330d2f1cdda839df19dea1afc450b6f2c7f67d6ce5da10a354",
+    "ndis/protocol.c": "2c17fe479822bf67c11cd6769fb7c5b40a2202b2042d2c11af3a727e1ab4d108",
+    "CMakeLists.txt": "0d107a1d4e7d545c6b2a66cb34132eb26aaf80aa33493908fd0c430fc0e1478d"
+  },
+  "patches": [
+    {
+      "path": "patches/reactos/0001-ndis-halt-context.patch",
+      "sha256": "642ddcfa7659f739ae2ef37ca3346ee665895fe2f3a139fe484435141113a6e6"
+    },
+    {
+      "path": "patches/reactos/0002-ndis-callback-rundown.patch",
+      "sha256": "5be4f21d94423fa9510d1fac27a1242c27bc34f8482e50c996c7a4f272eec01c"
+    },
+    {
+      "path": "patches/reactos/0003-ndis-device-power.patch",
+      "sha256": "8034ebd474c353dabc622573fdc57aefd1a28ef3a28f0c49b3c5b005c3411c74"
+    }
+  ],
+  "owned_ndis_candidate_sha256": "d71a8f327a2afda106c56031da84cf17da37f10fb9a32cf0311a9baa43bc7cd3"
+}

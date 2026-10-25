@@ -1,0 +1,7 @@
+[100%] Generating installer/RTL8125-Setup.exe
+[100%] Built target rtl8125_setup
+[100%] Generating installer/installer_preview_tests.exe
+[100%] Built target rtl8125_installer_preview_tests
+[ 50%] Building CXX object CMakeFiles/rtl8125_package_check.dir/tests/package_check.cpp.o
+[100%] Linking CXX executable rtl8125_package_check
+[100%] Built target rtl8125_package_check

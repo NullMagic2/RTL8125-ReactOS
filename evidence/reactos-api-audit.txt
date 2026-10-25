@@ -1,0 +1,27 @@
+Module: rtl8125.evidence.reactos_api_audit
+Created: 2026-10-24
+Source HEAD: a97c8a2cdcf6a9a7f5cc543951a02ccb7a80d8ca
+Inspected working-tree files, not asserted pristine; no native code executed.
+Native reference root: /home/x/Documents/Codex/2026-10-21/he/work/reactos
+
+NdisMInitializeScatterGatherDma, io.c:1168-1210:
+  Requires NDIS_ATTRIBUTE_BUS_MASTER. Establishes SystemAdapterObject using
+  IoGetDmaAdapter. ScatterGatherListSize is explicitly a placeholder (1).
+  Initial design uses fixed common buffers and packet copies, not a scatter/gather fast path.
+NdisMAllocateSharedMemory, memory.c:149-191:
+  Requires PASSIVE_LEVEL; implementation bugchecks otherwise. Calls the DMA
+  adapter AllocateCommonBuffer. Caller must establish the DMA adapter first.
+NdisMRegisterInterrupt, io.c:940 onward:
+  Uses HalGetInterruptVector and IoConnectInterrupt for line-interrupt delivery.
+  This inspection supplies no proof of MSI availability or physical INTx routing.
+e1000/ndis.c:
+  Supplies real NDIS 5 lifecycle examples, resources, DMA adapter setup,
+  common-buffer allocation and interrupt registration order.
+  Its incomplete Reset callback is not a behavior to copy into this port.
+
+SHA-256 inventory of inspected files:
+f38aaae6d229a4be17db584b25c0df32bcf813e317291cf483af15a2ed15b7f2  drivers/network/dd/e1000/ndis.c
+237d8ade9c8b8e18258487137b60083fcdee20d83c566a734339b78d1dbacd1e  drivers/network/dd/e1000/hardware.c
+e4059ed7383669de7ce00f777d41407e895ba9f308adb0ede93325e43aaaadc3  drivers/network/ndis/ndis/io.c
+be2efc7eb434b47e304cd4853de839781c6ad99d817103a57e9e2944923335e5  drivers/network/ndis/ndis/memory.c
+076e068af589bb86f5c9b16fda4b69b2f152c72abff9a9fb9df297ee0c0486f2  sdk/include/ddk/ndis.h

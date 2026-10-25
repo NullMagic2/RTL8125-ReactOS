@@ -1,0 +1,91 @@
+Module: rtl8125.evidence.m04
+Purpose: Record completed common-buffer source and separate validation limits.
+Created: 2026-10-24
+
+Source implementation: 100 percent for M04. Physical DMA validation: pending.
+The original 75-percent source summary is retained in m04-initial-summary.txt.
+The user separates testing/qualification from implementation percentages.
+
+Gate 1 source: real NDIS 32-bit DMA setup and checked addresses.
+acquire_dma requires PASSIVE_LEVEL and NDIS_ATTRIBUTE_BUS_MASTER. The actual
+ReactOS NdisMInitializeScatterGatherDma implementation rejects missing bus-master
+attributes; success establishes the actual IoGetDmaAdapter-backed object. The
+placeholder scatter/gather list is never consumed. FALSE selects 32-bit DMA,
+524288 caps the maximum physical mapping, and every complete logical/CPU range
+and pairwise allocation overlap is checked without truncating HighPart. The
+NDIS-owned adapter initialization persists through release/reacquire retries.
+Do not reconstruct DmaOwner while its NDIS wrapper remains alive.
+
+Gate 2 source: fixed uncached common buffers with inverse unwind.
+Separate 256 x 16-byte TX/RX rings and 256 x 2048-byte TX/RX arenas use original
+NDIS virtual/logical addresses, lengths and uncached flags on every free. Rings
+require 256-byte and arenas 64-byte CPU/bus alignment. Every allocation/address
+failure unwinds in reverse order. Bounds are fixed before allocation; no DMA-time
+heap allocation or allocating C++ runtime is used. enable_dma_bus_master validates
+exact PCI identity, Memory Enable, stopped/reset-clear engines and a well-formed
+PCIe endpoint capability with requests drained; writes only the PCI Command word
+and verifies all preserved bits and posted MMIO readback. OWN/base exposure is
+rejected until that explicit PCI contract succeeds. An uncertain PCI enable
+retains buffers and enters controlled retirement rather than trusting its failure.
+
+Gate 3 source: live publication and late completion ownership.
+Placement construction begins aligned volatile live-descriptor lifetimes. Data,
+logical address and options2 precede the memory barrier and final aligned OWN
+store. Completion reads OWN then uses a native barrier and consumes software
+pending once. RX payload copying repeats length/error/segmentation/FCS checks.
+Retirement latches admission closed before the real lifecycle fence callback;
+late OWN publication, completion and payload copying are rejected after failed
+retirement too. No offline descriptor image is cast into DMA memory.
+
+Gate 4 source: full A/B drain plus actual platform retirement boundary.
+The real M08 callback closes packet/restart admission and joins M07 interrupt,
+private KDPC/link work plus recovery/ordinary caller users before hardware I/O.
+retire_dma then invokes the shared hardware::quiesce_device sequence, adapted
+from pinned Linux v6.12 rtl8169_cleanup, rtl_enable_rxdvgate and
+rtl_wait_txrx_fifo_empty. It masks interrupts, rejects RX, gates RXDV and waits
+2 ms; A (MAC61) polls MCU RXTX_EMPTY, B (MAC63) first sets StopReq then polls MCU
+and the 0x0103 IntrMitigate drain indication. TXCFG_EMPTY belongs to older chips
+and is deliberately not substituted. After another 2 ms it resets and polls
+reset/RX/TX-enable clear with bounded waits, then commits posted writes. Exact
+PCI Command-only bus-master disable/readback and bounded PCIe Device Status
+Transactions Pending checks supplement that drain. Transactions Pending covers
+nonposted requests only, so it is never treated as proof of posted DMA drain by
+itself. Missing/malformed capabilities, changed identity, missing device, reset,
+FIFO, fence, readback and timeout failures retain all buffers and packet owners.
+Hardware-drain failures still attempt PCI containment, but do not permit a free.
+Never-exposed failed starts also disable/read back our PCI enable before release.
+All caller HardwareState readiness must be invalidated before the first retirement
+attempt, including a failed attempt. No boolean public clear-exposure API exists.
+
+Verification completed on these sources:
+  Genuine GCC 13-win32 i386 ReactOS SDK DMA/firmware ABI executable:
+  2245 checks, zero failures, under Wine with mocked NDIS/NT/MMIO/PCI imports.
+  Covers all allocation failures, high/range/alignment/overlap rejection,
+  all 256 TX/RX slots, double/late completion, wrong IRQL, missing CPU fence,
+  malformed/cyclic/short PCIe capabilities, pending request delay/timeout,
+  failed PCI enable/readback/flush, failed A/B FIFO/reset with containment,
+  removed device, release/reacquire with one NDIS DMA initialization, exact
+  original allocation freeing, and firmware ownership failures.
+  GCC 15.2 portable complete-hardware model under ASan/UBSan:
+  3826 checks, zero failures. Includes exact A/B quiesce order, each injected
+  quiesce I/O failure, variant-specific FIFO faults, reset and removal rejection.
+  ASAN_OPTIONS=detect_leaks=0 because this environment traces processes.
+  Genuine SDK native hardware bridge regression: 32 checks, zero failures.
+  Historical genuine SDK packet/miniport integration: 1092 checks, zero failures,
+  retaining the real DMA, packet and IRQ code with the explicit historical M08
+  shim. The production -nostdlib .sys link includes actual M08 recovery and CPU
+  fence objects and passes. hardware_io.cpp now owns the unchanged reusable
+  native register bridge, keeping firmware-file imports separate in ABI links.
+  No synthetic OS headers, real hardware, DMA coherency, actual PCIe traffic,
+  peer networking, guest networking, MSVC or AMD64 qualification is claimed.
+
+Reproduction from project root:
+  cmake -S . -B Binaries/.build/m04-finish-native -DRTL8125_TESTS=OFF -DRTL8125_NATIVE_DRIVER=ON -DRTL8125_REACTOS_SOURCE=/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/src -DRTL8125_REACTOS_BUILD=/home/x/Documents/Codex/2026-10-21/he/work/ros-build-release-i386-smp-private/build-release
+  cmake --build Binaries/.build/m04-finish-native --target rtl8125_native_dma_contract_tests rtl8125_native_hardware_contract_tests -j2
+  WINEPREFIX="$PWD/Binaries/.build/m04-finish-wine" WINEDEBUG=-all wine Binaries/.build/m04-finish-native/hardware-native/dma_contract_tests.exe
+  cmake -S . -B Binaries/.build/m04-finish-host -DRTL8125_TESTS=ON -DRTL8125_SANITIZERS=ON -DCMAKE_BUILD_TYPE=Debug
+  cmake --build Binaries/.build/m04-finish-host --target rtl8125_hardware_device_tests -j2
+  ASAN_OPTIONS=detect_leaks=0 Binaries/.build/m04-finish-host/rtl8125_hardware_device_tests
+
+No Linux NIC MMIO writes, reset, detach, rebind, bus-master change or DMA occurred.
+All generated files remain in the owned M04 build/evidence directories.

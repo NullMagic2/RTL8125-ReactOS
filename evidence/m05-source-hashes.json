@@ -1,0 +1,67 @@
+{
+  "module": "rtl8125.evidence.m05_m06_hashes",
+  "date": "2026-10-24",
+  "scope": "Source and owned link-check/ABI artifacts; no operational driver or hardware claim",
+  "files": [
+    {
+      "path": "src/core/packet.hpp",
+      "sha256": "8a5cf6c885ca8040e1455b3e85bb6a8c36c0e1019d9f822baf41dc429b4ca928"
+    },
+    {
+      "path": "src/core/packet.cpp",
+      "sha256": "a0b84608cd7db43c896592020d4e87176c1ecdb5a903d49e1474efdf1c91a39c"
+    },
+    {
+      "path": "src/core/filter.hpp",
+      "sha256": "eb4a5ccd6e8248dff6f1caaaa0d87479379b4fbd576f7b9260e530d78cdd6a8a"
+    },
+    {
+      "path": "src/core/filter.cpp",
+      "sha256": "c7429bf25cf46eae64bebbea89f617d172cdbcf96f9eed0e54cd388028c04369"
+    },
+    {
+      "path": "src/core/receive.hpp",
+      "sha256": "9c81562e2015425870483efc23e89942595354816344ec180b3e1d6059cf7fec"
+    },
+    {
+      "path": "src/core/receive.cpp",
+      "sha256": "0c9479cafa91af514071b3b155764670fba98cda4c7b8928443f6e1b03a1c1da"
+    },
+    {
+      "path": "src/core/descriptor.hpp",
+      "sha256": "e09d0d301eb59eab7ec89433d3123e67568ac227544adfeb66e5b3f3ad3eef99"
+    },
+    {
+      "path": "src/core/descriptor.cpp",
+      "sha256": "c1f9fdc6e99660eac1faee8784f8ac2b45ac905aacad22fdf1b29ce27154fd0e"
+    },
+    {
+      "path": "src/reactos/datapath.hpp",
+      "sha256": "04e324c2dab9a5a6a2f432a07794a7f3184391e461ee51a141b82f391f373ceb"
+    },
+    {
+      "path": "src/reactos/datapath.cpp",
+      "sha256": "5db018b6136e9ed1ead74275f078f9907006722f103e5b7ea5c4269b9b9d0737"
+    },
+    {
+      "path": "tests/packet_tests.cpp",
+      "sha256": "e9c5ef6fd81659fc6798636cda6c131e1605fe8e3b2d61c46470d51fe944f546"
+    },
+    {
+      "path": "tests/datapath_native_tests.cpp",
+      "sha256": "4bc4c2f07a2830c3af1f8b8c7f2f6af4e99e765844688d75bb9de1be70268bcc"
+    },
+    {
+      "path": "cmake/datapath.cmake",
+      "sha256": "ba3493064f02f760d85503f87ea9d0d2ade8e19aea1651d8efa581873f2a7690"
+    },
+    {
+      "path": "Binaries/.build/m05-native/datapath-native/datapath_contract_tests.exe",
+      "sha256": "ba0ab91923810ed6def80d2b13b632b8774b48f99b5ffb4264879b5ae131a81e"
+    },
+    {
+      "path": "Binaries/.build/m05-native/datapath-native/rtl8125-datapath-link.sys",
+      "sha256": "8d7fd2f2bc44589814bd0a5653145bb9fb629dd116767e5c8e5de9818a30fd7e"
+    }
+  ]
+}

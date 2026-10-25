@@ -1,0 +1,17 @@
+Module: rtl8125.evidence.m02_portable_tests
+Purpose: Record production PCI/assigned-resource/MMIO value boundary verification.
+Created: 2026-10-24
+Architecture: Host-only immutable byte snapshots; no OS/hardware access.
+
+Command:
+g++ -std=c++17 -Wall -Wextra -Wpedantic -Werror -fno-exceptions -fno-rtti -fsanitize=address,undefined -fno-omit-frame-pointer -Isrc/core tests/resources_tests.cpp src/core/resources.cpp -o Binaries/.build/m02-host/resources_tests
+ASAN_OPTIONS=detect_leaks=0 Binaries/.build/m02-host/resources_tests
+
+RTL8125 resources: 308 checks, 0 failures
+Exit status: 0
+Leak detection disabled because process tracing prevents LeakSanitizer; ASan and
+UBSan remain enabled. Production parser exercised with native 16-byte i386 and
+20-byte AMD64 CM descriptors, every truncated config/list, count overflow,
+64-bit BARs/affinity, type/flags/duplicate/missing-resource failures, exact minimum
+0x604c aperture, physical interval overflow, unaligned and wrapping MMIO offsets.
+The native SDK static assertions bind byte offsets/stride to actual SDK structs.

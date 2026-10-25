@@ -1,0 +1,97 @@
+Module: rtl8125.evidence.m05_m06_production
+Purpose: Close the actual production callback and ownership integration gap.
+Created: 2026-10-24 (America/Sao_Paulo)
+Architecture: Real source implementation and validation are separate quantities.
+
+Source implementation result: M05 100%, M06 100% for their enumerated packet
+responsibilities. The prior missing fourth source unit, production integration,
+is now implemented. Original peer/physical acceptance gate4 is validation-only
+and remains pending; it does not reduce implementation completion.
+
+Production code, not a parallel test driver:
+- Adapter owns HardwareState/HardwareAccess, DmaOwner, Datapath, actual acquired
+  station identity, measured PHY link state and the prerequisite callback contract.
+- prepare_packet_path uses actual initialized/stopped/non-recovery M03 state and
+  matching resource/MAC version. It refuses absent IRQ/recovery callbacks and
+  real interrupt readiness before allocation. BUS_MASTER attributes belong to
+  the prerequisite initializer before DMA setup, as the DmaOwner API requires.
+- activate_packet_path arms the single owned RX ring and invokes the real platform
+  activation boundary. Admission opens only after actual HardwareState is running,
+  initialized and not recovery-required. Partial startup invokes safe retirement;
+  no caller can turn the production probe into an active adapter by a fake bool.
+- Actual registered MiniportSend dispatches to send_packet only for a running,
+  qualified adapter and an actual reported connected PHY. PENDING means exactly
+  one later completion through NdisMSendComplete. All earlier packet behavior,
+  buffer-chain bounds, Linux UDP/PTP padding and doorbell rules are retained.
+- Actual production query/set callbacks dispatch current filter, multicast list,
+  maximum list, permanent/current MAC and bounded active filter programming to
+  the adapter's Datapath. General statistics read real component counters using
+  the existing64/32 reply contract. Hardware status, space, MAC options and link
+  speed reflect owned state; missing setup stays disconnected with no invented MAC.
+- DriverEntry registers the real bounded HandleInterrupt callback. After an actual
+  M07 ISR acknowledges and schedules it, each call services at most64 TX and64 RX
+  completions. A saturated budget invokes the prerequisite's deferred scheduler.
+  This does not register an interrupt or pretend an ISR/M07 scheduler exists.
+- Actual Halt closes admission, uses the external CPU retirement fence and existing
+  DMA reset/PCI-readback guards, then aborts pending packets once, frees pools/common
+  buffers and releases the mapping/adapter. Failure retains all live ownership and
+  mapping; late DPC/Send cannot restart it. M08 still owns actual asynchronous fence,
+  full recovery and driver-wide unload qualification. A timeout is never free proof.
+- Actual PnP removal/stopped and shutdown callbacks close admission without unsafe
+  hardware access at callback IRQL. Full hardware power/shutdown recovery stays M08.
+- stop_packet_path is idempotent and retryable after a real fence/retirement failure.
+  A real DMA reset invalidates cached M03 setup and requires fresh initialization.
+- report_packet_link consumes actual M03 LinkState. Unknown speeds or unfinished
+  autonegotiation cannot overwrite the last valid measured link; no link is invented.
+
+Fail-closed production policy remains:
+Initialize performs only its original read-only resource/XID probe, with zero
+BUS_MASTER attributes, no DMA allocation, no register writes and no packet setup.
+It returns NOT_SUPPORTED until missing independent IRQ/recovery prerequisites are
+implemented and supplied by the actual initializer. The M03 initialized device
+API leaves engines/IRQs stopped; the guarded packet activation boundary requires
+genuine ring activation and IRQ/fence orchestration. No live adapter is created
+by this work, and no host hardware was accessed or changed.
+
+Build integration:
+cmake/native.cmake compiles packet/filter/receive/DMA/datapath/datapath_adapter
+objects directly into the actual published-driver target. hardware.cmake reuses
+that DMA object; datapath.cmake reuses all production packet objects. No duplicate
+packet driver/implementation or alternate callback table is used by the new tests.
+The historical probe-only callback fixture uses clearly labelled fail-closed OS
+import stubs for now-linked but inactive packet APIs; the expanded packet fixture
+executes the real production modules and actual registered callback table.
+
+Completed verification (testing does not lower source implementation percentage):
+- New expanded genuine-SDK modeled packet fixture:1088 checks,0 failures, including
+  225 production-integration checks beyond the prior863 packet checks.
+- Historical genuine-SDK production callback fixture:199 checks,0 failures.
+- Portable packet/filter suite remains8335 ASan/UBSan checks; its source is unchanged.
+- GCC13 i386 real matching SDK builds actual .sys, both fixtures and guest harness.
+  Actual .sys PE imports only ndis.sys,hal.dll,ntoskrnl.exe; no C++ runtime imports.
+- New NIC-less genuine ReactOS run with these production packet objects linked:
+  two production NDIS registrations SUCCESS, two35-check kernel lifecycle cycles,
+  two wrapper unloads, two successful service stops, runner end-failures0.
+  Owned VM was quit via QMP and its process exited0. Base image hash is unchanged.
+  This reruns the unchanged labelled M01 kernel fixture against new production
+  objects: it proves registration/empty-adapter lifecycle, not active networking,
+  natural hardware PnP initialization, physical DMA or real interrupt behavior.
+- Every OS/hardware import in the1088-check fixture is mocked. Actual callback-table
+  tests cover IRQ prerequisite refusal, actual HardwareState checks, acquired MAC,
+  link gating, real Send routing,64-entry DPC budgets/continuation, filter/list OIDs,
+  production counters, failed activation cleanup, surprise removal, unsafe-Halt
+  retention/retry and exactly-once pending completion.
+
+Independent remaining implementation dependencies:
+M07: real IRQ registration/recognition/acknowledgement, scheduler/continuation.
+M08: actual CPU callback fence, recover/reset/power/shutdown and unload qualification.
+M09: final operational initialization/package binding after those prerequisites.
+Physical/peer qualification and real throughput remain separate validation work.
+No extra M05/M06 source gap is hidden behind the missing hardware test.
+
+Evidence:
+m05-production-build.txt, m05-production-miniport-contracts.txt,
+m05-production-packet-contracts.txt, m05-production-pe.txt,
+m05-production-guest-kernel.txt, m05-production-hashes.json,
+m05-production-guest-launch.txt. Prior first-pass evidence is retained unchanged
+except for a supersession notice in m05-summary.txt/m06-summary.txt.
