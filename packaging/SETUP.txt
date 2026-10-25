@@ -5,6 +5,23 @@ Architecture: The executable configures one selected PCI adapter through real Se
 
 RTL8125B setup for ReactOS i386
 
+Standalone development installer (RTL8125B-Setup.exe)
+  Run the single file as administrator in a recoverable trusted ReactOS i386
+  guest. Driver, firmware, licensing notices and the approved compatibility
+  update are embedded. No manager preparation or companion files are needed.
+  Setup verifies the native target and existing component baselines, preserves
+  originals, offers required reboots and resumes from its guest-local copy at
+  administrator sign-in. Removing the original media does not prevent resume.
+  Unknown NDIS builds are not overwritten. A matching physical RTL8125 is still
+  required for driver operation; an absent device is reported and its INF staged.
+  ReactOS ACL stubs cannot protect recovery state from other guest users.
+  Windows/AMD64 runtime support and physical RTL8125 operation are unverified.
+
+Earlier per-device maintenance wizard (RTL8125-Setup.exe)
+  The following instructions apply to the earlier wizard and alpha.1 release,
+  not to the new embedded standalone build.
+
+
 Keep RTL8125-Setup.exe beside rtl8125.sys, rtl8125.inf and this package's other
 files. Open the executable inside an isolated ReactOS i386 guest as an
 administrator. The wizard finds actual PCI VEN_10EC DEV_8125 devices and installs

@@ -1,0 +1,23 @@
+{
+  "module": "imported Qemu-Lightning guest package engine",
+  "capture_date": "2026-10-25",
+  "authored_driver_changes": "CMake packaging and provider metadata only",
+  "sources_sha256": {
+    "COPYING": "dd3ce02338c3a48abb6ba59b48809f7108a8bd242cb0cc8be90daafa30707c28",
+    "Cargo.lock": "33f498d83fc6693bc1a94d38e62ba4c2c3628eb265039bc8be5aa576022e5f7d",
+    "Cargo.toml": "6cd65150fa51b9b46ff82a5fc5a2a158be6ebe4dd43d528764229e6b1a07cb2c",
+    "SCHEMA.txt": "5470fc14e201447c989da56b37fb8b272a28b9e28a9765f3445a11952963c30b",
+    "guest/bundle.cpp": "c10cc922f7990a0384f9be45808bef9a9d4131202e85abbba0347a7f5861e9ca",
+    "guest/bundle.hpp": "8bdca04db603bf18935b690c0c8fc1fe587edeae8921e280962b677614495e9c",
+    "guest/setup.cpp": "4bb0fce05a5dfb0b43e65b867ec99919628a82aaecb6879e3328b5d18e62ed75",
+    "guest/setup.manifest": "0b3c6007ae94aa5c95e14a31aaf20e139ac6227ad1d241d164357b6e5a7c3457",
+    "guest/setup.rc": "032904c7edb72a35fb88b39968827c33b8191e502f889539ee9dbb7c719937bb",
+    "guest/sha256.cpp": "48edfd5a57175f01c66975f9ea64f054aa678f67a49bbc4d4762e66505692864",
+    "guest/sha256.hpp": "01275b2e919f94593d5237cbd45141b12e6740fea365727477bd0875b6d1e473",
+    "notices/gcc-runtime-copyright.txt": "a481f772f7a53335f13b32c6c54eb1c8577ce97704edd3757ab7ed4287a8e96a",
+    "notices/mingw-w64-copyright.txt": "43270e85280a76674fc840781d9863289b1565463d41696dabf61131a87ce710",
+    "src/bundle.rs": "3ea77ed44b1d1e8ef3bdf35ff7a47dbf0b15971a1dac888205ac407f60cff211",
+    "src/lib.rs": "78e6b56aca9a03e67956fde58adbfa393091abe2836190921eb5f4808a85e83c",
+    "src/main.rs": "88890ed6c840bea6c859b00c02aacb6b47dca901feb3d4422a9daf8a116e6285"
+  }
+}

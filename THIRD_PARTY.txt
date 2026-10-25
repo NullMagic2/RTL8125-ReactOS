@@ -148,3 +148,15 @@ Completed M03/M05/M06 source integration, 2026-10-24
   in this snapshot. Broader legacy-protocol compatibility remains validation work.
   Historical M01 and new M05 NIC-less kernel regressions are captured separately;
   neither is physical DMA/interrupt/network evidence. No external OS source changed.
+
+Imported general package engine (standalone installer)
+  third_party/qemu-lightning-guest-packages is an unchanged source snapshot of
+  Qemu-Lightning lightning/guest-packages captured on 2026-10-25. It is shared
+  infrastructure, not a second device-specific backend. Rust host code plans
+  packages; native NT5 C++17 code verifies payloads, installs approved updates
+  and resumes after reboot. Per-file GPL licenses, SHA256 origin and compiler
+  runtime notices are retained. The main driver remains GPL-2.0-only.
+  packaging/standalone/catalog.json declares the approved RTL8125 dependencies.
+  Firmware bytes are included in the release installer and provider snapshot,
+  with the Realtek redistribution notice preserved. No proprietary Realtek
+  driver source is included.

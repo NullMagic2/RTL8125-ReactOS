@@ -59,3 +59,12 @@ Unsupported/remaining qualification
   portable C++17 library compile does not establish either. Preserve exact tool
   versions, compiler commands, PE imports, sources and the operational build
   define with each binary. Guest and physical network tests remain separate.
+
+Standalone offline installer
+  Reuse Qemu-Lightning's generic package engine and an approved catalog containing
+  RTL8125, firmware and NDIS payloads. The complete provider snapshot is retained
+  with the standalone build's corresponding source. No device-specific logic is
+  added to the shared engine. See packaging/standalone/BUILD.txt for the complete
+  source and build instructions.
+  Build target rtl8125_standalone produces one RTL8125B-Setup.exe; this includes
+  prerequisites and does not need the manager's Prepare guest drivers step.

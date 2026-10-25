@@ -3,7 +3,12 @@ Purpose: Supply exact fixed-name firmware acquisition and installation boundarie
 Created: 2026-10-24
 Architecture: Names match core/chip.cpp and the PASSIVE_LEVEL NT loader.
 
-No firmware binary is distributed with this package. Obtain the corresponding
+The standalone RTL8125B-Setup.exe embeds the uncompressed A/B firmware and its
+redistribution notice. It installs these automatically; separate acquisition is
+not needed for that build. The earlier alpha.1 packages omit firmware; the
+following acquisition instructions apply to those and to source-only builds.
+
+Obtain the corresponding
 unmodified files and accompanying Realtek notice from a linux-firmware release:
   https://gitlab.com/kernel-firmware/linux-firmware
 For a pinned reference see release 20250211 and the r8169 notice in its WHENCE:

@@ -1,0 +1,34 @@
+{
+  "target": "ReactOS i386",
+  "single_file_only": true,
+  "sha256": "c3c0c79835e327e6b5f3484d350bfdd25327610c97070a04eed2db7fc5024688",
+  "embedded_prerequisites": [
+    "approved NDIS compatibility image",
+    "RTL8125A/B firmware and notice",
+    "RTL8125 driver/INF",
+    "corresponding driver and NDIS source archives"
+  ],
+  "actual_guest_results": [
+    "EmbeddedBundleVerified",
+    "BootServiceVerified: NDIS",
+    "PreflightVerified files=10 drivers=1",
+    "RebootRequired",
+    "original single-file CD ejected before resume",
+    "RebootVerified",
+    "DriverInfStaged",
+    "DriverWaitingForDevice",
+    "PreparationComplete"
+  ],
+  "negative_checks_passed": [
+    "archive hash mismatch",
+    "parent traversal with valid outer hash",
+    "case-insensitive duplicate path",
+    "u64-max entry length",
+    "reserved DOS component"
+  ],
+  "planner_bundle_tests": 7,
+  "manager_tests_passed": 31,
+  "manager_tests_ignored": 6,
+  "physical_card_tested": false,
+  "amd64_runtime_tested": false
+}

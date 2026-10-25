@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "packages": [
+    {
+      "id": "reactos-ndis",
+      "label": "ReactOS NDIS compatibility",
+      "version": "20261024",
+      "os": "reactos",
+      "arch": "i386",
+      "requires": [],
+      "license": {
+        "source": "notices/GPL-2.0.txt",
+        "sha256": "f6b78c087c3ebdf0f3c13415070dd480a3f35d8fc76f3d02180a407c1c812f79",
+        "destination": "",
+        "previous_sha256": [],
+        "reboot": false
+      },
+      "files": [
+        {
+          "source": "packages/reactos-ndis/20261024/ndis.sys",
+          "sha256": "d71a8f327a2afda106c56031da84cf17da37f10fb9a32cf0311a9baa43bc7cd3",
+          "destination": "system32/drivers/ndis.sys",
+          "previous_sha256": [
+            "acb465093a4ebd945d45ec94eac7d0a875fe05f3bcf16c3a9b97ad7414b05d3b"
+          ],
+          "reboot": true,
+          "boot_service": "NDIS"
+        },
+        {
+          "source": "packages/reactos-ndis/20261024/source.tar.gz",
+          "sha256": "d917502b198a7f1bad44268b3ae1a8e290f049f8367732a42e25caabd0ea220c",
+          "destination": "",
+          "previous_sha256": [],
+          "reboot": false
+        },
+        {
+          "source": "notices/GPL-2.0.txt",
+          "sha256": "f6b78c087c3ebdf0f3c13415070dd480a3f35d8fc76f3d02180a407c1c812f79",
+          "destination": "QemuLightning/Notices/ReactOS-NDIS-GPL-2.0.txt",
+          "previous_sha256": [],
+          "reboot": false
+        }
+      ],
+      "drivers": []
+    },
+    {
+      "id": "realtek-firmware",
+      "label": "Realtek Ethernet firmware",
+      "version": "20261024",
+      "os": "reactos",
+      "arch": "i386",
+      "requires": [],
+      "license": {
+        "source": "notices/Realtek-firmware.txt",
+        "sha256": "f9689ba2640d61e7b4527ad84cbfa6a9f0ec11484e2c9f6b5500197e22c27ecd",
+        "destination": "",
+        "previous_sha256": [],
+        "reboot": false
+      },
+      "files": [
+        {
+          "source": "packages/realtek-firmware/20261024/rtl8125a-3.fw",
+          "sha256": "3f6c328af0ceff5969c729edf0f535e8bb2a9b9e05d15b6be3199a3e6d421b99",
+          "destination": "system32/drivers/rtl_nic/rtl8125a-3.fw",
+          "previous_sha256": [],
+          "reboot": false
+        },
+        {
+          "source": "packages/realtek-firmware/20261024/rtl8125b-2.fw",
+          "sha256": "529bf1c25c97ff52b401090d00ff89cc22351012336e5a0c9662728a3ee909ef",
+          "destination": "system32/drivers/rtl_nic/rtl8125b-2.fw",
+          "previous_sha256": [],
+          "reboot": false
+        },
+        {
+          "source": "notices/Realtek-firmware.txt",
+          "sha256": "f9689ba2640d61e7b4527ad84cbfa6a9f0ec11484e2c9f6b5500197e22c27ecd",
+          "destination": "system32/drivers/rtl_nic/REALTEK-LICENSE.txt",
+          "previous_sha256": [],
+          "reboot": false
+        }
+      ],
+      "drivers": []
+    },
+    {
+      "id": "rtl8125",
+      "label": "RTL8125A/B network driver",
+      "version": "0.1.0-alpha.1",
+      "os": "reactos",
+      "arch": "i386",
+      "requires": [
+        "reactos-ndis",
+        "realtek-firmware"
+      ],
+      "license": {
+        "source": "notices/GPL-2.0.txt",
+        "sha256": "f6b78c087c3ebdf0f3c13415070dd480a3f35d8fc76f3d02180a407c1c812f79",
+        "destination": "",
+        "previous_sha256": [],
+        "reboot": false
+      },
+      "files": [
+        {
+          "source": "packages/rtl8125/0.1.0/rtl8125.sys",
+          "sha256": "6b3797171995598e999e10960ecd57cc24145b7c43dd1826a3edb1ca719ec158",
+          "destination": "system32/drivers/rtl8125.sys",
+          "previous_sha256": [],
+          "reboot": false
+        },
+        {
+          "source": "packages/rtl8125/0.1.0/rtl8125.inf",
+          "sha256": "2b118674d9d8682a1f2983c94ce7b8bf68f161a435da58b08ce9195a2e5ab928",
+          "destination": "",
+          "previous_sha256": [],
+          "reboot": false
+        },
+        {
+          "source": "packages/rtl8125/0.1.0/source.tar.gz",
+          "sha256": "5a9b704e75e0bd93f740be5cd0ec3492e5dafef1d7fcdd31e52325c886de89bb",
+          "destination": "",
+          "previous_sha256": [],
+          "reboot": false
+        },
+        {
+          "source": "notices/GPL-2.0.txt",
+          "sha256": "f6b78c087c3ebdf0f3c13415070dd480a3f35d8fc76f3d02180a407c1c812f79",
+          "destination": "QemuLightning/Notices/RTL8125-GPL-2.0.txt",
+          "previous_sha256": [],
+          "reboot": false
+        }
+      ],
+      "drivers": [
+        {
+          "inf": "packages/rtl8125/0.1.0/rtl8125.inf",
+          "hardware_ids": [
+            "PCI\\VEN_10EC&DEV_8125"
+          ]
+        }
+      ],
+      "required_versions": {
+        "reactos-ndis": "20261024",
+        "realtek-firmware": "20261024"
+      }
+    }
+  ]
+}

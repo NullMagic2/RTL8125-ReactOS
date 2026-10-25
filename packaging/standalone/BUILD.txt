@@ -1,0 +1,56 @@
+Module: rtl8125.package.standalone_build
+Purpose: Reproduce the single-file installer using the shared package engine.
+Created: 2026-10-25
+Architecture: Driver-specific policy is catalog data; engine sources are imported unchanged.
+
+Use the release's complete source archive for its approved-provider directory.
+The Git checkout contains the driver and unchanged general setup source, but
+does not store prebuilt firmware, NDIS or driver payloads in Git. The source
+asset includes those exact release inputs, notices and their source archives.
+Its root README.md is the user's unchanged repository README.
+
+Prerequisites: C++17 MinGW i686 compiler and windres, CMake, Rust/Cargo, and the
+dependencies pinned by the imported engine's Cargo.lock. Linux host commands:
+
+  Set REPO to the absolute extracted source root. Build only under its Binaries.
+
+  cmake -E make_directory "$REPO/Binaries/.build/standalone-engine"
+  cargo build --locked --release \
+    --manifest-path "$REPO/third_party/qemu-lightning-guest-packages/Cargo.toml" \
+    --target-dir "$REPO/Binaries/.build/standalone-engine/host"
+
+  From "$REPO/third_party/qemu-lightning-guest-packages/guest":
+  i686-w64-mingw32-windres -i setup.rc -O coff \
+    -o "$REPO/Binaries/.build/standalone-engine/setup.obj"
+  i686-w64-mingw32-g++ -std=c++17 -O2 -Wall -Wextra -Werror \
+    -Wno-cast-function-type -fno-exceptions -fno-rtti -static -municode -mwindows \
+    -DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0502 \
+    setup.cpp sha256.cpp bundle.cpp \
+    "$REPO/Binaries/.build/standalone-engine/setup.obj" \
+    -lsetupapi -ladvapi32 -lcfgmgr32 -lshell32 -luser32 \
+    -o "$REPO/Binaries/.build/standalone-engine/GuestPackageSetup-i386.exe"
+
+  cmake -S "$REPO" -B "$REPO/Binaries/.build/standalone" \
+    -DRTL8125_TESTS=OFF -DRTL8125_STANDALONE=ON \
+    -DRTL8125_PACKAGE_TOOL="$REPO/Binaries/.build/standalone-engine/host/release/lightning-guest-packages" \
+    -DRTL8125_PACKAGE_BACKEND="$REPO/Binaries/.build/standalone-engine/GuestPackageSetup-i386.exe" \
+    -DRTL8125_PACKAGE_CATALOG="$REPO/approved-provider"
+  cmake --build "$REPO/Binaries/.build/standalone" --target rtl8125_standalone
+
+The result is Binaries/.build/standalone/standalone/RTL8125B-Setup.exe.
+Rebuilding the native backend can change PE timestamps and executable hashes;
+the approved driver, firmware and NDIS identities remain pinned by the catalog.
+The package tool verifies every payload and dependency version before output.
+
+The bundled NDIS source is approved-provider/packages/reactos-ndis/20261024/source.tar.gz;
+the driver source matching the unchanged SYS is under packages/rtl8125/0.1.0.
+Those source archives retain their original build context. The three NDIS patches
+and packaging/REACTOS_COMPATIBILITY.txt explain the compatibility changes. Do not
+approve a different existing OS binary by editing its hash without reviewing it.
+
+To use the release, run only RTL8125B-Setup.exe in a trusted ReactOS i386 system
+as administrator. No manager, companion files or firmware download is needed.
+Required reboots resume at administrator sign-in from guest-local cached data.
+Only the catalog's approved existing OS baselines are eligible for replacement.
+With no real RTL8125, setup stages its INF and reports waiting for hardware.
+Physical network operation and Windows/AMD64 runtime acceptance remain unverified.
