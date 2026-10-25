@@ -2,7 +2,7 @@
 
 Experimental Realtek RTL8125A/B 2.5 GbE drivers and a native installer for ReactOS i386 (NDIS 5.1).
 
-**These drivers are tailor-made for ReactOS. ReactOS’s driver and network stack is not fully compatible with Windows; this package is not a supported Windows driver. The drivers, interfaces, and installation requirements are subject to change.**
+**These drivers are tailor-made for ReactOS and may not be fully compatible with Windows. The drivers, interfaces, and installation requirements are subject to change.**
 
 ## Status
 
